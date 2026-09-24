@@ -517,6 +517,9 @@
         var windowNo = 1;
         var WINDOW_PAGE_SIZE = 50;
         var window_height = 400;
+
+        var menuHeader_Height = 43;
+
         var NULLString = "NULLValue";
         var obscureTypes = { DigitButLast4: "904", DigitButFirstLast4: "944", AlphanumButLast4: "A04", AlphaNumButFirstLast4: "A44" };
 
@@ -669,6 +672,7 @@
             //    value = tabNo;
             //    tabNo = 0;
             //}
+            var ignoreUnparsable = false;
 
             var resultData = [];
 
@@ -703,8 +707,10 @@
 
                 //ctxInfo = ctx.getWindowContext(windowNo, tabNo, token, onlyWindow);	// get context
                 ctxInfo = record[token.toLowerCase()];
+                if (!ctxInfo)
+                    ctxInfo = '';
 
-                if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
+                if ((ctxInfo.length == 0) && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
 
                 
@@ -781,6 +787,22 @@
         function setScreenHeight(height) {
             window_height = height
         };
+
+        function getMenuHeaderHeight() {
+            return menuHeader_Height;
+        }
+
+        function getSideMenuWidth() {
+            var $sm = $('.vis-NewSideMenu-Container');
+            if (!$sm.length || !$sm.is(':visible')) {
+                return 0;                       // no menu → full width
+            }
+            return 54;//fix width
+        }
+
+        function setMenuHeaderHeight(mHeight) {
+            menuHeader_Height = mHeight;
+        }
       
         function getPreference(ctx, AD_Window_ID, context, system) {
             /**************************************************************************
@@ -1023,7 +1045,10 @@
             HIDE_CLIENT_ORG: 3,
             NULLString: NULLString,
             approveCol: "IsApproved",
-            getObscureValue: getObscureValue
+            getObscureValue: getObscureValue,
+            setMenuHeaderHeight: setMenuHeaderHeight,
+            getMenuHeaderHeight: getMenuHeaderHeight,
+            getSideMenuWidth: getSideMenuWidth
         }
     }();
     // ******************** END ENV *********************//

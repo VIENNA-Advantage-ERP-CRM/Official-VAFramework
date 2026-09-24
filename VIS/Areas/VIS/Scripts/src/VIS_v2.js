@@ -4,6 +4,7 @@ import "../F20/wframe.js";
 import "../F20/atabbedpane.js";
 import "../F20/veditview.js";
 import "../F20/vcardview.js";
+import "../F20/vlistview.js";
 import "../F20/vgridview.js";
 import "../F20/vmapview.js";
 import "../F20/aviewcontroller.js";

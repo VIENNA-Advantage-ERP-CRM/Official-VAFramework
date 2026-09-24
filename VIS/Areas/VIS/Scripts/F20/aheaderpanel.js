@@ -99,6 +99,9 @@
                             if (iControl instanceof VIS.Controls.VButton) {
                                 //colValue = mField.getValue();
                                 setValue(colValue, iControl, mField);
+                                // Re-evaluate readonly logic per record (create path only
+                                // computes it once, so navigation must refresh it).
+                                $self.applyButtonReadOnly(iControl, mField);
                             }
 
                             else if (mField.lookup && mField.lookup.gethasImageIdentifier()) {
@@ -378,6 +381,9 @@
                                         var defaultValue = mField.getDefault(VIS.context, this.windowNo);
                                         $self.toolbarButtonList[defaultValue] = iControl;
                                     }
+                                    // Apply per-record readonly logic so header field-buttons
+                                    // honor ReadOnlyLogic/context like the edit view does.
+                                    $self.applyButtonReadOnly(iControl, mField);
                                 } else if (mField.getDisplayType() == VIS.DisplayType.Image) {
                                     if (iControl != null) {
                                         this.imgCtrl.push(iControl);
@@ -607,16 +613,17 @@
             if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
                 return null;
             }
+            //header panel uses popover/dropdown mode only; container AGType is honored in edit view
             var agName = mField.getAGName().replace(' ', '');
             var agIns = null;
             if (agName in this.agGroupToAGInsMap) {
                 agIns = this.agGroupToAGInsMap[agName];
             }
             else {
-                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle(),true);
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle(), true, "P");
                 this.agGroupToAGInsMap[agName] = agIns;
             }
-            agIns.addItem(editor);
+            agIns.addItem(editor, mField);
             return agIns;
         }
 
@@ -1044,7 +1051,8 @@
             this.dynamicStyle.push("flex:1;flex-direction:row;height: " + height + "; ");
         }
         else {
-            this.dynamicStyle.push("flex-direction:column;width: " + width + ";height:calc(100vh - 94px); ");
+            var h = 23 + 28 + VIS.Env.getMenuHeaderHeight() +1;
+            this.dynamicStyle.push("flex-direction:column;width: " + width + ";height:calc(100vh - "+h+"px); ");
         }
         this.dynamicStyle.push("padding:" + padding + ";" + backcolor);
 
@@ -1239,6 +1247,28 @@
         if (Object.keys(this.toolbarButtonList).length > 0 && this.toolbarButtonList[action]) {
             this.toolbarButtonList[action].setReadOnly(!enable);
         }
+    };
+
+    /**
+     * Apply per-record readonly logic to a header field-button.
+     * Mirrors the edit-view rule (aviewcontroller.js dynamicDisplay):
+     *   - Reference-435 toolbar / window-action buttons are skipped; those are
+     *     enabled/disabled programmatically via setEnabled(), not by ReadOnlyLogic.
+     *   - An action button with no ReadOnlyLogic is always enabled.
+     *   - Otherwise honor per-record context (ReadOnlyLogic + tab readonly).
+     * */
+    HeaderPanel.prototype.applyButtonReadOnly = function (iControl, mField) {
+        if (!iControl || !mField)
+            return;
+        // Only real command buttons. A Button field with ColSql renders as a
+        // computed VKeyText label, which must not be toggled here.
+        if (!(iControl instanceof VIS.Controls.VButton))
+            return;
+        if (mField.getAD_Reference_Value_ID() == 435)
+            return;
+        var rw = (mField.getIsAction() && !mField.hasReadonlyLogic())
+            || (mField.getIsEditable(true,false,true) && !this.gTab.getIsReadOnly());
+        iControl.setReadOnly(!rw);
     };
 
     VIS.HeaderPanel = HeaderPanel;

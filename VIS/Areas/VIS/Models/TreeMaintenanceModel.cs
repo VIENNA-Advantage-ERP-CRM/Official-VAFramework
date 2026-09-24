@@ -2141,7 +2141,20 @@ namespace VIS.Models
         public List<string> GetNameByIds(string mids)
         {
             List<string> ids = new List<string>();
-            DataSet ds = DB.ExecuteDataset("SELECT name FROM ad_menu WHERE ad_menu_id IN(" + mids + ") ORDER BY upper(name)");
+            // SECURITY: mids is concatenated into an IN(...) list. Rebuild it from integers only.
+            string safeIds = "";
+            if (!string.IsNullOrEmpty(mids))
+            {
+                foreach (string part in mids.Split(','))
+                {
+                    int v = Util.GetValueOfInt(part);
+                    if (v != 0)
+                        safeIds += (safeIds.Length > 0 ? "," : "") + v;
+                }
+            }
+            if (safeIds.Length == 0)
+                return ids;
+            DataSet ds = DB.ExecuteDataset("SELECT name FROM ad_menu WHERE ad_menu_id IN(" + safeIds + ") ORDER BY upper(name)");
             if (ds != null)
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
@@ -2155,35 +2168,41 @@ namespace VIS.Models
         public int GetSeqNo(string tblName, string treeId, string nodeId)
         {
             int seqNo = 0;
+            // SECURITY: tblName is a SQL identifier; treeId/nodeId are numeric. Validate / coerce.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tblName))
+                return 0;
             if (nodeId != "-1")
             {
-                seqNo = Util.GetValueOfInt(DB.ExecuteScalar("SELECT seqno FROM " + tblName + "  WHERE AD_Tree_ID=" + treeId + " AND node_id=" + nodeId));
+                seqNo = Util.GetValueOfInt(DB.ExecuteScalar("SELECT seqno FROM " + tblName + "  WHERE AD_Tree_ID=" + Util.GetValueOfInt(treeId) + " AND node_id=" + Util.GetValueOfInt(nodeId)));
             }
             else
             {
-                seqNo =  Util.GetValueOfInt(DB.ExecuteScalar("SELECT MAX(seqno) FROM " + tblName + " WHERE AD_Tree_ID=" + treeId));
+                seqNo =  Util.GetValueOfInt(DB.ExecuteScalar("SELECT MAX(seqno) FROM " + tblName + " WHERE AD_Tree_ID=" + Util.GetValueOfInt(treeId)));
             }
             return seqNo;
         }
         public int UpdateSeqNo(string tblName, string seqNo, string treeId,string nodeId,bool bySeqNo,bool isParent)
         {
+            // SECURITY: tblName is a SQL identifier; seqNo/treeId/nodeId are numeric. Validate / coerce.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tblName))
+                return 0;
             var increaseSqe = "";
             if (bySeqNo)
             {
-                increaseSqe = "update " + tblName + " set seqno=seqno+1,Updated=Sysdate,parent_ID=0 where seqno >=" + seqNo +
-                                            " AND (parent_id=0 or parent_id is null)  AND AD_Tree_ID=" + treeId;
+                increaseSqe = "update " + tblName + " set seqno=seqno+1,Updated=Sysdate,parent_ID=0 where seqno >=" + Util.GetValueOfInt(seqNo) +
+                                            " AND (parent_id=0 or parent_id is null)  AND AD_Tree_ID=" + Util.GetValueOfInt(treeId);
             }
             else
             {
                 if (isParent)
                 {
-                    increaseSqe = "update " + tblName + " set seqno=" + seqNo + ",parent_id=0,Updated=Sysdate  where node_id=" + nodeId +
-                                               "   AND AD_Tree_ID=" + treeId;
+                    increaseSqe = "update " + tblName + " set seqno=" + Util.GetValueOfInt(seqNo) + ",parent_id=0,Updated=Sysdate  where node_id=" + Util.GetValueOfInt(nodeId) +
+                                               "   AND AD_Tree_ID=" + Util.GetValueOfInt(treeId);
                 }
                 else
                 {
-                    increaseSqe = "update " + tblName + " set seqno=" + seqNo + " where node_id=" + nodeId +
-                                           " AND (parent_id=0 or parent_id is null) AND AD_Tree_ID=" + treeId;
+                    increaseSqe = "update " + tblName + " set seqno=" + Util.GetValueOfInt(seqNo) + " where node_id=" + Util.GetValueOfInt(nodeId) +
+                                           " AND (parent_id=0 or parent_id is null) AND AD_Tree_ID=" + Util.GetValueOfInt(treeId);
                 }
             }
             return DB.ExecuteQuery(increaseSqe);
@@ -2191,15 +2210,20 @@ namespace VIS.Models
 
         public int GetParentId(string tblName, string treeId, string nodeId)
         {
-                return Util.GetValueOfInt(DB.ExecuteScalar("select parent_ID  from " + tblName + " WHERE NODE_ID=" + nodeId + " AND AD_Tree_ID=" + treeId + " AND IsActive='Y'"));
+                // SECURITY: tblName is a SQL identifier; treeId/nodeId are numeric. Validate / coerce.
+                if (!VIS.Classes.QueryValidator.IsValidIdentifier(tblName))
+                    return 0;
+                return Util.GetValueOfInt(DB.ExecuteScalar("select parent_ID  from " + tblName + " WHERE NODE_ID=" + Util.GetValueOfInt(nodeId) + " AND AD_Tree_ID=" + Util.GetValueOfInt(treeId) + " AND IsActive='Y'"));
         }
 
         public int UpdateSeqNoParentId(string tblName, string pid, string seqNo, string treeId, string nodeId)
         {
-
+            // SECURITY: tblName is a SQL identifier; pid/seqNo/treeId/nodeId are numeric. Validate / coerce.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tblName))
+                return 0;
             var sql = "UPDATE ";
-            sql += tblName + " SET Parent_ID=" + pid + ", SeqNo=" + seqNo + ", Updated=SysDate" +
-                            " WHERE AD_Tree_ID=" + treeId + " AND Node_ID=" + nodeId;
+            sql += tblName + " SET Parent_ID=" + Util.GetValueOfInt(pid) + ", SeqNo=" + Util.GetValueOfInt(seqNo) + ", Updated=SysDate" +
+                            " WHERE AD_Tree_ID=" + Util.GetValueOfInt(treeId) + " AND Node_ID=" + Util.GetValueOfInt(nodeId);
             return DB.ExecuteQuery(sql);
         }
 

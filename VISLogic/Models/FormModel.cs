@@ -82,6 +82,9 @@ namespace VIS.Models
         public List<string> GetZoomTargets(string tableName)
         {
             List<string> zoomTargets = new List<string>();
+            // SECURITY: tableName is concatenated into the SQL below; require a plain identifier.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return zoomTargets;
             string sql = "SELECT DISTINCT t.AD_Table_ID, t.TableName "
               + "FROM AD_Table t "
               + "WHERE EXISTS (SELECT 1 FROM AD_Tab tt "
@@ -118,6 +121,12 @@ namespace VIS.Models
         /// <returns></returns>
         public bool GetZoomIsSOTrx(Ctx ctx, string parentTable, string targetTableName, string targetWhereClause)
         {
+            // SECURITY: parentTable/targetTableName are concatenated as SQL identifiers; targetWhereClause
+            // is screened by the keyword guard (consistent with the framework's other where-clause inputs).
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(parentTable)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(targetTableName)
+                || !VIS.Classes.QueryValidator.IsValid(targetWhereClause))
+                return true;
             string qry = "SELECT p.IsSOTrx FROM " + parentTable + " p, " + targetTableName + " c WHERE " + targetWhereClause
                             + " AND p." + parentTable + "_ID = c." + parentTable + "_ID";
             object ret = DB.ExecuteScalar(qry);
@@ -256,6 +265,10 @@ namespace VIS.Models
         {
             int zoomWindow_ID = 0;
             int PO_zoomWindow_ID = 0;
+            // SECURITY: targetTableName is concatenated as a SQL identifier; targetWhereClause via keyword guard.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(targetTableName)
+                || !VIS.Classes.QueryValidator.IsValid(targetWhereClause))
+                return 0;
             // Find windows where the first tab is based on the table
             string sql = "SELECT DISTINCT AD_Window_ID, PO_Window_ID "
                 + "FROM AD_Table t "
@@ -321,6 +334,10 @@ namespace VIS.Models
         /// <returns>Record list</returns>
         public List<KeyNamePair> GetZoomTargets(Ctx ctx, String targetTableName, int curWindow_ID, String targetWhereClause)
         {
+            // SECURITY: targetTableName is concatenated as a SQL identifier; targetWhereClause via keyword guard.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(targetTableName)
+                || !VIS.Classes.QueryValidator.IsValid(targetWhereClause))
+                return new List<KeyNamePair>();
             #region variables
             //The Option List					
             List<KeyNamePair> zoomList = new List<KeyNamePair>();
@@ -663,6 +680,9 @@ namespace VIS.Models
         public List<string> GetTextButtonQueryResult(Ctx ctx, string Text, int windowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string _columnName,
            string ValidationCode)
         {
+            // SECURITY: _columnName is concatenated as a SQL identifier in the table-reference branches below.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(_columnName))
+                return new List<string>();
             List<JTable> ds = new List<JTable>();
             GridWindowVO vo = AEnv.GetMWindowVO(ctx, windowNo, AD_Window_ID, 0);
 
@@ -1086,6 +1106,12 @@ namespace VIS.Models
             {
                 colName = "Value, LocatorCombination, M_Warehouse_ID, (SELECT Name FROM M_Warehouse WHERE M_Warehouse_ID = M_Locator.M_Warehouse_ID) AS Warehouse";
             }
+            // SECURITY: colName is client-supplied and concatenated into the SELECT list. The "1" sentinel is
+            // mapped to a fixed server expression above; any other value must be a plain column identifier.
+            else if (!VIS.Classes.QueryValidator.IsValidIdentifier(colName))
+            {
+                return new List<JTable>();
+            }
 
             string sql = "SELECT M_Locator_ID," + colName + " FROM M_Locator WHERE IsActive='Y'";
             //JID_0932 In validation of locator need to consider organization  
@@ -1163,6 +1189,9 @@ namespace VIS.Models
 
         public string GetDocWhere(int AD_User_ID, string TableName)
         {
+            // SECURITY: TableName is concatenated as a SQL identifier (and into a literal) below; deny if not one.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(TableName))
+                return "1=2";
             string docAccess = "(EXISTS (SELECT 1 FROM C_BPartner bp INNER JOIN AD_User u "
             + "ON (u.C_BPartner_ID=bp.C_BPartner_ID) "
             + " WHERE u.AD_User_ID="
@@ -1194,6 +1223,9 @@ namespace VIS.Models
 
         public string UpdateTree(List<int> oldParentChildren, List<int> newParentChildren, int oldId, int newId, int AD_Tree_ID, string tableName)
         {
+            // SECURITY: tableName is concatenated as a SQL identifier in the UPDATEs below (ids are int).
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return "";
             string sql;
             for (var i = 0; i < oldParentChildren.Count; i++)
             {
@@ -1349,6 +1381,12 @@ namespace VIS.Models
         /// <returns></returns>
         public string SetFieldsSorting(List<string> columnIDs, List<string> noYes, string tableName, string keyColumnName, string columnSortName, string columnYesNoName, Dictionary<string, string> oldValue)
         {
+            // SECURITY: table/column names are concatenated as SQL identifiers below; column IDs are coerced to int.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(keyColumnName)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(columnSortName)
+                || (columnYesNoName != null && !VIS.Classes.QueryValidator.IsValidIdentifier(columnYesNoName)))
+                return "";
             StringBuilder sql = new StringBuilder();
             int yesCount = 0;
             int tableID = MTable.Get_Table_ID(tableName);
@@ -1365,7 +1403,7 @@ namespace VIS.Models
                     sql.Append("UPDATE " + tableName + " SET " + columnSortName + "=0");
                     if (columnYesNoName != null)
                         sql.Append("," + columnYesNoName + "='N'");
-                    sql.Append(", Updated=SYS_EXTRACT_UTC(SYSTIMESTAMP) ,UpdatedBy=" + _ctx.GetAD_User_ID() + " WHERE " + keyColumnName + "=" + columnIDs[i]);
+                    sql.Append(", Updated=SYS_EXTRACT_UTC(SYSTIMESTAMP) ,UpdatedBy=" + _ctx.GetAD_User_ID() + " WHERE " + keyColumnName + "=" + Util.GetValueOfInt(columnIDs[i]));
                     DB.ExecuteQuery(sql.ToString());
 
                     MChangeLog log = new MChangeLog(_ctx, 0, null, _ctx.GetAD_Session_ID(), tableID, colID, keyColumnName, _ctx.GetAD_Client_ID(),
@@ -1380,7 +1418,7 @@ namespace VIS.Models
                     sql.Append("UPDATE " + tableName + " SET " + columnSortName + "=" + (yesCount + 1) + "0");	//	10 steps
                     if (columnYesNoName != null)
                         sql.Append("," + columnYesNoName + "='Y'");
-                    sql.Append(", Updated=SYS_EXTRACT_UTC(SYSTIMESTAMP) ,UpdatedBy=" + _ctx.GetAD_User_ID() + "  WHERE " + keyColumnName + "=" + columnIDs[i]);
+                    sql.Append(", Updated=SYS_EXTRACT_UTC(SYSTIMESTAMP) ,UpdatedBy=" + _ctx.GetAD_User_ID() + "  WHERE " + keyColumnName + "=" + Util.GetValueOfInt(columnIDs[i]));
                     DB.ExecuteQuery(sql.ToString());
 
                     MChangeLog log = new MChangeLog(_ctx, 0, null, _ctx.GetAD_Session_ID(), tableID, colID, keyColumnName, _ctx.GetAD_Client_ID(),
@@ -1415,7 +1453,7 @@ namespace VIS.Models
                     sql = sql.Append("AD_Org_ID");
                     if (value != null)
                     {
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                     }
                     //if (string.IsNullOrEmpty(value))
                     //    sql = sql.Append(" IS NULL AND ");
@@ -1428,7 +1466,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_SubAccount))
                 {
@@ -1436,7 +1474,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_Product))
                 {
@@ -1444,7 +1482,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_BPartner))
                 {
@@ -1452,7 +1490,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_Campaign))
                 {
@@ -1460,7 +1498,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_LocationFrom))
                 {
@@ -1468,7 +1506,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_LocationTo))
                 {
@@ -1476,7 +1514,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_Project))
                 {
@@ -1484,7 +1522,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_SalesRegion))
                 {
@@ -1492,7 +1530,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_OrgTrx))
                 {
@@ -1500,7 +1538,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_Activity))
                 {
@@ -1508,7 +1546,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserList1))
                 {
@@ -1516,7 +1554,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserList2))
                 {
@@ -1524,7 +1562,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement1))
                 {
@@ -1532,7 +1570,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement2))
                 {
@@ -1540,7 +1578,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement3))
                 {
@@ -1548,7 +1586,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement4))
                 {
@@ -1556,7 +1594,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement5))
                 {
@@ -1564,7 +1602,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement6))
                 {
@@ -1572,7 +1610,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement7))
                 {
@@ -1580,7 +1618,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement8))
                 {
@@ -1588,7 +1626,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 else if (type.Equals(MAcctSchemaElement.ELEMENTTYPE_UserElement9))
                 {
@@ -1596,7 +1634,7 @@ namespace VIS.Models
                     if (string.IsNullOrEmpty(value))
                         sql = sql.Append(" IS NULL AND ");
                     else
-                        sql = sql.Append("=").Append(value).Append(" AND ");
+                        sql = sql.Append("=").Append(Util.GetValueOfInt(value)).Append(" AND ");
                 }
                 //  
                 if (isMandatory && (value == null) && sb != null)
@@ -1681,7 +1719,8 @@ namespace VIS.Models
                 try
                 {
                     // create comma separated string from list of elements provided
-                    string Columns = string.Join(",", string.Join(",", Cols).Replace(" ", "").Split(',').Select(x => string.Format("'{0}'", x)));
+                    // SECURITY: each column name is wrapped in a SQL literal below; escape embedded quotes.
+                    string Columns = string.Join(",", string.Join(",", Cols).Replace(" ", "").Split(',').Select(x => string.Format("'{0}'", x.Replace("'", "''"))));
 
                     string sqlElements = "";
                     string sqlMsgs = "";

@@ -62,7 +62,9 @@ namespace VIS.Controllers
 
             if (id == 0)
             {
-                string sql = "SELECT Count(*) FROM AD_UserQuery WHERE AD_Table_ID=" + tid + " AND AD_Tab_ID=" + tabid + " AND Upper(Name)='" + name.ToUpper() + "'";
+                // SECURITY: name is a client-supplied request value placed inside a SQL string literal;
+                // escape embedded single quotes so it cannot break out and inject SQL (tid/tabid are ints).
+                string sql = "SELECT Count(*) FROM AD_UserQuery WHERE AD_Table_ID=" + tid + " AND AD_Tab_ID=" + tabid + " AND Upper(Name)='" + name.ToUpper().Replace("'", "''") + "'";
                 int count = Convert.ToInt32(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_UserQuery", true, false)));
                 if (count > 0)
                 {

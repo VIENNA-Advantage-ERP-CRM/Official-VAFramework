@@ -621,9 +621,16 @@ namespace VAdvantage.Model
         {
             //	if (newRecord || is_ValueChanged("UserLevel"))
             //	{
+            if ((GetAD_Client_ID() == 0) && (GetUserLevel() == USERLEVEL_System))
+            {
+                Set_Value("IsForNewTenant", false);
+            }
+
             if (GetAD_Client_ID() == 0)
             {
-                SetUserLevel(USERLEVEL_System);
+                // commented code to allow save userlevel other than system
+                // so that user can configure Roles for Initail Tenant Setup and set User Level accordingly
+                //SetUserLevel(USERLEVEL_System);
             }
             else if (GetUserLevel().Trim().Equals(USERLEVEL_System.Trim()))
             {

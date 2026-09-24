@@ -28,6 +28,9 @@ namespace VISLogic.Models
             string TableName = od.TName.Value;
             // Get original table name by removing "_Ver" suffix from the end
             string origTableName = TableName.Substring(0, TableName.Length - 4);
+            // SECURITY: TableName/origTableName come from the client (od.TName) and are concatenated as SQL identifiers and literals; validate as identifiers before building any SQL.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(TableName) || !VIS.Classes.QueryValidator.IsValidIdentifier(origTableName))
+                return data;
             var RecID = od.RID.Value;
             // Get parent table ID
             int AD_Table_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName = '" + origTableName + "'", null, null));
@@ -47,7 +50,8 @@ namespace VISLogic.Models
             StringBuilder sbSQL = new StringBuilder("");
             // check if table has single key
             if (tbl.IsSingleKey())
-                sbSQL.Append(origTableName + "_ID = " + od[(origTableName + "_ID").ToLower()].Value);
+                // SECURITY: key value from client (od) concatenated into SQL; coerce to int (key columns are numeric IDs).
+                sbSQL.Append(origTableName + "_ID = " + Util.GetValueOfInt(od[(origTableName + "_ID").ToLower()].Value));
             else
             {
                 string[] keyCols = tbl.GetKeyColumns();
@@ -56,14 +60,16 @@ namespace VISLogic.Models
                     if (w == 0)
                     {
                         if (keyCols[w] != null)
-                            sbSQL.Append(keyCols[w] + " = " + od[(keyCols[w]).ToLower()]);
+                            // SECURITY: key value from client (od) concatenated into SQL; coerce to int (key columns are numeric IDs).
+                            sbSQL.Append(keyCols[w] + " = " + Util.GetValueOfInt(od[(keyCols[w]).ToLower()]));
                         else
                             sbSQL.Append(" NVL(" + keyCols[w] + ",0) = 0");
                     }
                     else
                     {
                         if (keyCols[w] != null)
-                            sbSQL.Append(" AND " + keyCols[w] + " = " + od[(keyCols[w]).ToLower()]);
+                            // SECURITY: key value from client (od) concatenated into SQL; coerce to int (key columns are numeric IDs).
+                            sbSQL.Append(" AND " + keyCols[w] + " = " + Util.GetValueOfInt(od[(keyCols[w]).ToLower()]));
                         else
                             sbSQL.Append(" AND NVL(" + keyCols[w] + ",0) = 0");
                     }
@@ -228,6 +234,9 @@ namespace VISLogic.Models
         {
             if (rowData != null)
             {
+                // SECURITY: rowData.TableName comes from the client and is concatenated as a SQL identifier and literal; validate as an identifier before building SQL.
+                if (!VIS.Classes.QueryValidator.IsValidIdentifier(rowData.TableName))
+                    return false;
                 MTable tbl = new MTable(ctx, rowData.AD_Table_ID, null);
 
                 StringBuilder sbSql = new StringBuilder("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + rowData.TableName + "_Ver'");
@@ -263,14 +272,16 @@ namespace VISLogic.Models
                                 sbSql.Append(@"SELECT COUNT(" + keyCols[w] + ") FROM " + rowData.TableName + "_Ver WHERE ");
 
                                 if (keyCols[w] != null)
-                                    sbSql.Append(keyCols[w] + " = " + rowData.RowData[keyCols[w].ToLower()]);
+                                    // SECURITY: key value from client (rowData.RowData) concatenated into SQL; coerce to int (key columns are numeric IDs).
+                                    sbSql.Append(keyCols[w] + " = " + Util.GetValueOfInt(rowData.RowData[keyCols[w].ToLower()]));
                                 else
                                     sbSql.Append(" NVL(" + keyCols[w] + ",0) = 0");
                             }
                             else
                             {
                                 if (keyCols[w] != null)
-                                    sbSql.Append(" AND " + keyCols[w] + " = " + rowData.RowData[keyCols[w].ToLower()]);
+                                    // SECURITY: key value from client (rowData.RowData) concatenated into SQL; coerce to int (key columns are numeric IDs).
+                                    sbSql.Append(" AND " + keyCols[w] + " = " + Util.GetValueOfInt(rowData.RowData[keyCols[w].ToLower()]));
                                 else
                                     sbSql.Append(" AND NVL(" + keyCols[w] + ",0) = 0");
                             }
@@ -339,6 +350,9 @@ namespace VISLogic.Models
         /// <returns></returns>
         public string CheckAccessForAction(string columnName, int roleID)
         {
+            // SECURITY: columnName comes from the client and is concatenated as a SQL identifier; validate before building SQL.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(columnName))
+                return "";
             return Util.GetValueOfString(DB.ExecuteScalar("SELECT " + columnName + " FROM AD_ROLE WHERE AD_role_ID=" + roleID));
         }
 
@@ -354,6 +368,9 @@ namespace VISLogic.Models
         {
             var DyObjectsList = new List<dynamic>();
             string[] actions = actionName.Split(';');
+            // SECURITY: actionName comes from the client and each value is placed inside single-quoted SQL literals in IN(...); escape embedded quotes.
+            for (int a = 0; a < actions.Length; a++)
+                actions[a] = actions[a].Replace("'", "''");
             string formattedString = "'" + string.Join("','", actions) + "'";
             string sql = "";
             string action = "";
@@ -412,7 +429,8 @@ namespace VISLogic.Models
         /// <returns>Ad_Form_ID</returns>
         public int GetFormID(string formName)
         {
-            string sql = "SELECT AD_Form_ID FROM AD_Form WHERE IsActive='Y' AND Name = '" + formName + "'";
+            // SECURITY: formName comes from the client and is placed inside a single-quoted SQL literal; escape embedded quotes.
+            string sql = "SELECT AD_Form_ID FROM AD_Form WHERE IsActive='Y' AND Name = '" + formName.Replace("'", "''") + "'";
             int formID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return formID;
         }
@@ -424,7 +442,8 @@ namespace VISLogic.Models
         /// <returns>AD_Process_ID</returns>
         public int GetProcessID(string processName)
         {
-            string sql = "SELECT AD_Process_ID FROM AD_Process WHERE IsActive='Y' AND Value = '" + processName + "'";
+            // SECURITY: processName comes from the client and is placed inside a single-quoted SQL literal; escape embedded quotes.
+            string sql = "SELECT AD_Process_ID FROM AD_Process WHERE IsActive='Y' AND Value = '" + processName.Replace("'", "''") + "'";
             int processID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return processID;
         }

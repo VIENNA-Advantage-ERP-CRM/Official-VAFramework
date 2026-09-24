@@ -417,6 +417,9 @@
                 tabdataPageSize = 10, tabdataPage = 0, tabdataLastPage = 0, tabdatacntpage = 0;
                 /*End Pagging initialize */
 
+
+               
+
                 /* App Layout Adjustment Script START */
                 adjustDivSize();
                 $(window).resize(adjustDivSize);

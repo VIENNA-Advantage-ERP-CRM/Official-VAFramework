@@ -230,7 +230,7 @@ namespace VIS.Controllers
 
                         return RedirectToAction("SignOff", "Account", new
                         {
-                            ctx=ctx,
+                            ctx = ctx,
                             webSessionId = Session.SessionID
                         });
                         //return new AccountController().SignOff(ctx, Session.SessionID);
@@ -244,11 +244,13 @@ namespace VIS.Controllers
                     {
                         var oldctx = Session["ctx"] as Ctx;
                         ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
+                        // Set Session GUID in context to identify get session in other requests.
+                        ctx.SetContext("#AD_Session_GUID", DB.GetRecordGUID("AD_Session", oldctx.GetAD_Session_ID()));
                         ctx.SetSecureKey(oldctx.GetSecureKey());
                         ctx.SetApplicationUrl(oldctx.GetApplicationUrl());
                         Session.Timeout = 17;
                         if (oldctx.GetContext("NewSession") == "Y") // logout previous session if user chnage 
-                            // authorization form auth dialog
+                                                                    // authorization form auth dialog
                         {
                             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx, Session.SessionID);
                             createNew = true;
@@ -292,14 +294,14 @@ namespace VIS.Controllers
                     model.Login2Model.Org = ctx.GetAD_Org_ID().ToString();
                     model.Login2Model.Warehouse = ctx.GetAD_Warehouse_ID().ToString();
                     model.Login2Model.FilteredOrg = ctx.GetContext("#AD_FilteredOrg");
-                    
 
 
-                   
+
+
                     var ClientList = new List<KeyNamePair>();
                     var OrgList = new List<KeyNamePair>();
                     var WareHouseList = new List<KeyNamePair>();
-                   
+
 
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;
@@ -330,6 +332,7 @@ namespace VIS.Controllers
                         ViewBag.Menu = mnuHelper.GetMenuTree(); // create tree
                         Session["barNodes"] = ViewBag.Menu.GetBarNodes(); /* add is session to get it in favourite call */
                         ViewBag.IsMobile = Request.Browser.IsMobileDevice;
+                        Session["screenList"] = mnuHelper.GetScreenList(ViewBag.Menu.GetRootNode().Nodes);
                         if (Request.Browser.IsMobileDevice)
                         {
                             ViewBag.TreeHtml = mnuHelper.GetMobileMenuTreeUI(ViewBag.Menu.GetRootNode(), @Url.Content("~/"));
@@ -367,9 +370,10 @@ namespace VIS.Controllers
                     if (createNew)
                     {
                         //Cretae new Sessin
-
                         MSession sessionNew = MSession.Get(ctx, Session.SessionID, true, Common.GetVisitorIPAddress(Request, true));
                         // sessionNew.SetWebSession(Session.SessionID);
+                        // Set Session GUID in context to identify get session in other requests.
+                        ctx.SetContext("#AD_Session_GUID", DB.GetRecordGUID("AD_Session", sessionNew.GetAD_Session_ID()));
                         ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                         sessionData.UserId = ctx.GetAD_User_ID();
                         sessionData.Name = ctx.GetAD_User_Name();
@@ -382,6 +386,12 @@ namespace VIS.Controllers
 
                     ViewBag.LibSuffix = "_v3";
                     ViewBag.FrameSuffix = "_v2";
+
+
+                    /* get System Layout 
+                     */
+                    ViewBag.PageSection = LoginHelper.GetPageSection(ctx.GetAD_Client_ID());
+
 
 
                     /// VIS0008
@@ -414,9 +424,9 @@ namespace VIS.Controllers
             else
             {
                 /* Read Web config setting */
-                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"]; 
+                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"];
 
-                if(!string.IsNullOrEmpty(loginPageUrl))
+                if (!string.IsNullOrEmpty(loginPageUrl))
                 {
                     ViewBag.LoginPageUrl = loginPageUrl;
                 }
@@ -445,7 +455,13 @@ namespace VIS.Controllers
                             if (Util.GetValueOfBool(tokDetails["Success"]))
                             {
                                 TempData["user"] = tokDetails["User"]; //get uservalue
-                                TempData["pwd"] = SecureEngine.Decrypt(tokDetails["Password"]);//get userpwd
+                                // No password is taken from the token. AD_User.Password is hashed, so the
+                                // stored value cannot be decrypted and replayed through the login form -
+                                // SecureEngine.Decrypt used to throw here, land in the catch below and leave
+                                // the user on a blank login page. A valid AuthToken is itself the credential,
+                                // so mark the attempt pre-authenticated and let the login skip the password
+                                // check (2FA still applies).
+                                TempData["preauth"] = true;
                             }
                         }
                         else
@@ -463,8 +479,19 @@ namespace VIS.Controllers
 
                 if (TempData.ContainsKey("user"))
                 {
-                    model.Login1Model.UserValue = TempData["user"].ToString() + "^Y^" + TempData["pwd"].ToString();
-                    // model.Login1Model.Password = TempData.Peek("pwd").ToString();
+                    // Security: keep the auto-login password server-side. Previously this
+                    // concatenated user^Y^password into UserValue, which rendered the
+                    // cleartext password into the login page HTML (view-source, browser
+                    // cache/history, proxies). Now the password is stored against a
+                    // one-time LoginToken (see LoginTokenStore) and only the username and
+                    // token reach the browser; CommonLogin resolves the password from it.
+                    // preauth: set by the ?token= branch above, where no password exists to carry.
+                    // The ?U=&P= branch still supplies a real password and stays password-verified.
+                    bool preAuth = Util.GetValueOfBool(TempData["preauth"]);
+                    model.Login1Model.UserValue = TempData["user"].ToString();
+                    model.Login1Model.Password = Util.GetValueOfString(TempData["pwd"]);
+                    model.Login1Model.LoginToken = LoginTokenStore.Save(model.Login1Model, preAuth);
+                    model.Login1Model.Password = null;
                 }
 
                 model.Login1Model.LoginLanguage = "en_US";
@@ -964,7 +991,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
-        public JsonResult GetDynamicWidget( int widgetID,int windowNo, int tabID, int tableID)
+        public JsonResult GetDynamicWidget(int widgetID, int windowNo, int tabID, int tableID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
@@ -977,7 +1004,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="AD_UserHomeWidget_ID">AD_UserHomeWidget_ID</param>
         /// <returns>AD_UserHomeWidget_ID and Htmlstyle</returns>
-        public JsonResult GetWidgetID( int userHomeWidgetID)
+        public JsonResult GetWidgetID(int userHomeWidgetID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
@@ -1060,7 +1087,7 @@ namespace VIS.Controllers
             {
                 error = "Session Expired";
             }
-            return Json(new { count = count,error = error }, JsonRequestBehavior.AllowGet);
+            return Json(new { count = count, error = error }, JsonRequestBehavior.AllowGet);
         }
         #endregion
 
@@ -1073,7 +1100,29 @@ namespace VIS.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+
+        [HttpPost]
+        public ActionResult CspReport()
+        {
+            Request.InputStream.Position = 0;
+
+            using (var reader = new StreamReader(Request.InputStream))
+            {
+                string report = reader.ReadToEnd();
+
+                string logPath = Server.MapPath("~/App_Data/csp.log");
+                // AppendAllText does not create missing directories; ensure App_Data exists
+                // (it is not created on a fresh deployment), otherwise the write throws and no log is written.
+                Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+
+                System.IO.File.AppendAllText(
+                    logPath,
+                    DateTime.Now + Environment.NewLine +
+                    report + Environment.NewLine +
+                    "------------------------" + Environment.NewLine);
+            }
+
+            return new HttpStatusCodeResult(204);
+        }
     }
-
-
 }

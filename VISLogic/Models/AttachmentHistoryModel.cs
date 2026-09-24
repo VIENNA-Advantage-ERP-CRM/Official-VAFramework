@@ -34,6 +34,8 @@ namespace VIS.Models
         /// <returns></returns>
         public int LoadRecordDataCount(Ctx ctx, string searchText, int _AD_Table_ID, int _Record_ID)
         {
+            // SECURITY: searchText is client-controlled and embedded in single-quoted SQL literals; escape single quotes
+            if (searchText != null) { searchText = searchText.Replace("'", "''"); }
             string strAppCount = "SELECT count(*) FROM " +
                        "(( SELECT ai.AppointmentsInfo_ID AS ID, ai.record_ID, ai.created,'" + Msg.GetMsg(ctx, "Appointment") + "' AS TYPE, subject  FROM AppointmentsInfo ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_Id =" + _Record_ID;
             if (searchText != "undefined" && searchText != null && searchText != "")
@@ -116,6 +118,8 @@ and record_id = " + _Record_ID;
         {
             List<HistoryRecordInfo> hLists = new List<HistoryRecordInfo>();
 
+            // SECURITY: searchText is client-controlled and embedded in single-quoted SQL literals; escape single quotes
+            if (searchText != null) { searchText = searchText.Replace("'", "''"); }
             var strApp = "SELECT * FROM " +
                       "(( SELECT ai.AppointmentsInfo_ID AS ID, ai.record_ID, ai.created,'" + Msg.GetMsg(ctx, "Appointment") + "' AS TYPE,ai.Subject,au.name  FROM AppointmentsInfo ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_Id =" + _Record_ID;
             if (searchText != "undefined" && searchText != null && searchText != "")
@@ -235,6 +239,10 @@ and ai.record_id = " + _Record_ID;
             RealtedHistoryInfoDetails hDetails = new RealtedHistoryInfoDetails();
             List<RelatedHistoryInfo> histo = new List<RelatedHistoryInfo>();
 
+            // SECURITY: keyColName is client-controlled and concatenated as a SQL identifier/literal; bail on invalid identifiers
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(keyColName)) return hDetails;
+            // SECURITY: searchText is client-controlled and embedded in single-quoted SQL literals; escape single quotes
+            if (searchText != null) { searchText = searchText.Replace("'", "''"); }
             string tableName = keyColName.Substring(0, keyColName.Length - 3);
 
             //select all tables where AD_User_ID is used and have an entry in attachment(appointmentinfo OR mailattachment1)
@@ -535,6 +543,8 @@ and ai.record_id = " + _Record_ID;
 
         public void GetHistoryOfUserTable(int C_BPartner_ID, int pageSize, int pageNo, Ctx ctx, string searchText)
         {
+            // SECURITY: searchText is client-controlled and embedded in single-quoted SQL literals; escape single quotes
+            if (searchText != null) { searchText = searchText.Replace("'", "''"); }
             RealtedHistoryInfoDetails hDetails = new RealtedHistoryInfoDetails();
 
             //select all tables where AD_User_ID is used and have an entry in attachment(appointmentinfo OR mailattachment1)
@@ -895,6 +905,8 @@ and ai.record_id = " + _Record_ID;
         /// <returns></returns>
         public RealtedHistoryInfoDetails Userhistory(int C_BPartner_ID, int pageSize, int pageNo, Ctx ctx, string searchText)
         {
+            // SECURITY: searchText is client-controlled and embedded in single-quoted SQL literals; escape single quotes
+            if (searchText != null) { searchText = searchText.Replace("'", "''"); }
             GetHistoryOfUserTable(C_BPartner_ID, pageSize, pageNo, ctx, searchText);
 
             RealtedHistoryInfoDetails hDetails = new RealtedHistoryInfoDetails();
@@ -1744,7 +1756,8 @@ ON au.AD_User_ID=ai.createdby JOIN AD_Table adt ON adt.AD_Table_ID   =ai.AD_Tabl
              "       ELSE '" + Msg.GetMsg(ctx, "No") + "' " +
              "     END) AS IsPrivate,AI.comments ,ac.Name as caname" +
              "   FROM AppointmentsInfo ai LEFT OUTER JOIN appointmentcategory AC " +
-            " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE AI.AppointmentsInfo_ID=" + Id;
+            // SECURITY: Id is client-controlled; coerce to int to prevent SQL injection
+            " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE AI.AppointmentsInfo_ID=" + Util.GetValueOfInt(Id);
 
 
             Dictionary<string, object> obj = null;
@@ -1786,7 +1799,8 @@ ON au.AD_User_ID=ai.createdby JOIN AD_Table adt ON adt.AD_Table_ID   =ai.AD_Tabl
         public List<string> GetUser(string users)
         {
             List<string> obj = null;
-            string sql = "SELECT Name FROM AD_User WHERE AD_User_ID IN(" + users.Replace(';', ',') + ")";
+            // SECURITY: users is a client-controlled id list embedded in IN(...); sanitize to ints
+            string sql = "SELECT Name FROM AD_User WHERE AD_User_ID IN(" + VIS.Classes.QueryValidator.SafeIntList(users.Replace(';', ',')) + ")";
             DataSet ds = DB.ExecuteDataset(sql);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {

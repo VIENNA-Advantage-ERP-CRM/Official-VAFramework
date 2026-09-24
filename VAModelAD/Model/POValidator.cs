@@ -190,6 +190,44 @@ namespace VAModelAD.Model
             if (!success)
                 return success;
 
+            // --- Record Timeline (created / updated / doc-action) -----------
+            // Created & Updated are written straight into AD_EventTimeline (no
+            // AD_ChangeLog dependency). DocStatus is a PO column, so this one
+            // hook also catches every doc-action transition (Prepared/Completed/
+            // Voided/Re-activated/Closed). The raw DocStatus code is stored; the
+            // human label is resolved at read time. Guarded by AD_Table.
+            // IsTimelineTracked so untracked tables pay ~nothing. Never fails the
+            // host save (MEventTimeline.Log swallows its own errors).
+            if (MEventTimeline.IsTracked(po.GetCtx(), po.Get_Table_ID()))
+            {
+                if (newRecord)
+                {
+                    MEventTimeline.Log(po, MEventTimeline.EVENT_Created, null, 0, null);
+                }
+                else if (po.Get_ColumnIndex("DocStatus") >= 0 && po.Is_ValueChanged("DocStatus"))
+                {
+                    string val = Util.GetValueOfString(po.Get_Value("DocStatus"));
+                   string olVal = Util.GetValueOfString(po.Get_ValueOld("DocStatus")); 
+                    if(olVal == "DR" && val == "IP")
+                    {
+                        MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                        "PR", 0, null);
+                    }
+                    else if(olVal == "CO" && val == "IP")
+                    {
+                        MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                        "RE", 0, null);
+                    }
+                    else
+                        MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                            val, 0, null);
+                }
+                else if (MEventTimeline.HasTrackedChange(po))
+                {
+                    MEventTimeline.Log(po, MEventTimeline.EVENT_Updated, null, 0, null);
+                }
+            }
+
             if (Env.IsModuleInstalled("VA093_"))
             {
                 MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
@@ -342,6 +380,7 @@ namespace VAModelAD.Model
                             if (_po != null)
                             {
                                 _po.SetAD_Window_ID(MasterDetails.AD_Window_ID);
+                                _po.SetWindowTabID(MasterDetails.AD_Tab_ID);
                                 // copy date from Version table to Master table
                                 bool saveSuccess = CopyVersionToMaster(_po, po, MasterDetails.HasDocValWF);
                                 if (!saveSuccess)
@@ -512,7 +551,7 @@ namespace VAModelAD.Model
 
                 string columnName = po.Get_ColumnName(i);
                 // skip column if column name is either "Created" or "CreatedBy"
-                if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby")
+                if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby" || columnName.Trim().ToLower() == "updated" || columnName.Trim().ToLower() == "updatedby")
                     continue;
                 if (poMaster.Get_ColumnIndex(columnName) < 0)
                     continue;

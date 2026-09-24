@@ -85,6 +85,11 @@ namespace VIS.Models
         public bool NoLoginSet { get; set; }
 
         public String Login1DataOTP { get; set; }
+
+        // Opaque, server-issued handle for this login attempt. The browser holds only this token between
+        // steps; the password and 2FA seed are stored server-side against it (see LoginTokenStore) and
+        // are never serialized to the client. Also proves step-1 (credential check) completed.
+        public string LoginToken { get; set; }
     }
 
     /// <summary>

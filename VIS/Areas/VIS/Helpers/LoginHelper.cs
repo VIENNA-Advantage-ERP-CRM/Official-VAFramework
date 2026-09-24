@@ -1,8 +1,10 @@
 ﻿using Google.Authenticator;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -11,6 +13,7 @@ using System.Web;
 using VAdvantage.Classes;
 using VAdvantage.Common;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.Models;
@@ -34,7 +37,7 @@ namespace VIS.Helpers
         /// <param name="password"></param>
         /// <returns>QR Image url</returns>
         /// <author>VIS_427</author>
-        public string GetQROnRefresh(string UserValue,string tokenKey2FA, string Password)
+        public string GetQROnRefresh(string UserValue, string tokenKey2FA, string Password)
         {
             bool authenticated = false;
             bool isLDAP = false;
@@ -94,7 +97,12 @@ namespace VIS.Helpers
         /// <param name="roles">out roles , has role list of user</param>
         /// <param name="ctx" ></param>
         /// <returns>true if athenicated</returns>
-        public static bool Login(LoginModel model, out List<KeyNamePair> roles, string IP, bool isSSO)
+        /// <param name="preAuthenticated">
+        /// Identity already proven server-side without a password (validated AD_User.AuthToken - see
+        /// LoginTokenStore.LoginSecrets.PreAuthenticated). Like <paramref name="isSSO"/> this skips the
+        /// password check, but unlike isSSO it does NOT skip 2FA. Never derive this from a client-posted field.
+        /// </param>
+        public static bool Login(LoginModel model, out List<KeyNamePair> roles, string IP, bool isSSO, bool preAuthenticated = false)
         {
             // loginModel = null;
             //bool isMatch = false;
@@ -125,6 +133,13 @@ namespace VIS.Helpers
 
                 authenticated = true;
 
+            }
+
+            // Token auto-login: the AuthToken already proved who this is, and the password cannot be
+            // recovered from a hashed column to re-verify. 2FA still applies (isSSO stays false).
+            if (preAuthenticated)
+            {
+                authenticated = true;
             }
 
             //Save Failed Login Count and Password validty in cache
@@ -180,20 +195,33 @@ namespace VIS.Helpers
                 throw new Exception("UserNotFound");
             }
 
-            //if authenticated by LDAP or password is null(Means request from home page)
-            if (!authenticated && model.Login1Model.Password != null)
+            // Verify the password unless the identity was already established by other means
+            // (LDAP, SSO or a validated AuthToken - all of which set 'authenticated' above).
+            //
+            // SECURITY: this used to also skip when model.Login1Model.Password was null. That made the
+            // whole check optional: JsonLogin nulls Password whenever a LoginToken is posted, and GetRoles
+            // below matches on username alone, so anyone posting a username plus an arbitrary LoginToken
+            // got in without a credential. A missing password is now a failure, not a bypass.
+            if (!authenticated)
             {
+                if (string.IsNullOrEmpty(model.Login1Model.Password))
+                {
+                    // No failed-login-count increment here: an absent password is a malformed request,
+                    // not a guess, and counting it would let anyone lock any account out.
+                    throw new Exception("UserPwdError");
+                }
+
                 string sqlEnc = "SELECT isencrypted,isHashed FROM ad_column WHERE ad_table_id=(SELECT ad_table_id FROM ad_table WHERE tablename='AD_User') AND columnname='Password'";
                 DataSet ds = DB.ExecuteDataset(sqlEnc);
                 char isEncrypted = Convert.ToChar(ds.Tables[0].Rows[0]["isencrypted"]);
                 char isHashed = Convert.ToChar(ds.Tables[0].Rows[0]["isHashed"]);
 
                 string originalpwd = model.Login1Model.Password;
-                
+
                 if (model.Login1Model.Password != null)
                 {
-                    if(isEncrypted == 'Y')
-                    model.Login1Model.Password = SecureEngine.Encrypt(model.Login1Model.Password);
+                    if (isEncrypted == 'Y')
+                        model.Login1Model.Password = SecureEngine.Encrypt(model.Login1Model.Password);
                     //else if(isHashed == 'Y')
                     //    isHashVerified = model.Login1Model.Password);
                 }
@@ -430,7 +458,8 @@ namespace VIS.Helpers
                .Append(" u.ConnectionProfile, u.Password, u.FailedLoginCount, u.PasswordExpireOn, u.Is2FAEnabled, u.TokenKey2FA, u.TwoFAMethod, u.Value, u.Name as username, u.Created ")	//	4,5
                .Append("FROM AD_User u")
                .Append(" INNER JOIN AD_User_Roles ur ON (u.AD_User_ID=ur.AD_User_ID AND ur.IsActive='Y')")
-               .Append(" INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') ");
+               .Append(" INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') ")
+               .Append(" AND NOT (r.AD_Client_ID = 0 AND r.UserLevel != 'S')");
             if (isLDAP && authenticated)
             {
                 sql.Append(" WHERE (COALESCE(u.LDAPUser,u.Value)=@username)");
@@ -843,7 +872,7 @@ namespace VIS.Helpers
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
 
             //Set Login Model Prop
-            if(model.Login1Model == null)
+            if (model.Login1Model == null)
             {
                 model.Login1Model = new Login1Model();
                 model.Login1Model.AD_User_ID = ctxLogIn.GetAD_User_ID();
@@ -852,7 +881,7 @@ namespace VIS.Helpers
             ctxLogIn.SetContext("NewSession", "Y");
             //ctx.SetContext("#Date", model.Login2Model.Date.ToString());
 
-            
+
             return ctx;
         }
 
@@ -893,7 +922,7 @@ namespace VIS.Helpers
                     string sql = "UPDATE AD_LoginSetting SET " +
                                      "AD_Client_ID = " + model.Login2Model.Client + ",AD_Org_ID=" + model.Login2Model.Org + ",AD_Role_ID=" + model.Login2Model.Role
                                      + ",M_WareHouse_ID= ";
-                             
+
                     if (!String.IsNullOrEmpty(model.Login2Model.Warehouse) && model.Login2Model.Warehouse != "-1")
                     {
                         sql += model.Login2Model.Warehouse + ",";
@@ -903,11 +932,11 @@ namespace VIS.Helpers
                         sql += "null,";
                     }
 
-                    sql+= " FilteredOrg=";
+                    sql += " FilteredOrg=";
 
                     if (!String.IsNullOrEmpty(model.Login2Model.FilteredOrg) && model.Login2Model.FilteredOrg != "")
                     {
-                        sql += "'"+model.Login2Model.FilteredOrg + "',";
+                        sql += "'" + model.Login2Model.FilteredOrg + "',";
                     }
                     else
                     {
@@ -955,7 +984,8 @@ namespace VIS.Helpers
                     if (isValid && Util.GetValueOfString(dsUser.Tables[0].Rows[0]["TokenKey2FA"]).Trim() == "")
                     {
                         string encKey = SecureEngine.Encrypt(model.Login1Model.TokenKey2FA);
-                        int countUpd = Util.GetValueOfInt(DB.ExecuteQuery(@"UPDATE AD_USER SET TokenKey2FA = '" + encKey + @"' WHERE 
+                        // SECURITY: quote/escape encKey via DB.TO_STRING rather than manual '...' (AD_User_ID is int).
+                        int countUpd = Util.GetValueOfInt(DB.ExecuteQuery(@"UPDATE AD_USER SET TokenKey2FA = " + DB.TO_STRING(encKey) + @" WHERE
                                     AD_USER_ID = " + model.Login1Model.AD_User_ID));
                     }
                 }
@@ -1123,5 +1153,72 @@ FROM sso_configuration  WHERE sso_configuration.IsActive='Y' ");
             return list;
         }
 
+
+        public static dynamic GetPageSection(int ad_Client_ID)
+        {
+            dynamic ret = new ExpandoObject();
+
+           
+
+            ret.HS = null;
+            ret.SM = null;
+            ret.MS = null;
+            ret.PS = null;
+            try
+            {
+                DataSet ds = DB.ExecuteDataset("SELECT * FROM AD_HomePageConfig WHERE IsActive='Y' AND AD_Client_ID IN (0," + ad_Client_ID
+                                                +") ORDER BY AD_Client_ID Desc");
+                if (ds != null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    int ad_client = -1;
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        if (ad_client < 0)
+                        {
+                            ad_client = Convert.ToInt32(dr["AD_Client_ID"]);
+                        }
+
+                        if (ad_client > -1 && ad_client != Convert.ToInt32(dr["AD_Client_ID"])) {
+                            break;
+                        }
+
+                        if (dr["PageSection"].ToString() == "H")
+                        {
+                            ret.HS = new ExpandoObject();
+                            ret.HS.Background = dr["Background"].ToString();
+                            ret.HS.Color = dr["Color"].ToString();
+                            ret.HS.Height = Util.GetValueOfInt(dr["Height"]);
+                            ret.HS.IsHorzonatlSplitMenu = dr["IsHorizontalSplit"].ToString() == "Y";
+                            ret.HS.Style = dr["HtmlStyle"].ToString();
+                        }
+                        else if (dr["PageSection"].ToString() == "S")
+                        {
+                            ret.SM = new ExpandoObject();
+                            ret.SM.Background = dr["Background"].ToString();
+                            ret.SM.Color = dr["Color"].ToString();
+                            ret.SM.Height = Util.GetValueOfInt(dr["Height"]);
+                            ret.SM.Style = dr["HtmlStyle"].ToString();
+                        }
+                        else if (dr["PageSection"].ToString() == "M")
+                        {
+                            ret.MS = new ExpandoObject();
+                            ret.MS.Background = dr["Background"].ToString();
+                            ret.MS.Color = dr["Color"].ToString();
+                            ret.MS.Style = dr["HtmlStyle"].ToString();
+                        }
+                        else if (dr["PageSection"].ToString() == "P")
+                        {
+                            ret.PS = new ExpandoObject();
+                            ret.PS.Background = dr["Background"].ToString();
+                            ret.PS.Color = dr["Color"].ToString();
+                            ret.PS.Style = dr["HtmlStyle"].ToString();
+                        }
+                    }
+                }
+            }
+            catch(Exception ex) { VLogger.Get().Severe("Home page config error=>" + ex.Message); }
+
+            return ret;
+        }
     }
 }

@@ -922,6 +922,103 @@
             });
         }
 
+        // For List view tabs only: the list view (VListView) has no header
+        // card-switcher like the card view does, so surface one inside this dialog.
+        // It lets the user switch the active list template (getCardViewData) and set
+        // the default card (InsertUpdateDefaultCard). No-op for card view.
+        function buildListViewSwitcher() {
+            if (!(VIS.VListView && cardView instanceof VIS.VListView)) {
+                return;
+            }
+            if (root.find('#DivListViewSwitcher_' + WindowNo).length > 0) {
+                return; // already built
+            }
+
+            var msg = function (key, fallback) {
+                var m = VIS.Msg.getMsg(key);
+                return (!m || m.charAt(0) === '[') ? fallback : m;
+            };
+
+            // Section title above the control, mirroring the dialog's "Group Sequence"
+            // heading so the switcher reads as a native part of the dialog.
+            var $wrap = $('<div id="DivListViewSwitcher_' + WindowNo + '" class="vis-lv-switcher mb-2 pb-2 pr-2" style="border-bottom:1px solid rgba(var(--v-c-on-secondary),0.2);"></div>');
+            var $lbl = $('<span class="vis-lv-switcher-lbl d-block vis-font-weight-600 vis-font-size-sm mb-1" style="color:rgba(var(--v-c-on-secondary),0.7);">' + msg("CurrentListView", "List View") + '</span>');
+            var $row = $('<div class="d-flex align-items-center" style="gap:8px;"></div>');
+            var $sel = $('<select class="vis-lv-switcher-sel" style="flex:1 1 auto;min-width:0;height:30px;padding:2px 8px;font-size:13px;background-color:#fff;color:rgba(var(--v-c-on-secondary),0.9);border:1px solid rgba(var(--v-c-on-secondary),0.25);border-radius:4px;outline:none;"></select>');
+            var $star = $('<span class="vis-lv-switcher-default" style="cursor:pointer;flex:0 0 auto;display:flex;align-items:center;" title="' + msg("MakeDefaultCard", "Make Default") + '"><i class="fa fa-star-o vis-font-size-lg"></i></span>');
+            $row.append($sel).append($star);
+            $wrap.append($lbl).append($row);
+            // Render inside the left card-list column (a column-flex container) as a
+            // full-width row above the card list. The main container is a flex ROW, so
+            // prepending there would wedge the switcher in as a misaligned third column.
+            root.find('.vis-cr-left').prepend($wrap);
+
+            var cards = [];
+            var isDefaultOf = function (card) {
+                return !!card && (card.IsDefault === true || card.IsDefault === 'Y');
+            };
+            var renderDefaultIcon = function () {
+                var selId = parseInt($sel.val(), 10);
+                var card = null;
+                for (var i = 0; i < cards.length; i++) {
+                    if (cards[i].AD_CardView_ID == selId) { card = cards[i]; break; }
+                }
+                var isDef = isDefaultOf(card);
+                $star.attr('title', isDef ? msg("DefaultCard", "Default") : msg("MakeDefaultCard", "Make Default"));
+                $star.find('i').attr('class', (isDef ? 'fa fa-star' : 'fa fa-star-o') + ' vis-font-size-lg')
+                    .css('color', isDef ? '#f0ad4e' : '');
+            };
+            var loadCards = function () {
+                var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetCardsInfo", { AD_Tab_ID: AD_Tab_ID });
+                cards = res || [];
+                $sel.empty();
+                var activeId = cardView.getAD_CardView_ID();
+                for (var i = 0; i < cards.length; i++) {
+                    cards[i].Name = VIS.Utility.decodeText(cards[i].Name);
+                    var selected = (cards[i].AD_CardView_ID == activeId) ? ' selected' : '';
+                    $sel.append('<option value="' + cards[i].AD_CardView_ID + '"' + selected + '>' + cards[i].Name + '</option>');
+                }
+                renderDefaultIcon();
+            };
+
+            // Switch the active list template and re-render the list view.
+            $sel.on('change', function () {
+                var id = parseInt($sel.val(), 10);
+                var name = $sel.find('option:selected').text();
+                if (id > 0) {
+                    cardView.getCardViewData(mTab, id, name);
+                    renderDefaultIcon();
+                    ch.close();
+                }
+            });
+
+            // Set the selected card as default for this tab.
+            $star.on('click', function () {
+                var id = parseInt($sel.val(), 10);
+                if (!(id > 0)) {
+                    return;
+                }
+                // NOTE: the endpoint returns void (empty body). Do NOT set
+                // dataType:"json" — jQuery would try to JSON.parse the empty
+                // response and fire error() instead of success(), leaving the
+                // star/toast stuck even though the DB row was updated.
+                $.ajax({
+                    url: VIS.Application.contextUrl + "JsonData/InsertUpdateDefaultCard",
+                    data: { AD_Tab_ID: AD_Tab_ID, AD_Card_ID: id },
+                    success: function () {
+                        for (var i = 0; i < cards.length; i++) {
+                            cards[i].IsDefault = (cards[i].AD_CardView_ID == id);
+                        }
+                        renderDefaultIcon();
+                        toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true });
+                    },
+                    error: function (er) { console.log(er); }
+                });
+            });
+
+            loadCards();
+        }
+
         // #endregion
         // load UI From partial view
         function CardViewUI(temResult) {
@@ -1046,6 +1143,8 @@
                     DivCradStep1.show();
                     //get all cards
                     GetCards();
+                    //list view only: card switcher (switch active template + set default)
+                    buildListViewSwitcher();
                     //get template category
                     getTemplateCategory();
                     FillFields(true, false);

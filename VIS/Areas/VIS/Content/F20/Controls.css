@@ -49,7 +49,8 @@
     /*border: 1px solid rgba(var(--v-c-on-secondary), .2);*/
     border: 1px solid rgba(var(--v-c-primary), 1) !important;
     /*border: 1px solid var(--input-border);*/
-    border-radius: .25rem;
+    border-radius: 20px;
+    padding:0 10px;
     color: rgba(var(--v-c-primary), 1);
     background-color: transparent;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
@@ -213,6 +214,12 @@
 
     .vis-ad-w-p-vc-editview .vis-input-wrap:has(.vis-ev-col-wrap-button) {
         border-bottom: 1px solid transparent;
+    }
+
+    /* AG container's own outer wrapper duplicates the per-field bottom border —
+       each inner field wrapper already draws it, so suppress it on the shell. */
+    .vis-ad-w-p-vc-editview .vis-input-wrap:has(.vis-ev-col-ag-container) {
+        border-bottom: 1px solid transparent !important;
     }
 
     .vis-ad-w-p-vc-editview .vis-input-wrap:has(.vis-ev-col-mandatory) .vis-ev-col-msign {
@@ -431,7 +438,7 @@ button.vis-ev-col-img-ctrl:focus,
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > button.vis-ev-col-wrap-button:hover {
     border: 2px solid rgba(var(--v-c-on-secondary), 0.8) !important; /*06-01-2025*/
-    color: rgba(var(--v-c-on-secondary), 0.8) !important; /*06-01-2025*/
+    //color: color-mix(in srgb, currentColor 50%, transparent); /*06-01-2025*/
 }
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > button.vis-ev-col-wrap-button:focus {
@@ -1330,6 +1337,41 @@ input[type="radio"] {
         background: inherit;
         width: 100%;
         text-align: left;
+    }
+
+/* Inline Action Group container (AGType = T or C).
+   Groups multiple controls inside one edit-view cell.
+     --toggle: column stacking; display logic typically leaves one visible at a time, taking full width.
+     --parent: row flow; all controls visible, each sized by its natural render width. */
+.vis-ev-col-ag-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+    /* Drop the per-field bottom margin inherited from .vis-input-wrap on inner
+       controls. The container's own outer wrapper already provides cell spacing,
+       so the inner wrappers would otherwise push fields out of alignment. */
+    .vis-ev-col-ag-container > .input-group {
+        margin-bottom: 0;
+    }
+
+/* Toggle: column stacking (container's base direction), each visible wrapper spans full width */
+    .vis-ev-col-ag-container--toggle > .input-group {
+        width: 100%;
+    }
+
+/* Parent: row flow, each control takes its own natural width and wraps if needed */
+.vis-ev-col-ag-container--parent {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+    .vis-ev-col-ag-container--parent > .input-group {
+        width: auto;
+        flex: 0 1 auto;
     }
 
 /*.vis-apanel-rb-ul .vis-ev-col-linkbutton {

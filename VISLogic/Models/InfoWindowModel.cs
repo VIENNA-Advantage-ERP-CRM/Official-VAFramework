@@ -340,6 +340,18 @@ namespace VIS.Models
         public InfoData GetData(string tableName, int pageNo, VAdvantage.Utility.Ctx ctx, string selectedIDs
             , bool requery, Info info, string validationCode, List<InfoSearchCol> srchCtrls)
         {
+            // SECURITY: tableName is client-supplied and flows into the FROM/SELECT of the query below.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return new InfoData();
+
+            // Check if validationCode (where query starts with | if yes then user has send a temp table instead of data)
+            // Store it in another variable and empty the validationCode so that it should not add any wrong code
+            string withJoin = string.Empty;
+            if (validationCode!=null && validationCode.StartsWith("base64 "))
+            {
+                withJoin = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(validationCode.Substring(7)));
+                validationCode = "";
+            }
 
             string sql = "SELECT ";
             string colName = null;
@@ -539,7 +551,9 @@ namespace VIS.Models
                             }
                             else
                             {
-                                whereClause += " " + columName + " ='" + fromValue + "'";
+                                // SECURITY: fromValue is the user-entered search value; escape via TO_STRING
+                                // instead of manual quoting. (columName comes from server-side info metadata.)
+                                whereClause += " " + columName + " =" + GlobalVariable.TO_STRING(fromValue);
                             }
 
 
@@ -720,7 +734,14 @@ namespace VIS.Models
                 sql = ParseContext(sql, ctx);
                 //sql = MRole.GetDefault(ctx).AddAccessSQL(sql, tableName,
                 //               MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
-
+                // Prepend WITH and Append Join clause
+                // Index [0] contains temp tables(with)
+                // Index [1] contains select query fetches data from above select query join clause
+                if (!string.IsNullOrEmpty(withJoin))
+                {
+                    string[] withArray = withJoin.Split(new char[] { '!' }, StringSplitOptions.RemoveEmptyEntries);
+                    sql = withArray[0] + sql + withArray[1];
+                }
 
                 int totalRec = Util.GetValueOfInt(VAdvantage.DataBase.DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sql + " ) t", null, null));
                 int pageSize = 50;
@@ -770,8 +791,11 @@ namespace VIS.Models
             string value = string.Empty;
             while (res.Contains('@'))
             {
-                token = res.Substring(res.IndexOf('@') + 1);
-                token = token.Substring(0, token.IndexOf('@'));
+                int start = res.IndexOf('@');
+                int end = res.IndexOf('@', start + 1);
+                if (end < 0)                       // no closing @ -> nothing more to substitute
+                    break;
+                token = res.Substring(start + 1, end - start - 1);
                 if (token.StartsWith("#"))
                 {
                     value = ctx.GetContext(token);
@@ -780,7 +804,12 @@ namespace VIS.Models
                 {
                     value = ctx.GetContext("#" + token);
                 }
-                res = res.Replace("@" + token + "@", value);
+                if (value == null)
+                    value = string.Empty;
+                // Security: the resolved context value is concatenated into the info
+                // window SQL, so double single quotes to keep it inside its string
+                // literal and prevent SQL injection.
+                res = res.Replace("@" + token + "@", value.Replace("'", "''"));
 
             }
             return res;
@@ -793,7 +822,10 @@ namespace VIS.Models
         /// <returns></returns> info window id.
         public int GetInfoWindowID(string InfoSearchKey)
         {
-            return Util.GetValueOfInt(VAdvantage.DataBase.DB.ExecuteScalar("SELECT AD_InfoWindow_ID FROM AD_InfoWindow WHERE IsActive='Y' AND Value='" + InfoSearchKey + "'", null, null));
+            // Security: InfoSearchKey is caller/user supplied, so escape single quotes
+            // to prevent SQL injection in this string-literal comparison.
+            string safeKey = (InfoSearchKey ?? string.Empty).Replace("'", "''");
+            return Util.GetValueOfInt(VAdvantage.DataBase.DB.ExecuteScalar("SELECT AD_InfoWindow_ID FROM AD_InfoWindow WHERE IsActive='Y' AND Value='" + safeKey + "'", null, null));
         }
 
     }

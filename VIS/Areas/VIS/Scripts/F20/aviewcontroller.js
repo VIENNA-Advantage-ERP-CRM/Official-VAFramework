@@ -488,6 +488,97 @@
         this.vTabPanel.init(this.getMTab());
     };
 
+    // View-wise tab panel: rebuild the panel for the given view (Y/N/C).
+    // The view filter is applied via gTab.setActiveView, which is read by the
+    // view-aware getTabPanels/Rght/Botm getters used inside VTabPanel.init.
+    VIS.GridController.prototype.reloadTabPanelForView = function (view) {
+        if (!this.gTab.isViewWisePanel()) return;
+
+        this.rebuildTabPanelForView(view);
+
+        // Not the displayed GC yet (e.g. initial presentation inside initGrid):
+        // only the rebuild matters — APanel shows the panel itself on activation.
+        if (!this.aPanel || this.aPanel.curGC !== this) return;
+
+        // Alignment (right/bottom) and panel presence can differ per view, so
+        // re-run the height/scroll layout before showing — card/grid pick up
+        // the new fixed/auto body state before any resize recalculates them.
+        this.applyViewHeightLayout();
+
+        var hideTP = this.aPanel.actionParams && this.aPanel.actionParams.IsHideTabPanel;
+        this.aPanel.showTabPanel(!hideTP && this.gTab.getTabPanels().length > 0);
+    };
+
+    // Rebuild only: set the active view and recreate this.vTabPanel from the
+    // view-filtered panel list. Safe to call before the GC is displayed.
+    VIS.GridController.prototype.rebuildTabPanelForView = function (view) {
+        this.gTab.setActiveView(view);
+
+        if (this.vTabPanel) {
+            this.vTabPanel.dispose();
+            this.vTabPanel = null;
+        }
+
+        var panels = this.gTab.getTabPanels(); // view-filtered now
+        if (panels.length > 0) {
+            var w = this.gTab.getPanelWidthForView(view);
+            if (!w || w <= 0) w = this.aPanel.gridWindow.getWindowWidth();
+            this.initTabPanel(w, this.windowNo);
+        }
+    };
+
+    // Current presentation as a ViewType code — same list as AD_Tab.TabLayout:
+    // Y=Single, N=Grid, C=Card ('M' for map: only shared/legacy panels apply).
+    VIS.GridController.prototype.getCurrentViewCode = function () {
+        if (this.isCardRow) return TABLAYOUT_CardViewLayout;
+        if (this.isMapRow) return 'M';
+        if (this.singleRow) return TABLAYOUT_SingleRowLayout;
+        return TABLAYOUT_GridLayout;
+    };
+
+    // Height/scroll layout for the current presentation + active view.
+    // Extracted from activate() so reloadTabPanelForView can re-run it on view
+    // switches — with view-wise tab panels the bottom alignment (and therefore
+    // auto vs fixed height / single page scroll) can change per view.
+    VIS.GridController.prototype.applyViewHeightLayout = function () {
+        var isWPanel = this.aPanel instanceof VIS.APanel;
+        var gridAutoHeight = false; // grid fixed height body
+        var singlePageScroll = false; // one scroll spanning view + included tab / bottom panel
+
+        if (this.vIncludedGC) { // has included GC
+            singlePageScroll = true;
+            gridAutoHeight = true;
+        }
+        else if (this.gTab.getHasPanel() && this.gTab.getIsTPBottomAligned()) { // show single scroll in case of tab panel bottom aligned also
+            singlePageScroll = true;
+            gridAutoHeight = true;
+        }
+        if (this.multiTabView)
+            gridAutoHeight = true;
+        //if (gridAutoHeight && this.showMultiViewOnly)
+        //    gridAutoHeight = false;
+
+        var tdArea = this.aPanel.getLayout ? this.aPanel.getLayout() : null;
+        if (tdArea) {
+            if (singlePageScroll) {
+                tdArea.removeClass('vis-ad-w-p-center-view-height');
+                tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
+            }
+            else if (isWPanel && !this.multiTabView && this.gTab.getIncluded_Tab_ID() == 0
+                && !tdArea.hasClass('vis-ad-w-p-center-view-height')) {
+                tdArea.addClass('vis-ad-w-p-center-view-height');
+                tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+            }
+        }
+
+        this.vTable.activate(this.displayAsMultiView || gridAutoHeight, this.showMultiViewOnly);
+
+        if (this.vCardView)
+            this.vCardView.setIsFixedBody(!gridAutoHeight);
+
+        return gridAutoHeight;
+    };
+
    
     VIS.GridController.prototype.initFilterPanel = function (winNo) {
         this.aFilterPanel = new VIS.FilterPanel(winNo, this);
@@ -513,16 +604,34 @@
     VIS.GridController.prototype.onSizeChanged = function (resize) {
 
         var gc = this.aPanel.curGC;
-
-        if (resize && gc.vTabPanel) {
-            gc.vTabPanel.setSize(0, resize);
-        }
-        gc.multiRowResize();
-        if (gc.vIncludedGC) {
-            gc.vIncludedGC.multiRowResize();
+        if (gc) {
+            if (resize && gc.vTabPanel) {
+                gc.vTabPanel.setSize(0, resize);
+            }
+            gc.multiRowResize();
+            if (gc.vIncludedGC) {
+                gc.vIncludedGC.multiRowResize();
+            }
         }
         if (this.aPanel.vTabbedPane)
             this.aPanel.vTabbedPane.refresh();
+
+        // List view toggles between card and list layout based on whether the
+        // right tab panel is open — re-evaluate when the tab panel size
+        // notification fires (open/close, manual resize, etc.).
+        if (gc) {
+            if (gc.isCardRow && gc.vCardView && VIS.VListView
+                && gc.vCardView instanceof VIS.VListView
+                && gc.vCardView.calculateWidth) {
+                gc.vCardView.calculateWidth();
+            }
+
+            else if (gc.isCardRow && gc.vCardView
+                && gc.vCardView.calculateWidth) {
+                gc.vCardView.calculateWidth();
+            }
+        }
+        
     };
 
     VIS.GridController.prototype.refreshTabPanelData = function (record_ID, action) {
@@ -542,13 +651,13 @@
 
         var output = true;
         var isSurveyPanel = false;
-        if (this.gTab.getHasPanel()) {
-            var panels = this.gTab.getTabPanels();
-            for (var i = 0; i < panels.length; i++) {
-                if (panels[i].getClassName() == 'VIS.SurveyPanel') {
-                    isSurveyPanel = true;
-                    i = panels.length;
-                }
+        // all views — the checklist requirement must not depend on which view
+        // (and so which filtered panel set) is currently visible.
+        var panels = this.gTab.getAllTabPanels();
+        for (var i = 0; i < panels.length; i++) {
+            if (panels[i].getClassName() == 'VIS.SurveyPanel') {
+                isSurveyPanel = true;
+                i = panels.length;
             }
         }
 
@@ -666,6 +775,32 @@
     @name mTab
     <returns></returns>*/
     VIS.GridController.prototype.initGrid = function (onlyMultiRow, curWindowNo, aPanel, mTab) {
+
+        //check list view flag from action params
+        var isCardAsListview = false;
+        if (aPanel.actionParams && aPanel.actionParams.ShowCardsAsListView) {
+            isCardAsListview = true;
+        }
+
+        // Card view ↔ List view selection: a single DB flag on the tab decides
+        // which renderer occupies this.vCardView. Both views share AD_CardView
+        // metadata, conditions, the same toolbar button, and the isCardRow
+        // state; only the rendering differs. The constructor already created a
+        // default VCardView; swap it for VListView when the flag is set.
+        if (mTab.vo && (mTab.vo.IsListView || isCardAsListview)
+            && VIS.VListView && !(this.vCardView instanceof VIS.VListView)) {
+            if (this.vCardView && this.vCardView.dispose) {
+                this.vCardView.dispose();
+            }
+            this.vCardView = new VIS.VListView();
+            var self = this;
+            this.vCardView.onCardEdit = function (event, onlySelect) {
+                self.onTableRowSelect(event);
+                if (!onlySelect) {
+                    self.aPanel.actionPerformedCallback(self.aPanel, "Single");
+                }
+            };
+        }
 
         var fields = mTab.gridTable.gridFields;
         var mField = null;
@@ -1303,7 +1438,15 @@
         var isWPanel = this.aPanel instanceof VIS.APanel;
         this.displayAsMultiView = displayAsMultiView;
 
-       
+        // view-wise tab panel: sync the active view with this GC's presentation
+        // before any alignment/height getters (getHasPanel/getIsTPBottomAligned)
+        // read it, and rebuild the panel if it was built for another view.
+        if (this.gTab.isViewWisePanel()) {
+            var vCode = this.getCurrentViewCode();
+            if (this.gTab.getActiveView() !== vCode || !this.vTabPanel) {
+                this.rebuildTabPanelForView(vCode);
+            }
+        }
 
         if (this.displayAsIncludedGC && isWPanel) {
             var tdArea = this.aPanel.getLayout();
@@ -1335,38 +1478,20 @@
         
         //vIncludedGC
         this.isIncludedGCVisible = false;
-        var gridAutoHeight = false; // grid fixed height body
 
         if (this.vIncludedGC) { // has included GC
             //  this.vIncludedGC.vTable.activate();
             this.vIncludedGC.displayAsIncludedGC = false;
             this.vIncludedGC.isIncludedGCVisible = false;
-            var tdArea = this.aPanel.getLayout();
-            tdArea.removeClass('vis-ad-w-p-center-view-height');
-            tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
-          
-            gridAutoHeight = true;
-
         }
-        else if (this.gTab.getHasPanel() && this.gTab.getIsTPBottomAligned()) { // show single scroll in case of tab panel bottom aligned also
-            var tdArea = this.aPanel.getLayout();
-            tdArea.removeClass('vis-ad-w-p-center-view-height');
-            tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
-           
-            gridAutoHeight = true;
-        }
-        if (this.multiTabView)
-            gridAutoHeight = true;
-        if (gridAutoHeight && this.showMultiViewOnly)
-            gridAutoHeight = false;
 
         this.vTable.setUI(displayAsMultiView);
-        this.vTable.activate(displayAsMultiView || gridAutoHeight, this.showMultiViewOnly);
-        
+
+        // height/scroll layout (auto vs fixed body) — view-aware; also re-run
+        // from reloadTabPanelForView on every view switch.
+        this.applyViewHeightLayout();
 
         this.vTable.setReadOnly(false);
-        if (this.vCardView)
-            this.vCardView.setIsFixedBody(!gridAutoHeight);
 
         
 
@@ -2213,7 +2338,9 @@
         //chnage to popup
        // this.vGridPanel.showAsPopUp(p);
 
-        
+        if (this.gTab.isViewWisePanel()) {
+            this.reloadTabPanelForView('Y');
+        }
     };
 
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {
@@ -2242,11 +2369,10 @@
                 this.aPanel.displayIncArea(false);
                 this.vTable.activate(false, this.showMultiViewOnly); 
                 //if (this.gTab.getIsTPBottomAligned())
-                this.aPanel.showTabPanel(false);
+                //this.aPanel.showTabPanel(false);
             }
 
-            this.vTable.resize();
-            this.vTable.refreshRow();
+            
 
             if (!this.displayAsMultiView && (this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
                 this.vHeaderPanel.hidePanel();
@@ -2264,6 +2390,11 @@
             //}
             this.isNewClick = false;
 
+            if (this.gTab.isViewWisePanel()) {
+                this.reloadTabPanelForView('N');
+            }
+            this.vTable.resize();
+            this.vTable.refreshRow();
         }
 
     };
@@ -2293,7 +2424,7 @@
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
                 //if (this.gTab.getIsTPBottomAligned())
-                    this.aPanel.showTabPanel(false);
+                    //this.aPanel.showTabPanel(false);
             }
 
             this.gTab.getTableModel().setCardID(this.vCardView.cardID);
@@ -2317,6 +2448,10 @@
             }
 
             p1 = null;
+
+            if (this.gTab.isViewWisePanel()) {
+                this.reloadTabPanelForView('C');
+            }
         }
     };
 
@@ -2350,6 +2485,10 @@
             this.vMapView.refreshUI(this.getVMapPanel().width(), locationID);
             p1 = null;
             //this.vTable.resize();
+
+            if (this.gTab.isViewWisePanel()) {
+                this.reloadTabPanelForView('M');
+            }
         }
 
     };

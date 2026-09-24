@@ -114,6 +114,9 @@ namespace VAdvantage.WF
             SetWFState(activity.GetWFState());
             SetEventType(EVENTTYPE_ProcessCreated);
             SetElapsedTimeMS(Utility.Env.ZERO);
+            Set_ValueNoCheck("AD_WF_Activity_ID", activity.GetAD_WF_Activity_ID());
+            Set_ValueNoCheck("VA137_Action", activity.Get_Value("VA137_Action"));
+            Set_ValueNoCheck("VA137_LastAction", activity.Get_Value("VA137_LastAction"));
             MWFNode node = activity.GetNode();
             if (node != null && node.Get_ID() != 0)
             {
@@ -140,6 +143,67 @@ namespace VAdvantage.WF
             if (node.Get_ID() == 0)
                 return "?";
             return node.GetName(true);
+        }
+
+        /// <summary>
+        /// Save User and Team on the Event Audit
+        /// </summary>
+        /// <param name="AD_User_ID"></param>
+        /// <param name="C_Team_ID"></param>
+        /// <returns></returns>
+        public bool SaveUserTeam(int AD_User_ID, int C_Team_ID)
+        {
+            PO _poWFUserTeam = null;
+            if (AD_User_ID > 0)
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(VA137_WF_Event_User_ID) FROM VA137_WF_Event_User WHERE IsActive = 'Y' AND AD_User_ID = " + AD_User_ID + " AND AD_WF_EventAudit_ID = " + GetAD_WF_EventAudit_ID())) > 0)
+                    return true;
+                _poWFUserTeam = MTable.GetPO(GetCtx(), "VA137_WF_Event_User", 0, null);
+                _poWFUserTeam.Set_ValueNoCheck("AD_User_ID", AD_User_ID);
+                _poWFUserTeam.Set_ValueNoCheck("AD_WF_EventAudit_ID", GetAD_WF_EventAudit_ID());
+                if (!_poWFUserTeam.Save())
+                {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    StringBuilder errorMsg = new StringBuilder("");
+                    if (vnp != null)
+                    {
+                        errorMsg.Append(Util.GetValueOfString(vnp.GetName()));
+                        if (errorMsg.ToString() == "")
+                            errorMsg.Append(vnp.GetValue());
+                    }
+                    if (errorMsg.ToString() == "")
+                        errorMsg.Append("Error in saving WF Activity User ");
+
+                    log.SaveError("VA137ActivityUserError", errorMsg.ToString());
+                    return false;
+                }
+            }
+            if (C_Team_ID > 0)
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(VA137_WF_Event_Team_ID) FROM VA137_WF_Event_Team WHERE IsActive = 'Y' AND C_Team_ID = " + C_Team_ID + " AND AD_WF_EventAudit_ID = " + GetAD_WF_EventAudit_ID())) > 0)
+                    return true;
+                _poWFUserTeam = MTable.GetPO(GetCtx(), "VA137_WF_Event_Team", 0, null);
+                _poWFUserTeam.Set_ValueNoCheck("C_Team_ID", C_Team_ID);
+                _poWFUserTeam.Set_ValueNoCheck("AD_WF_EventAudit_ID", GetAD_WF_EventAudit_ID());
+                if (!_poWFUserTeam.Save())
+                {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    StringBuilder errorMsg = new StringBuilder("");
+                    if (vnp != null)
+                    {
+                        errorMsg.Append(Util.GetValueOfString(vnp.GetName()));
+                        if (errorMsg.ToString() == "")
+                            errorMsg.Append(vnp.GetValue());
+                    }
+                    if (errorMsg.ToString() == "")
+                        errorMsg.Append("Error in saving WF Activity Team ");
+
+                    log.SaveError("VA137ActivityTeamError", errorMsg.ToString());
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

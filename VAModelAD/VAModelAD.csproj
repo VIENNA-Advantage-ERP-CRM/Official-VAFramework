@@ -273,6 +273,7 @@
     <Compile Include="ModelAD\MChat.cs" />
     <Compile Include="ModelAD\MChatEntry.cs" />
     <Compile Include="ModelAD\MClientShare.cs" />
+    <Compile Include="ModelAD\MEventTimeline.cs" />
     <Compile Include="ModelAD\MColor.cs" />
     <Compile Include="ModelAD\MColumn.cs" />
     <Compile Include="ModelAD\MColumnAccess.cs" />
@@ -383,6 +384,7 @@
     <Compile Include="ModelAD\ViennatProcessor.cs" />
     <Compile Include="ModelAD\X_AD_DirectQueryLog.cs" />
     <Compile Include="ModelAD\X_AD_Group_Widget.cs" />
+    <Compile Include="ModelAD\X_AD_EventTimeline.cs" />
     <Compile Include="ModelAD\X_AD_IndexColumn.cs" />
     <Compile Include="ModelAD\X_AD_TableIndex.cs" />
     <Compile Include="ModelAD\X_AD_UserHomeWidget.cs" />

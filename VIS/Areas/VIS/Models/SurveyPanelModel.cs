@@ -455,7 +455,8 @@ namespace VIS.Models
             string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
             {
-                sql += " AND docaction='" + DocAction + "'";
+                // SECURITY: DocAction is client-controlled (controller action param); escape single quotes to prevent SQL injection inside the quoted literal
+                sql += " AND docaction='" + DocAction.Replace("'", "''") + "'";
             }
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
             bool result = true;

@@ -452,6 +452,7 @@ namespace VAdvantage.WF
         /// <param name="AD_Client_ID">for client</param>
         private void AddNodesSF(List<MWFNode> list, int AD_WF_Node_ID, int AD_Client_ID)
         {
+            List<MWFNode> tmplist = new List<MWFNode>();
             MWFNode node = GetNode(AD_WF_Node_ID);
             if (node != null
                 && (node.GetAD_Client_ID() == 0 || node.GetAD_Client_ID() == AD_Client_ID))
@@ -468,14 +469,24 @@ namespace VAdvantage.WF
                         || child.GetAD_Client_ID() == AD_Client_ID)
                     {
                         if (!list.Contains(child))
+                        {
                             list.Add(child);
+                            tmplist.Add(child);
+                        }
                     }
                 }
+                // VIS0008 Commented Old Logic to check remainder nodes
                 //	Remainder Nodes not connected
-                for (int i = 0; i < nexts.Length; i++)
+                //for (int i = 0; i < nexts.Length; i++)
+                //{
+                //    if (nexts[i].IsActive())
+                //        AddNodesSF(list, nexts[i].GetAD_WF_Next_ID(), AD_Client_ID);
+                //}
+
+                for (int i = 0; i < tmplist.Count; i++)
                 {
                     if (nexts[i].IsActive())
-                        AddNodesSF(list, nexts[i].GetAD_WF_Next_ID(), AD_Client_ID);
+                        AddNodesSF(list, tmplist[i].GetAD_WF_Node_ID(), AD_Client_ID);
                 }
             }
         }

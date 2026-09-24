@@ -255,6 +255,10 @@ namespace VAdvantage.WF
                 base.SetWFState(WFState);
                 _state = new StateEngine(GetWFState());
                 _state.SetCtx(GetCtx());
+                if (WFState.Equals(StateEngine.STATE_COMPLETED))
+                {
+                    Set_ValueNoCheck("VA137_ActionUser_ID", GetCtx().GetContextAsInt("#AD_User_ID"));
+                }
                 Save();			//	closed in MWFProcess.checkActivities()
                 UpdateEventAudit();
 
@@ -305,7 +309,71 @@ namespace VAdvantage.WF
             }
             else
                 _audit.SetEventType(MWFEventAudit.EVENTTYPE_StateChanged);
+            if (Env.IsModuleInstalled("VA137_"))
+            {
+                _audit.Set_ValueNoCheck("VA137_Action", Get_Value("VA137_Action"));
+                _audit.Set_ValueNoCheck("VA137_LastAction", Get_Value("VA137_LastAction"));
+                _audit.Set_ValueNoCheck("VA137_ActionUser_ID", Get_Value("VA137_ActionUser_ID"));
+                _audit.Set_ValueNoCheck("VA137_IsAllTeams", Get_Value("VA137_IsAllTeams"));
+                //_audit.Set_ValueNoCheck("VA137_Corresp_User_ID", Get_Value("VA137_Corresp_User_ID"));
+                //_audit.Set_ValueNoCheck("C_Team_ID", Get_Value("C_Team_ID"));
+                DataSet dsUsers = DB.ExecuteDataset("SELECT AD_User_ID FROM VA137_WF_Activity_User WHERE AD_WF_Activity_ID =  " + GetAD_WF_Activity_ID());
+                if (dsUsers != null && dsUsers.Tables[0].Rows.Count > 0)
+                {
+                    //string[] UserIDs = Util.GetValueOfString(Get_Value("VA137_Corresp_User_ID")).Split(',');
+                    for (int u = 0; u < dsUsers.Tables[0].Rows.Count; u++)
+                    {
+                        _audit.SaveUserTeam(Util.GetValueOfInt(dsUsers.Tables[0].Rows[u]["AD_User_ID"]), 0);
+                    }
+                }
+                DataSet dsTeams = DB.ExecuteDataset("SELECT C_Team_ID FROM VA137_WF_Activity_Team WHERE AD_WF_Activity_ID =  " + GetAD_WF_Activity_ID());
+                if (dsTeams != null && dsTeams.Tables[0].Rows.Count > 0)
+                {
+                    //string[] TeamIDs = Util.GetValueOfString(Get_Value("C_Team_ID")).Split(',');
+                    for (int t = 0; t < dsTeams.Tables[0].Rows.Count; t++)
+                    {
+                        _audit.SaveUserTeam(0, Util.GetValueOfInt(dsTeams.Tables[0].Rows[t]["C_Team_ID"]));
+                    }
+                }
+            }
             _audit.Save();
+
+            // --- Record Timeline: workflow node events -----------------------
+            // Mirror the WF audit into AD_EventTimeline so the timeline panel stays
+            // a single-table read. Only the states a reader cares about: a node
+            // suspended awaiting approval and a node that completed. The label is
+            // passed as an AD_Message key, not as English text - MEventTimeline
+            // stores the key in Title and resolves it through Msg for the note.
+            // The IsTracked check runs first so untracked documents never pay the
+            // GetPO() reload.
+            if (GetNode().GetAction() == X_AD_WF_Node.ACTION_UserChoice && MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
+            {
+                string wfState = GetWFState();
+                if (WFSTATE_Suspended.Equals(wfState))
+                {
+                    string resMsg = "";
+                    MWFResponsible resp = GetResponsible();
+                    if (resp.IsRole())
+                    {
+                        resMsg = Msg.GetMsg(GetCtx(), "Role") + " " + resp.GetRole().GetName();
+                    }
+                    else
+                    {
+                        MUser user = MUser.Get(GetCtx(), _audit.GetAD_User_ID());
+                        resMsg = Msg.GetMsg(GetCtx(), "User") + " " + user.GetName();
+                    }
+
+                    MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                        null, GetAD_WF_Node_ID(), resMsg + " " + GetNodeName(), MEventTimeline.MSG_SentFor);
+                }
+                else if (WFSTATE_Completed.Equals(wfState))
+                {
+                    MUser user = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
+                    MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                        null, GetAD_WF_Node_ID(), user.GetName() + " " + GetNodeName(),
+                        MEventTimeline.MSG_ApprovedBy);
+                }
+            }
         }
 
         /// <summary>
@@ -1700,6 +1768,29 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
                 return true;
             }
+            // vis0008 For correspondence actions
+            else if (MWFNode.ACTION_CorrespondenceAction.Equals(action))
+            {
+                try
+                {
+                    PO _po = GetPO(Get_TrxName());
+                    Assembly assembly = Assembly.Load("VA137Svc");
+                    Type type = assembly.GetType("VA137.Classes.VA137Common");
+                    object[] param = new object[3];
+                    param[0] = GetCtx();
+                    param[1] = _po;
+                    param[2] = this;
+                    var resultObj = type.GetMethod("ExecuteCorresAction").Invoke(null, param);
+                    log.SaveInfo("Correspondence Action", resultObj?.ToString());
+                }
+                catch (Exception ex)
+                {
+                    SetTextMsg(ex.Message);
+                    throw new Exception("Error while HTTPRequest - AD_Table_ID="
+                        + GetAD_Table_ID() + ", Record_ID=" + GetRecord_ID());
+                }
+                return false;
+            }
 
             throw new ArgumentException("Invalid Action (Not Implemented) =" + action);
         }
@@ -3049,6 +3140,14 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             if (GetResponsibleOrg_ID() > 0)
                 _audit.SetResponsibleOrg_ID(GetResponsibleOrg_ID());
             _audit.Save();
+
+            if (MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
+            {
+                MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                    null, GetAD_WF_Node_ID(), user.GetName() + " " + GetNodeName(),
+                    MEventTimeline.MSG_ForwardTo);
+            }
+
             return true;
         }
 
@@ -4664,25 +4763,30 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
 
                 token = inStr.Substring(0, j);
+                // Security: the result of ParseCustomQuery is executed as SQL
+                // (DB.ExecuteScalar(txt)). The substituted values are raw PO field
+                // values and client/org names that may contain single quotes (user
+                // editable / free text), so double quotes to keep them inside their
+                // string literal and prevent SQL injection.
                 if (token == "Tenant")
                 {
                     int id = po.GetAD_Client_ID();
-                    outStr.Append(DB.ExecuteScalar("Select Name FROM AD_Client WHERE AD_Client_ID=" + id));
+                    outStr.Append(EscapeSqlLiteral(Util.GetValueOfString(DB.ExecuteScalar("Select Name FROM AD_Client WHERE AD_Client_ID=" + id))));
                 }
                 else if (token == "Org")
                 {
                     int id = po.GetAD_Org_ID();
-                    outStr.Append(DB.ExecuteScalar("Select Name FROM AD_ORG WHERE AD_ORG_ID=" + id));
+                    outStr.Append(EscapeSqlLiteral(Util.GetValueOfString(DB.ExecuteScalar("Select Name FROM AD_ORG WHERE AD_ORG_ID=" + id))));
                 }
                 else if (token == "BPName")
                 {
                     if (po.Get_TableName() == "C_BPartner")
-                        outStr.Append(ParseVariable("Name", po));
+                        outStr.Append(EscapeSqlLiteral(ParseVariable("Name", po)));
                     else
                         outStr.Append("@" + token + "@");
                 }
                 else
-                    outStr.Append(ParseVariable(token, po));		// replace context
+                    outStr.Append(EscapeSqlLiteral(ParseVariable(token, po)));		// replace context
                 inStr = inStr.Substring(j + 1);
                 // from second @
                 i = inStr.IndexOf("@");
@@ -4690,6 +4794,15 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
 
             outStr.Append(inStr);           					//	add remainder
             return outStr.ToString();
+        }
+
+        /// <summary>
+        /// Escape a substituted value for safe embedding inside a SQL string literal
+        /// by doubling single quotes. Null/empty is passed through.
+        /// </summary>
+        private static string EscapeSqlLiteral(string value)
+        {
+            return string.IsNullOrEmpty(value) ? value : value.Replace("'", "''");
         }
 
         private string SaveActionLog(string emailto, Trx trxname)

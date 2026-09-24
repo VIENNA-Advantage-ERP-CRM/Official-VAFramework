@@ -3216,6 +3216,9 @@ p.vis-maintain-customer-p span {
     overflow: hidden;
     width: 100%;
     height: 100%;
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 2px solid #FFFFFF;
+    border-radius: 0.875em;
 }
 
 .vis-dynamicWidget-msg {
@@ -3586,6 +3589,8 @@ ul.vis-userLinks-ListMenu li a i {
     transition: transform 0.2s;
     float: left;
     height: 100%;
+    /* Added with the new side menu so percentage widths include borders/padding in the available space. */
+    box-sizing: border-box;
 }
 
 .vis-drag-info {
@@ -3621,30 +3626,67 @@ ul.vis-userLinks-ListMenu li a i {
     width: 30%;
     box-shadow: 0 0 7px 1px #cccccc;
     height: calc(100% - 3px);
+    /* Added with the new side menu to keep the Mosaic panel inside the resized home area. */
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .vis-widget-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 6px;
+    overflow: hidden;
     padding: 0.4rem;
     border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
 }
 
     .vis-widget-header h4 {
+        flex: 1 1 auto;
         color: rgba(var(--v-c-on-common), 1);
         font-size: 1.5rem;
         margin: 0;
+        /* Added after the side menu introduced narrower Mosaic widths; let controls stay visible. */
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
+
+    .vis-widget-header > .d-flex {
+        /* Added after the side menu so search can shrink while refresh/close keep their space. */
+        flex: 0 1 235px;
+        gap: 4px;
+        justify-content: flex-end;
+        min-width: 0;
+        max-width: calc(100% - 85px);
+        flex-wrap: nowrap;
+    }
+
+        .vis-widget-header > .d-flex input {
+            flex: 1 1 auto;
+            width: calc(100% - 68px);
+            min-width: 0;
+            max-width: 160px;
+        }
 
     .vis-widget-header .vis {
         background-color: rgba(var(--v-c-mandatory), 1);
-        padding: 0.4rem;
-        display: block;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         color: rgba(var(--v-c-common), 1) !important;
         font-size: 1rem;
         cursor: pointer;
         border: 1px solid rgba(var(--v-c-mandatory), 1);
+        flex: 0 0 auto;
+    }
+
+    .vis-widget-header .vis.mr-1 {
+        margin-right: 0 !important;
     }
 
         .vis-widget-header .vis:focus {
@@ -3782,7 +3824,8 @@ ul.vis-userLinks-ListMenu li a i {
 
 
 
-.vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]) .vis-widgetDelete {
+/* charts, KPIs and views have no action menu of their own, only reveal it when there is a description to show */
+.vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]):not(.vis-widgetHasInfo) .vis-widgetDelete {
     display: none;
 }
 
@@ -3812,6 +3855,32 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 
+/* Widget description popover, opened from the info action of the widget menu */
+.vis-widgetInfo-pop {
+    max-width: 20rem;
+    min-width: 12rem;
+    font-family: var(--v-c-font-family);
+}
+
+.vis-widgetInfo-head {
+    font-size: .875rem;
+    font-weight: bold;
+    color: rgba(var(--v-c-on-secondary), 1);
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+    padding: 7px 10px;
+    word-break: break-word;
+}
+
+.vis-widgetInfo-body {
+    font-size: .75rem;
+    line-height: 1.45;
+    color: rgba(var(--v-c-on-secondary), .85);
+    padding: 8px 10px;
+    max-height: 14rem;
+    overflow-y: auto;
+    white-space: pre-line;
+    word-break: break-word;
+}
 
 
 .vis-linksWidget {
@@ -3822,7 +3891,10 @@ ul.vis-userLinks-ListMenu li a i {
     justify-content: center;
     height: 100%;
     cursor: pointer;
-    border: 1px solid rgba(var(--v-c-primary), 0.05);
+    /*border: 1px solid rgba(var(--v-c-primary), 0.05);*/
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 2px solid #FFFFFF;
+    border-radius: 0.875em;
 }
 
 .vis-linksWidget .linktitle{
@@ -3925,7 +3997,8 @@ ul.vis-userLinks-ListMenu li a i {
     right: 1rem;
     top: 3rem;
     z-index: 999;
-    background-color: white;
+    background-color: rgba(var(--v-c-secondary), 1);
+    color: inherit;
 }
 
 .vis-nm-fav-menu-heading h1 {
@@ -3980,7 +4053,7 @@ ul.vis-userLinks-ListMenu li a i {
     }
 
 .vis-nm-fav-tile .vis-star-empty {
-    color: rgba(var(--v-c-primary), 1);
+    /*color: rgba(var(--v-c-primary), 1);*/
     font-size: 1.1rem;
 }
 
@@ -4022,7 +4095,7 @@ ul.vis-userLinks-ListMenu li a i {
 
     .vis_home-fav-count .vis {
         font-size: 1.1rem;
-        color: rgba(var(--v-c-primary), 1);
+        color:inherit;
     }
 
 .vis-nm-fav-icon-float {

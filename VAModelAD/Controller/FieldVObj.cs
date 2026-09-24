@@ -290,6 +290,12 @@ namespace VAdvantage.Controller
         public string AGName = ""; /* Action Group Name */
         public string AGFontName = ""; /* Action Group Font Name */
         public string AGStyle = "";
+        /* Action Group render type:
+         *   "" or "P" = Popover (existing dropdown of buttons)
+         *   "T"      = Toggle container (one field visible at a time, full available width)
+         *   "C"      = Parent container (all fields rendered inline side-by-side, sized by their natural width)
+         */
+        public string AGType = "";
 
 
         /// <summary>

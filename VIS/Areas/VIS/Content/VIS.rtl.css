@@ -143,7 +143,7 @@ html[dir="rtl"] .ui-menu .ui-menu-item-wrapper p {
     padding-right: 5px;
 }
 html[dir="rtl"] .vis-app-hdr-r-user a,
-html[dir="rtl"] .vis-app-hdr,
+
 html[dir="rtl"] .vis-attachhistory-attach-download,
 html[dir="rtl"] .vis-advancedSearchHorigontal > label,
 html[dir="rtl"] .vis-ad-w-p-nav-btns {
@@ -455,7 +455,7 @@ html[dir="rtl"] .vis-ad-w-p-s-plst li:nth-child(2) {
 
 html[dir="rtl"] .vis-ad-w-p-tabs-oflow a,
 html[dir="rtl"] .vis-statusbar-ul div,
-html[dir="rtl"] .vis-ad-w-p-s-plst li:nth-child(2),
+html[dir="rtl"] .vis-ad-w-p-s-plst li:nth-child(4),
 html[dir="rtl"] .vis-ad-w-p-s-plst li:last-child,
 html[dir="rtl"] .input-group-text .fa-arrow-left,
 html[dir="rtl"] .vis-cardviewbutton button.vis-btnright,

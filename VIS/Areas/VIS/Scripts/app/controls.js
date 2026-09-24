@@ -1213,7 +1213,7 @@
         this.values = null;
         this.isIconSet = true;
 
-        var $img = $("<i style='color:inherit' title='" + text + "'>");
+        var $img = $("<i style='color:inherit;display:none' title='" + text + "'>");
         var $imgSrc = $("<img style='color:inherit;display:none' title='" + text + "' />");
 
         var $txt = $("<span style='color:inherit'>").text(text);
@@ -4295,6 +4295,11 @@
      *  @param title title
      */
 
+    // Optional column, on the tab that owns the location field, holding the
+    // record level address qualifier (flat / door / floor number). When present
+    // its value is shown in front of the address string - see refreshDisplay().
+    var ADDITIONAL_ADDRESS_INFO = "AdditionalAddressInfo";
+
     function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup, hideMapButton) {
         if (!displayType) {
             displayType = VIS.DisplayType.Location;
@@ -4388,9 +4393,22 @@
             if (self.mField && self.mField.vo)
                 maintainVers = self.mField.vo.IsMaintainVersions;
             var obj = new VIS.LocationForm(self.value, maintainVers);
+
+            // Additional Address Info: when the current tab/table has an
+            // "AdditionalAddressInfo" column, show an extra section in the
+            // location form seeded from that column/context value.
+            var addlGridTab = (self.mField && self.mField.gridTab) ? self.mField.gridTab : null;
+            var hasAddlColumn = addlGridTab && addlGridTab.getTableModel().findColumn(ADDITIONAL_ADDRESS_INFO) >= 0;
+            if (hasAddlColumn) {
+                obj.setAdditionalAddressInfo(addlGridTab.getValue(ADDITIONAL_ADDRESS_INFO));
+                // Hand the master address over so the dialog can preview exactly
+                // the string this control paints once it is closed.
+                obj.setAddressDisplay(VIS.Utility.decodeText(self.lastDisplay || ""));
+            }
+
             obj.load();
             obj.showDialog();
-            obj.onClose = function (location, change) {
+            obj.onClose = function (location, change, additionalInfo, hasAdditionalInfo) {
                 //if (self.oldValue != location)
                 {
                     if (change) {
@@ -4402,6 +4420,24 @@
                         self.fireValueChanged(evt);
                         evt = null;
                     }
+
+                    // Write the additional address info back to its own
+                    // column/context when it actually changed. Routed through
+                    // gridTab.setValue so it updates data, refreshes the field
+                    // and runs callouts in both form and inline-grid modes.
+                    if (hasAdditionalInfo && hasAddlColumn) {
+                        var newAddl = (additionalInfo == null || additionalInfo === "") ? null : additionalInfo;
+                        var curAddl = addlGridTab.getValue(ADDITIONAL_ADDRESS_INFO);
+                        curAddl = (curAddl == null || curAddl === "") ? null : String(curAddl);
+                        if (curAddl !== (newAddl == null ? null : String(newAddl))) {
+                            addlGridTab.setValue(ADDITIONAL_ADDRESS_INFO, newAddl);
+                        }
+                    }
+
+                    // Repaint: the additional info is part of the address string
+                    // shown here, and it can change without the C_Location_ID
+                    // changing (so setValue alone would leave it stale).
+                    self.refreshDisplay();
                 }
             };
             obj = null;
@@ -4427,6 +4463,30 @@
 
     VIS.Utility.inheritPrototype(VLocation, IControl);//inherit IControl
 
+    /**
+     *  Current value of the AdditionalAddressInfo column on the tab that owns
+     *  this field, or null when the tab has no such column - or when the control
+     *  is used standalone (BPartner form, amount dimension) and has no field.
+     */
+    VLocation.prototype.getAdditionalInfo = function () {
+        var gridTab = (this.mField && this.mField.gridTab) ? this.mField.gridTab : null;
+        if (!gridTab || gridTab.getTableModel().findColumn(ADDITIONAL_ADDRESS_INFO) < 0) {
+            return null;
+        }
+        return gridTab.getValue(ADDITIONAL_ADDRESS_INFO);
+    };
+
+    /**
+     *  Paint the textbox from the cached master address plus the record's
+     *  additional info. Kept separate from setValue() because the info changes
+     *  independently of the C_Location_ID - on row change, when edited in its own
+     *  field, or when returning from the location dialog.
+     */
+    VLocation.prototype.refreshDisplay = function () {
+        var display = VIS.MLocationLookup.combineAddress(this.lastDisplay, this.getAdditionalInfo());
+        this.ctrl.val(VIS.Utility.decodeText(display));
+    };
+
     VLocation.prototype.setValue = function (newValue) {
         if (this.oldValue != newValue) {
             this.settingValue = true;
@@ -4436,29 +4496,27 @@
             //	Set comboValue
             if (newValue == null) {
                 this.lastDisplay = "";
-                this.ctrl.val("");
                 this.settingValue = false;
-                return;
             }
-            if (this.lookup == null) {
-                this.ctrl.val(newValue.toString());
+            else if (this.lookup == null) {
                 this.lastDisplay = newValue.toString();
                 this.settingValue = false;
-                return;
             }
-
-            this.lastDisplay = this.lookup.getDisplay(newValue);
-            if (this.lastDisplay.equals("<-1>")) {
-                this.lastDisplay = "";
-                this.oldValue = null;
-                this.value = null;
+            else {
+                this.lastDisplay = this.lookup.getDisplay(newValue);
+                if (this.lastDisplay.equals("<-1>")) {
+                    this.lastDisplay = "";
+                    this.oldValue = null;
+                    this.value = null;
+                }
+                this.value = newValue;
+                this.settingValue = true;
             }
-            this.value = newValue;
-            //this.ctrl.val(this.lastDisplay);
-            this.ctrl.val(VIS.Utility.decodeText(this.lastDisplay));
-            this.settingValue = true;
-
         }
+        // Always repaint, even when the id did not change: moving to another
+        // record that shares the same address still has to pick up that record's
+        // own additional info.
+        this.refreshDisplay();
     };
 
     VLocation.prototype.getValue = function () {
@@ -4471,7 +4529,12 @@
             retValue = this.value;
         else
             retValue = this.lookup.getDisplay(this.value);
-        return retValue;
+
+        var addl = this.getAdditionalInfo();
+        if (addl == null || String(addl).trim().length == 0) {
+            return retValue;
+        }
+        return VIS.MLocationLookup.combineAddress(retValue, addl);
     };
 
     //END
@@ -6424,7 +6487,7 @@
             else {
                 $.ajax({
                     url: baseUrl + 'productContainer/GetProductContainer',
-                    data: { text: text, validation: validated },
+                    data: { text: text, validation: VIS.secureEngine.encrypt(validated) },
                     success: function (result) {
                         result = JSON.parse(result);
                         if (result == "null" || result == null || result == "" || result == 0) {
@@ -6606,8 +6669,23 @@
         var validation = null;
         var validationData = [];
 
+        // Card "static content" via style-logic syntax: when ColSql is a conditional
+        // expression (e.g. @IsActive@='Y' ? 'Active' : 'Inactive') instead of a SQL
+        // statement, evaluate it from the record on the client so we don't round-trip
+        // to the DB. Falls through to the normal SQL/static handling otherwise.
+        if (this.needtoParse && records && !$.isEmptyObject(records) && this.isStyleLogicExpr(this.colSql)) {
+            var staticVal = this.evaluateStyleLogicFromRecord(this.colSql, records);
+            staticVal = (staticVal == null) ? "" : staticVal;
+            if (isHTML) {
+                this.ctrl.html(staticVal);
+            } else {
+                this.ctrl.text(staticVal);
+            }
+            return;
+        }
+
         if (this.needtoParse) {
-            if (records && !$.isEmptyObject(records)) { // parse sql query with records 
+            if (records && !$.isEmptyObject(records)) { // parse sql query with records
                 validationData = VIS.Env.parseSQLFromRecords(this.colSql, records);
                 for (var i = 0; i < validationData.length > 0; i++) {
                     this.colSql = this.colSql.replace('@' + validationData[i].Key + '@', validationData[i].Value);
@@ -6689,6 +6767,69 @@
             //    }
             //});
         }
+    };
+
+    /**
+     * Detect a card "static content" style-logic expression (vs a real SQL statement).
+     * Form: <logic> ? <trueValue> [: <falseValue>] [, <logic> ? ... ]
+     * e.g. @IsActive@='Y' ? 'Active' : 'Inactive'
+     * Such an expression is evaluated on the client from the record, avoiding a DB round trip.
+     */
+    VKeyText.prototype.isStyleLogicExpr = function (expr) {
+        return !!expr && expr.indexOf('?') > -1 && expr.toLowerCase().indexOf('select') == -1;
+    };
+
+    /**
+     * Evaluate a style-logic expression against a record and return the resolved static content.
+     * Conditions are evaluated with VIS.Evaluator (supports = ! ^ < > and &/| ); values may be
+     * quoted literals or @ColumnName@ references resolved from the same record.
+     * Returns null when no clause matches and no false/default value is given.
+     */
+    VKeyText.prototype.evaluateStyleLogicFromRecord = function (expr, records) {
+        var source = {
+            getValueAsString: function (variable) {
+                var v = records[('' + variable).toLowerCase()];
+                return (v === null || v === undefined) ? "" : ('' + v);
+            }
+        };
+        var resolveValue = function (s) {
+            s = (s == null ? "" : ('' + s)).trim();
+            if (s.length >= 2 &&
+                ((s.charAt(0) == "'" && s.charAt(s.length - 1) == "'") ||
+                 (s.charAt(0) == '"' && s.charAt(s.length - 1) == '"'))) {
+                return s.substring(1, s.length - 1); // quoted literal
+            }
+            if (s.indexOf('@') > -1) { // allow the value to reference another record field
+                s = s.replace(/@([^@]+)@/g, function (m, col) { return source.getValueAsString(col); });
+            }
+            return s;
+        };
+
+        var clauses = expr.split(',');
+        for (var c = 0; c < clauses.length; c++) {
+            var clause = clauses[c];
+            var qIdx = clause.indexOf('?');
+            if (qIdx == -1) {
+                return resolveValue(clause); // bare value acts as a default
+            }
+            var cond = clause.substring(0, qIdx);
+            var rest = clause.substring(qIdx + 1);
+            var colonIdx = rest.indexOf(':');
+            var trueVal = (colonIdx == -1) ? rest : rest.substring(0, colonIdx);
+            var falseVal = (colonIdx == -1) ? null : rest.substring(colonIdx + 1);
+            var matched = false;
+            try {
+                matched = VIS.Evaluator.evaluateLogic(source, cond);
+            } catch (e) {
+                matched = false;
+            }
+            if (matched) {
+                return resolveValue(trueVal);
+            } else if (falseVal != null) {
+                return resolveValue(falseVal);
+            }
+        }
+        return null;
     };
 
     VKeyText.prototype.getValue = function () {
@@ -7089,7 +7230,7 @@
             this.settingVal = true;
             //else
             //his.ctrl.val(newValue);
-            if (!newValue && newValue !='') {
+            if (!newValue && newValue != '') {
                 this.iti ? this.iti.setNumber('') : this.ctrl.val('');
                 this.setCountry();
             } else {

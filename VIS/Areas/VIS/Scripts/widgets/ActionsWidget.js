@@ -45,7 +45,10 @@
             // welcomeActionsDivId.find("#refreshDivId" + $self.AD_UserHomeWidgetID).on("click", $self.refreshWidget);
             modelPopupId.find("#closeBtnId" + $self.AD_UserHomeWidgetID).on("click", function () {
                 modelPopupId.hide();
-                wform.dispose();
+                if (wform) {
+                    wform.dispose();
+                    wform = null;
+                }
                 $self.refreshWidget();
             });
             followupsDivId.on("click", function () {
@@ -176,7 +179,10 @@
 
         //Opne Workflow Widget
         function opneWorkflow() {
-            showWidgets('VIS.WorkflowWidget');
+            var widgetPanel = showWidgets('VIS.WorkflowWidget', false);
+            if (widgetPanel && widgetPanel.openWorkflowModal) {
+                widgetPanel.openWorkflowModal();
+            }
             // var objWorkflowWidget = new VIS.WorkflowWidget();
             // objWorkflowWidget.init($self.windowNo, $self.frame);
         };
@@ -193,12 +199,18 @@
             //objRequestsWidget.init($self.windowNo, $self.frame);
         };
         //Show Widget in Popup
-        function showWidgets(clsName) {
+        function showWidgets(clsName, showPopup) {
+            showPopup = showPopup !== false;
+            if (wform) {
+                wform.dispose();
+                wform = null;
+            }
             modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).empty();
             wform = new VIS.AForm();
             wform.openWidget(clsName, $self.windowNo, $self.frame.widgetInfo);
             modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).append(wform.getContentGrid());
-            modelPopupId.show();
+            modelPopupId.toggle(showPopup);
+            return wform.mPanel;
         };
 
         // Function to show red dot if there is a new chat from subscribed record

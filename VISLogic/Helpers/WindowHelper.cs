@@ -1039,6 +1039,7 @@ namespace VIS.Helpers
                 versionInfo.AD_Table_ID = AD_Table_ID;
                 versionInfo.Record_ID = Record_ID;
                 versionInfo.AD_Window_ID = inn.AD_WIndow_ID;
+                versionInfo.AD_Tab_ID = inn.AD_Tab_ID;
                 versionInfo.ImmediateSave = inn.ImmediateSave;
                 versionInfo.TableName = inn.TableName;
 
@@ -2535,8 +2536,15 @@ namespace VIS.Helpers
                     sql = sql + " AND (" + columnName + " NOT IN (" + whereCondition + ") OR " + columnName + " IS NULL) ";
                 }
             }
-
-            return Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            try
+            {
+                return Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            }
+            catch (Exception ex)
+            {
+                log.Severe("Card query err ->" + ex.Message);
+                return 0;
+            }
         }
 
         /// <summary>
@@ -3664,6 +3672,15 @@ namespace VIS.Helpers
         {
             //ZoomChildTab
             int recordID = 0;
+            // SECURITY: SelectColumn/SelectTable/WhereColumn are client-supplied and are concatenated as SQL
+            // identifiers (cannot be bind parameters). Reject anything that is not a plain identifier.
+            // (WhereValue is already coerced to int below.)
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(SelectColumn)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(SelectTable)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(WhereColumn))
+            {
+                return 0;
+            }
             string sql = "SELECT " + SelectColumn + " FROM " + SelectTable + " WHERE " + WhereColumn + "=" + Util.GetValueOfInt(WhereValue);
             recordID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
             return recordID;
@@ -3679,6 +3696,14 @@ namespace VIS.Helpers
         public dynamic GetZoomWhereClause(string value, int refId,string colName)
         {
             dynamic data = new ExpandoObject();
+
+            // SECURITY: colName is client-supplied and can end up concatenated into SQL as an identifier
+            // (keyColName) when the AD_Ref_Table lookup returns no row. Reject non-identifier input.
+            // (refId is int; value is int-parsed or escaped via DB.TO_STRING below.)
+            if (!string.IsNullOrEmpty(colName) && !VIS.Classes.QueryValidator.IsValidIdentifier(colName))
+            {
+                return data;
+            }
 
             string sql = "SELECT kc.ColumnName, tt.TableName"
                             + " FROM AD_Ref_Table rt"
@@ -3781,6 +3806,22 @@ namespace VIS.Helpers
                     Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
                 }
             }
+
+            var formattedColumns = Columns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if(c.Contains("RAWTOHEX") || c.Contains("::text"))
+                    {
+                        return c;
+                    }
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
 
             string SelectSQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName;
             if (!string.IsNullOrEmpty(SelectSQL))

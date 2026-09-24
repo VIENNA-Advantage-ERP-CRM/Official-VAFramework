@@ -3,6 +3,16 @@
 
     var tmpTabPnl = document.querySelector('#vis-ad-tabpnltmp').content;// $("#vis-ad-windowtmp");
 
+    /* AD_TabPanel.ExtraInfo can hold a JSON config, and its double quotes end the
+       data-extrainfo attribute early - the panel then receives a truncated
+       fragment instead of its config (e.g. just "{"), so its dataUrl is never
+       set and it fetches nothing. Escape before embedding. */
+    function escAttr(v) {
+        return String(v).replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    }
+
     function VTabPanel(windowNo, wWidth) {
 
        // this.defaultObj = null; // it sontain obj if all tab panel is aligned to bootom or right old
@@ -11,6 +21,7 @@
 
 
         this.width = wWidth;
+        this.rawWidth = wWidth; // original percentage as received; this.width gets converted to px below
         this.tabPanels = []; //All object
         this.isShowAll = false;
         this.curTabPanel = null;
@@ -206,6 +217,10 @@
                 $divContent.hide();
             }
 
+            // show/hide resize handle based on panel open/closed state
+            if ($divBody.is('.ui-resizable'))
+                $divBody.children('.ui-resizable-handle').toggle(!this.isClosed);
+
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged();
 
@@ -341,7 +356,7 @@
         }
         else if (gTab.getIsShowBothTP()) {
             //special
-            this.specialObj = new VTabPanel(this.windowNo, this.width);
+            this.specialObj = new VTabPanel(this.windowNo, this.rawWidth);
             this.specialObj.addSizeChangeListner(this.sizeChangedListner);
             this.specialObj.parent = this;
             this.specialObj.init(gTab, true);
@@ -372,7 +387,7 @@
                         iconPath = 'fa fa-object-group';// 'VIS/Images/base/defPanel.ico';// "fa fa-window-maximize";//'VIS/Images/base/defPanel.ico';
                     }
                     str.push('<li default="' + panels[i].getIsDefault() + '" data-panelid="' + panels[i].getAD_TabPanel_ID() +
-                        '" data-cname="' + panels[i].getClassName() + '" data-name="' + panels[i].getName() + '"  data-extrainfo="' + panels[i].getExtraInfo() + '" >');
+                        '" data-cname="' + panels[i].getClassName() + '" data-name="' + panels[i].getName() + '"  data-extrainfo="' + escAttr(panels[i].getExtraInfo()) + '" >');
                     if (iconPath.indexOf('.') > -1)
                         str.push('<img alt = "' + panels[i].getName() + '" title = "' + panels[i].getName() +
                             '"  src = "' + VIS.Application.contextUrl + 'Areas/' + iconPath + '" onerror=this.src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/defpanel.ico"></img >');
@@ -444,6 +459,8 @@
                             }
                         }
                     })
+                // hide resize handle if panel is closed initially (no default panel)
+                body.children('.ui-resizable-handle').toggle(!this.isClosed);
                // }, 1000); //wait for dom to be ready
             }
         }

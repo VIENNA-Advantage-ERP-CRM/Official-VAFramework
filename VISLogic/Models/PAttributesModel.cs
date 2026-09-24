@@ -434,6 +434,8 @@ namespace VIS.Models
             int codeCount = Util.GetValueOfInt(DB.ExecuteScalar(attrCodeQry));
             bool hasValue = codeCount > 0 ? true : false;
 
+            // SECURITY: attrcode is client-controlled; escape single quotes before embedding in SQL literal
+            attrcode = attrcode == null ? null : attrcode.Replace("'", "''");
             // JID_1388: On ASI Control if we select attribute form existing instance same is not showing on control.
             if (hasValue)
             {
@@ -442,7 +444,7 @@ namespace VIS.Models
             }
             else
             {
-                attrsetQry = @"SELECT ats.M_AttributeSet_ID FROM M_ProductAttributes patr LEFT JOIN  M_AttributeSetInstance ats 
+                attrsetQry = @"SELECT ats.M_AttributeSet_ID FROM M_ProductAttributes patr LEFT JOIN  M_AttributeSetInstance ats
                         ON (patr.M_AttributeSetInstance_ID=ats.M_AttributeSetInstance_ID) where patr.AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND patr.UPC='" + attrcode + "'";
             }
             attributeSet = Util.GetValueOfInt(DB.ExecuteScalar(attrsetQry));
@@ -564,13 +566,15 @@ namespace VIS.Models
             string attrCodeQry = "SELECT Count(*) FROM AD_Column WHERE AD_Table_ID = 559 AND ColumnName = 'Value'";
             int codeCount = Util.GetValueOfInt(DB.ExecuteScalar(attrCodeQry));
             bool hasValue = codeCount > 0 ? true : false;
+            // SECURITY: attrcode is client-controlled; escape single quotes before embedding in SQL literal
+            attrcode = attrcode == null ? null : attrcode.Replace("'", "''");
             if (hasValue)
             {
                 attrsetQry = @"SELECT M_AttributeSet_ID FROM M_AttributeSetInstance WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND Value='" + attrcode + "'";
             }
             else
             {
-                attrsetQry = @"SELECT ats.M_AttributeSet_ID FROM M_ProductAttributes patr LEFT JOIN  M_AttributeSetInstance ats 
+                attrsetQry = @"SELECT ats.M_AttributeSet_ID FROM M_ProductAttributes patr LEFT JOIN  M_AttributeSetInstance ats
                         ON (patr.M_AttributeSetInstance_ID=ats.M_AttributeSetInstance_ID) where patr.UPC='" + attrcode + "'";
             }
             attributeSet = Util.GetValueOfInt(DB.ExecuteScalar(attrsetQry));
@@ -945,14 +949,16 @@ namespace VIS.Models
                 if (!productWindow && strAttrCode != "")
                 {
                     qryAttr = new StringBuilder();
+                    // SECURITY: strAttrCode is client-controlled; escape single quotes for use in SQL literals
+                    string strAttrCodeSql = strAttrCode.Replace("'", "''");
                     if (hasValue)
                     {
-                        qryAttr.Append(@"SELECT Count(M_AttributeSetInstance_ID) FROM M_AttributeSetInstance WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND Value = '" + strAttrCode + "'");
+                        qryAttr.Append(@"SELECT Count(M_AttributeSetInstance_ID) FROM M_AttributeSetInstance WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND Value = '" + strAttrCodeSql + "'");
                         prdAttributes = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                         if (prdAttributes != 0)
                         {
                             qryAttr.Clear();
-                            qryAttr.Append("SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND Value = '" + strAttrCode + "'");
+                            qryAttr.Append("SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND Value = '" + strAttrCodeSql + "'");
                             attributeID = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                         }
                     }
@@ -960,12 +966,12 @@ namespace VIS.Models
                     {
                         qryAttr.Append(@"SELECT Count(M_Product_ID) FROM M_Product prd LEFT JOIN M_ProductAttributes patr on (prd.M_Product_ID=patr.M_Product_ID) " +
                         " LEFT JOIN M_Manufacturer muf on (prd.M_Product_ID=muf.M_Product_ID) WHERE prd.AD_Client_ID = " + ctx.GetAD_Client_ID()
-                        + " AND (patr.UPC = '" + strAttrCode + "' OR prd.UPC = '" + strAttrCode + "' OR muf.UPC = '" + strAttrCode + "')");
+                        + " AND (patr.UPC = '" + strAttrCodeSql + "' OR prd.UPC = '" + strAttrCodeSql + "' OR muf.UPC = '" + strAttrCodeSql + "')");
                         prdAttributes = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                         if (prdAttributes != 0)
                         {
                             qryAttr.Clear();
-                            qryAttr.Append("SELECT M_ProductAttributes_ID FROM M_ProductAttributes WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND UPC = '" + strAttrCode + "'");
+                            qryAttr.Append("SELECT M_ProductAttributes_ID FROM M_ProductAttributes WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND UPC = '" + strAttrCodeSql + "'");
                             pAttribute_ID = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                             if (pAttribute_ID != 0)
                             {
@@ -991,7 +997,8 @@ namespace VIS.Models
                     }
                     else
                     {
-                        sql.Append("UPPER(ats.Lot) = '" + text.ToUpper() + "'");
+                        // SECURITY: Lot text is client-controlled; escape single quotes for SQL literal
+                        sql.Append("UPPER(ats.Lot) = '" + text.ToUpper().Replace("'", "''") + "'");
                     }
                     if (aset.IsLotMandatory() && (text == null || text.Length == 0))
                         mandatory += " - " + Msg.Translate(ctx, "Lot");
@@ -1010,7 +1017,8 @@ namespace VIS.Models
                     }
                     else
                     {
-                        serQry = " UPPER(ats.SerNo) = '" + text.ToUpper() + "'";
+                        // SECURITY: SerNo text is client-controlled; escape single quotes for SQL literal
+                        serQry = " UPPER(ats.SerNo) = '" + text.ToUpper().Replace("'", "''") + "'";
                     }
                     if (sql.Length > 0)
                     {
@@ -1130,7 +1138,8 @@ namespace VIS.Models
                                 qry.Append(" OR");
                             }
                             attrCount++;
-                            qry.Append("( au.Value = '" + Util.GetValueOfString(lst[attributes[i]]) + "' AND au.M_Attribute_ID=" + attributes[i].GetM_Attribute_ID() + " )");
+                            // SECURITY: attribute value originates from client editors; escape single quotes for SQL literal
+                            qry.Append("( au.Value = '" + Util.GetValueOfString(lst[attributes[i]]).Replace("'", "''") + "' AND au.M_Attribute_ID=" + attributes[i].GetM_Attribute_ID() + " )");
                             hasAttr = true;
                         }
                     }
@@ -1486,26 +1495,28 @@ namespace VIS.Models
             if (!productWindow && strAttrCode != "")
             {
                 qryAttr = new StringBuilder();
+                // SECURITY: strAttrCode is client-controlled; escape single quotes for use in SQL literals
+                string strAttrCodeSql = strAttrCode.Replace("'", "''");
                 if (hasValue)
                 {
-                    qryAttr.Append(@"SELECT count(*) FROM M_AttributeSetInstance WHERE Value = '" + strAttrCode + "'");
+                    qryAttr.Append(@"SELECT count(*) FROM M_AttributeSetInstance WHERE Value = '" + strAttrCodeSql + "'");
                     prdAttributes = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                     if (prdAttributes != 0)
                     {
                         qryAttr.Clear();
-                        qryAttr.Append("SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE Value = '" + strAttrCode + "'");
+                        qryAttr.Append("SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE Value = '" + strAttrCodeSql + "'");
                         attributeID = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                     }
                 }
                 else
                 {
                     qryAttr.Append(@"SELECT count(*) FROM M_Product prd LEFT JOIN M_ProductAttributes patr on (prd.M_Product_ID=patr.M_Product_ID) " +
-                    " LEFT JOIN M_Manufacturer muf on (prd.M_Product_ID=muf.M_Product_ID) WHERE (patr.UPC = '" + strAttrCode + "' OR prd.UPC = '" + strAttrCode + "' OR muf.UPC = '" + strAttrCode + "')");
+                    " LEFT JOIN M_Manufacturer muf on (prd.M_Product_ID=muf.M_Product_ID) WHERE (patr.UPC = '" + strAttrCodeSql + "' OR prd.UPC = '" + strAttrCodeSql + "' OR muf.UPC = '" + strAttrCodeSql + "')");
                     prdAttributes = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                     if (prdAttributes != 0)
                     {
                         qryAttr.Clear();
-                        qryAttr.Append("SELECT M_ProductAttributes_ID FROM M_ProductAttributes WHERE UPC = '" + strAttrCode + "'");
+                        qryAttr.Append("SELECT M_ProductAttributes_ID FROM M_ProductAttributes WHERE UPC = '" + strAttrCodeSql + "'");
                         pAttribute_ID = Util.GetValueOfInt(DB.ExecuteScalar(qryAttr.ToString()));
                         if (pAttribute_ID != 0)
                         {
@@ -1531,7 +1542,8 @@ namespace VIS.Models
                 }
                 else
                 {
-                    sql.Append("UPPER(ats.Lot) = '" + text.ToUpper() + "'");
+                    // SECURITY: Lot text is client-controlled; escape single quotes for SQL literal
+                    sql.Append("UPPER(ats.Lot) = '" + text.ToUpper().Replace("'", "''") + "'");
                 }
                 if (aset.IsLotMandatory() && (text == null || text.Length == 0))
                     mandatory += " - " + Msg.Translate(ctx, "Lot");
@@ -1550,7 +1562,8 @@ namespace VIS.Models
                 }
                 else
                 {
-                    serQry = " UPPER(ats.SerNo) = '" + text.ToUpper() + "'";
+                    // SECURITY: SerNo text is client-controlled; escape single quotes for SQL literal
+                    serQry = " UPPER(ats.SerNo) = '" + text.ToUpper().Replace("'", "''") + "'";
                 }
                 if (sql.Length > 0)
                 {
@@ -1659,7 +1672,8 @@ namespace VIS.Models
                             qry += " OR";
                         }
                         attrCount++;
-                        qry += " au.value = '" + Util.GetValueOfString(lst[attributes[i]]) + "'";
+                        // SECURITY: attribute value originates from client editors; escape single quotes for SQL literal
+                        qry += " au.value = '" + Util.GetValueOfString(lst[attributes[i]]).Replace("'", "''") + "'";
                         hasAttr = true;
                     }
                 }
@@ -2060,7 +2074,8 @@ namespace VIS.Models
                 {
                     sqlWhere = sqlWhere.Remove(0, 3);
                     sql = sql + " AND (" + sqlWhere.ToString();
-                    sql = sql + ") AND s.M_AttributeSetInstance_ID IN (SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE Lot = '" + lotString + "')";
+                    // SECURITY: lotString is client-controlled (LotNumber param); escape single quotes for SQL literal
+                    sql = sql + ") AND s.M_AttributeSetInstance_ID IN (SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE Lot = '" + lotString.Replace("'", "''") + "')";
                 }
                 Count = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
             }

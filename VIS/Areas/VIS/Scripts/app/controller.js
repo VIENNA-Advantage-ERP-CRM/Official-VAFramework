@@ -245,6 +245,10 @@
         return this.vo.IsAdvanceTask;
     };
 
+    GridWindow.prototype.getIsRiskRegister = function () {
+        return this.vo.IsRiskRegister;
+    };
+
     GridWindow.prototype.getIsEmail = function () {
         return this.vo.IsEmail;
     };
@@ -470,6 +474,7 @@
         this.tabPanels = [];
         this.tabPanelsRght = [];
         this.tabPanelsBotm = []; //bottom aligned tab panels
+        this.activeView = 'G'; //current view for view-wise tab panel filtering (G/S/C); meaningful only when IsViewWisePanel
         this.linkColumnName = gTab._linkColumnName;
         this.extendedWhere = gTab._extendedWhere;
         this.keyColumnName = "";
@@ -725,12 +730,14 @@
 
     GridTab.prototype.getIsTPBottomAligned = function () {
         // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
-        return this.tabPanelsBotm.length > 0;
+        // view-aware: a bottom panel bound to another view must not force
+        // bottom-aligned layout (single page scroll) on the current view.
+        return this.getTabPanelsBotm().length > 0;
     };
 
     GridTab.prototype.getIsShowBothTP = function () {
         // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
-        return this.tabPanelsBotm.length > 0 && this.tabPanelsRght.length > 0;
+        return this.getTabPanelsBotm().length > 0 && this.getTabPanelsRght().length > 0;
     };
 
     GridTab.prototype.getIsTPBottomShowAll = function () {
@@ -1494,6 +1501,7 @@
     };
 
     GridTab.prototype.loadTabPanels = function () {
+        this._isViewWise = false;
         if (this.gTab._panels && this.gTab._panels.length > 0) {
             this.hasPanel = true;
             for (var i = 0; i < this.gTab._panels.length; i++) {
@@ -1508,6 +1516,12 @@
                     this.tabPanelsRght.push(gridTabPanel);
                 }
                 this.tabPanels.push(gridTabPanel); //all list
+                // view-wise mode is auto-derived: any panel carrying a ViewType
+                // (Y/N/C) flips this tab into view-wise rendering. Panels with
+                // empty ViewType still render as legacy/shared across views.
+                if (gridTabPanel.getViewType()) {
+                    this._isViewWise = true;
+                }
             }
         }
         else {
@@ -1569,18 +1583,68 @@
     };
 
     GridTab.prototype.getHasPanel = function () {
+        // view-wise: presence depends on the active view's filtered set; until
+        // a view is set (legacy frame / before activation) keep the raw flag.
+        if (this.isViewWisePanel() && this.activeView)
+            return this.getTabPanels().length > 0;
         return this.hasPanel;
     }
 
+    // View-filtered getters. Without an active view yet (legacy frame /
+    // before activation) fall back to the full lists — old behavior.
     GridTab.prototype.getTabPanels = function () {
-        return this.tabPanels;
+        return (this.isViewWisePanel() && this.activeView) ? filterPanelsByView(this.tabPanels, this.activeView) : this.tabPanels;
     };
     GridTab.prototype.getTabPanelsBotm = function () {
-        return this.tabPanelsBotm;
+        return (this.isViewWisePanel() && this.activeView) ? filterPanelsByView(this.tabPanelsBotm, this.activeView) : this.tabPanelsBotm;
     };
     GridTab.prototype.getTabPanelsRght = function () {
-        return this.tabPanelsRght;
+        return (this.isViewWisePanel() && this.activeView) ? filterPanelsByView(this.tabPanelsRght, this.activeView) : this.tabPanelsRght;
     };
+
+    // Unfiltered list — for consumers that must see every panel regardless of
+    // the active view (e.g. checklist/survey validation on save).
+    GridTab.prototype.getAllTabPanels = function () {
+        return this.tabPanels;
+    };
+
+    GridTab.prototype.isViewWisePanel = function () {
+        return this._isViewWise === true;
+    };
+
+    GridTab.prototype.setActiveView = function (v) {
+        // v: 'Y' (single), 'N' (grid), 'C' (card) — same codes as
+        // AD_Tab.TabLayout / AD_TabPanel.ViewType.
+        this.activeView = v;
+    };
+
+    GridTab.prototype.getActiveView = function () {
+        return this.activeView;
+    };
+
+    // Resolve per-view panel width override (percentage). Returns the first non-zero
+    // PanelWidth among panels matching the view; 0 means "no override — caller falls back".
+    GridTab.prototype.getPanelWidthForView = function (v) {
+        if (!this.isViewWisePanel()) return 0;
+        for (var i = 0; i < this.tabPanels.length; i++) {
+            if (this.tabPanels[i].getViewType() === v) {
+                var w = this.tabPanels[i].getPanelWidth();
+                if (w && w > 0) return w;
+            }
+        }
+        return 0;
+    };
+
+    // Per-view filter: panels with ViewType === v, plus legacy panels (ViewType empty/null)
+    // which act as shared/visible-on-all-views.
+    function filterPanelsByView(list, v) {
+        var out = [];
+        for (var i = 0; i < list.length; i++) {
+            var vt = list[i].getViewType();
+            if (vt === v || !vt) out.push(list[i]);
+        }
+        return out;
+    }
 
     GridTab.prototype.validateQuery = function (query) {
         if (query == null || query.getRestrictionCount() == 0)
@@ -2285,8 +2349,16 @@
             e.Updated = this.getValue("Updated");
             e.UpdatedBy = this.getValue("UpdatedBy");
             e.Record_ID = this.getKeyID(e.getCurrentRow());  //this.getValue(this.keyColumnName);
-            //  Info
-            var info = new StringBuilder(this.getTableName());
+            //  Info - show Window (screen) name along with the table name
+            var info = new StringBuilder();
+            var windowName = VIS.context.getWindowContext(this.vo.windowNo, "WindowName", true);
+            if ((windowName == null || windowName.length == 0) && this.gridWindow != null) {
+                windowName = this.gridWindow.getDisplayName() || this.gridWindow.getName();
+            }
+            if (windowName != null && windowName.length > 0) {
+                info.append(windowName).append(" - ");
+            }
+            info.append(this.getTableName());
             //  We have a key column
             if (this.keyColumnName != null && this.keyColumnName.length > 0) {
                 info.append(" - ")
@@ -3979,11 +4051,40 @@
         field.setValue(value, this.inserting);
         _rowData[field.getColumnName().toLowerCase()] = value;
 
+        // The Additional Address Info is painted as part of the address string by
+        // the location control (see VLocation.refreshDisplay). Changing it leaves
+        // C_Location_ID untouched, so the location fields fire nothing of their
+        // own and have to be repainted here.
+        if (field.getColumnName().toLowerCase() == "additionaladdressinfo") {
+            this.refreshLocationDisplay();
+        }
+
         //  inform
         if (!this.disableNotification) {
             var evt = this.createDSE();
             evt.setChangedColumn(col, field.getColumnName());
             this.fireDataStatusChanged(evt);
+        }
+    };
+
+    /**
+     *  Repaint the location fields of this table.
+     *  Used when a value that is only part of their DISPLAY - the Additional
+     *  Address Info - changed: their own value is unchanged, so nothing else
+     *  would tell the control to redraw. Duck typed, controls that do not paint
+     *  an address (older/foreign editors) are simply skipped.
+     */
+    GridTable.prototype.refreshLocationDisplay = function () {
+        if (!this.gridFields) {
+            return;
+        }
+        for (var i = 0; i < this.gridFields.length; i++) {
+            var fld = this.gridFields[i];
+            if (fld && fld.getDisplayType() == VIS.DisplayType.Location
+                && fld.propertyChangeListner
+                && typeof fld.propertyChangeListner.refreshDisplay == "function") {
+                fld.propertyChangeListner.refreshDisplay();
+            }
         }
     };
 
@@ -6396,7 +6497,7 @@
      * @param {any} checkContext
      * @param {any} isMR
      */
-    GridField.prototype.getIsEditable = function (checkContext, isMR) {
+    GridField.prototype.getIsEditable = function (checkContext, isMR,skipDisplayLogic) {
         var _vo = this.vo;
         if (this.getIsVirtualColumn())
             return false;
@@ -6515,7 +6616,9 @@
         //  Record is not Active
         if (checkContext && !ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "IsActive").equals("Y"))
             return false;
-
+        if (skipDisplayLogic) {
+            return true;
+        }
         if (!isMR)
             return this.getIsDisplayed(checkContext);
         return this.getIsDisplayedMR(checkContext);
@@ -7755,6 +7858,17 @@
     };
 
     /**
+     * Action Group render type.
+     *   "" or "P" -> Popover (existing dropdown of buttons)
+     *   "T"       -> Toggle container (one field visible at a time, full width)
+     *   "C"       -> Parent container (fields laid out inline by their natural size)
+     * @returns string
+     */
+    GridField.prototype.getAGType = function () {
+        return this.vo.AGType || "";
+    };
+
+    /**
      *  Refresh Lookup if the lookup is unstable
      *  @return true if lookup is validated
      */
@@ -7823,6 +7937,14 @@
 
     GridTabPanel.prototype.getIsTPBottomAligned = function () {
         return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+    };
+
+    GridTabPanel.prototype.getViewType = function () {
+        return this.vo.ViewType || "";
+    };
+
+    GridTabPanel.prototype.getPanelWidth = function () {
+        return this.vo.PanelWidth || 0;
     };
 
     function DataStatusEvent(source1, totalRows, changed, autoSave, inserting) {

@@ -190,7 +190,7 @@
 
             var locatorId = GetValuefromContext($self.windowNo, "M_Locator_ID");
             $ReqControlLocator.setValue(locatorId);
-        }; 
+        };
 
         // pick value from the context
         function GetValuefromContext(windowNo, token) {
@@ -283,7 +283,7 @@
             $.ajax({
                 type: "POST",
                 url: VIS.Application.contextUrl + "ProductContainer/UpdateProductContainer",
-                data: { TableName: TableName, RecordId: RecordId, ContainerId: ContainerId },
+                data: { TableName: VIS.secureEngine.encrypt(TableName), RecordId: RecordId, ContainerId: ContainerId },
                 dataType: "json",
                 success: function (data) {
                     var result = JSON.parse(data);

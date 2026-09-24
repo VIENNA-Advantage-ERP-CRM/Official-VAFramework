@@ -129,7 +129,7 @@
         this.isFilter = false;
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
-        var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
+        var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter, $divTabRightNav;
         var $root, $busyDiv, $landingpage;
         var $ulRightBar2; //right bar
         var $btnlbToggle, $ulactionbar, $uldynactionbar, $divlbMain, $divlbNav; //right bar
@@ -223,6 +223,8 @@
             //close 
             $btnClose = $root.find(".vis-ad-w-p-t-close");
             $spnTitle = $root.find('.vis-ad-w-p-t-name h5');
+
+            $divTabRightNav = $root.find(".vis-ad-w-p-tb-rc-nav");
 
             //Filter Panel
             $btnFilter = $root.find("span.vis-ad-w-p-tb-rc-action");
@@ -395,7 +397,7 @@
             self.vTabbedPane.finishLayout(VIS.Application.isMobile);
 
             if (self.gridWindow.getIsHideTabLinks()) {
-                $divHeaderNav.find('*').css('visibility', 'hidden');
+                $divHeaderNav.find('*').css('display', 'none');
             }
 
 
@@ -416,9 +418,9 @@
 
         this.hideTabLinks = function (hide) {
             if (hide)
-                $divHeaderNav.find('*').css('visibility', 'hidden');
+                $divHeaderNav.find('*').css('display', 'none');
             else
-                $divHeaderNav.find('*').css('visibility', 'visible');
+                $divHeaderNav.find('*').css('display', '');
         };
 
         this.hideActionbar = function (hide) {
@@ -535,15 +537,17 @@
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
 
-            $ulNav
+            //$ulNav
                 //.append(this.aFirst.getListItm())
-                .append(this.aPrevious.getListItm())
-                .append(this.aNext.getListItm())
+             //   .append(this.aPrevious.getListItm())
+               // .append(this.aNext.getListItm())
             //.append(this.aLast.getListItm());
             $ulNav.append(this.aMulti.getListItm());
             $ulNav.append(this.aSingle.getListItm());
             $ulNav.append(this.aCard.getListItm());
             $ulNav.append(this.aMap.getListItm().hide());
+
+            $divTabRightNav.append($ulNav);
 
             // Mohit - Shortcut as title.
             ///3. bottom toolbar 
@@ -592,6 +596,11 @@
                 this.aLetter = this.addActions("LER", null, false, false, false, onAction); //1
                 this.aLetter.setTextDirection("r");
                 $ulactionbar.append(this.aLetter.getListItmIT());
+            }
+            if (mWindow.getIsRiskRegister()) {
+                this.aRiskRegister = this.addActions("RSK", null, false, false, false, onAction); //1
+                this.aRiskRegister.setTextDirection("r");
+                $ulactionbar.append(this.aRiskRegister.getListItmIT());
             }
             if (mWindow.getIsSms()) {
                 this.aSms = this.addActions("SMS", null, false, false, false, onAction); //1
@@ -740,7 +749,9 @@
             $ulRightBar2.append(this.aShowSummaryLevel.getListItmIT());
 
             mWindow = null;
-
+            
+            this.statusBar.setPageItem(this.aNext.getListItm(), true);
+            this.statusBar.setPageItem(this.aPrevious.getListItm(), true);
             //this.statusBar.setPageItem(this.aPageFirst.getListItm());
             this.statusBar.setPageItem(this.aPageUp.getListItm());
             this.statusBar.setComboPage();
@@ -2138,8 +2149,20 @@
                     includedMap[gTab.getIncluded_Tab_ID()] = gc;
                 }
 
-                if (gTab.getHasPanel()) {
-                    gc.initTabPanel(gridWindow.getWindowWidth(), curWindowNo);
+                // view-wise: fix the starting view before the panel is built —
+                // getHasPanel/getTabPanels filter by it. initGrid's initial
+                // presentation (single/card default layout) may already have
+                // set the view and built the panel via reloadTabPanelForView.
+                if (gTab.isViewWisePanel() && !gTab.getActiveView()) {
+                    gTab.setActiveView(gc.getCurrentViewCode());
+                }
+                if (gTab.getHasPanel() && !gc.vTabPanel) {
+                    var initPnlW = gridWindow.getWindowWidth();
+                    if (gTab.isViewWisePanel()) {
+                        var viewW = gTab.getPanelWidthForView(gTab.getActiveView());
+                        if (viewW > 0) initPnlW = viewW;
+                    }
+                    gc.initTabPanel(initPnlW, curWindowNo);
                 }
 
                 //	Is this tab included?
@@ -2382,6 +2405,8 @@
                 else {
                     //	Refresh data
                     this.curTab.dataRefresh();
+                    if(this.curGC)
+                    this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
                 }
             }
             //	Timeout
@@ -2439,7 +2464,8 @@
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
             //exempt window action button, and field Button actions from Readonly state of tab and field
-            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && !btnField.getIsAction() && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
+            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && !btnField.getIsAction() &&
+                (!btnField.getIsEditable(true,false, controller instanceof VIS.HeaderPanel) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
@@ -2643,7 +2669,9 @@
         else if (tis.aAdvanceTask && tis.aAdvanceTask.getAction() === action) {
             tis.cmd_advanceTask();
         }
-
+        else if (tis.aRiskRegister && tis.aRiskRegister.getAction() === action) {
+            tis.cmd_riskRegister();
+        }
         else if (tis.aSubscribe && tis.aSubscribe.getAction() === action) {
             tis.cmd_subscribe();
         }
@@ -3896,6 +3924,8 @@
             //aChat.setEnabled(true);
         }
 
+        // getHasPanel is view-aware for view-wise tabs (gc.activate just synced
+        // the active view), so this hides the panel when the current view has none.
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
 
         if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
@@ -4374,7 +4404,7 @@
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(false);
-                gPanel.setToolbarBtnState(this.aAttachment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAttachFrom.getAction(), false);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(false);
@@ -5003,6 +5033,17 @@
         VIS.AdvanceTask.init(windowName, AD_Table_ID, record_ID);
     };
 
+    APanel.prototype.cmd_riskRegister = function () {
+        var record_ID = this.curTab.getRecord_ID();
+        if (record_ID > 0) {
+            var AD_Table_ID = this.curTab.getAD_Table_ID();
+            var user_ID = this.curTab.getValue("AD_User_ID");
+            var req = new VIS.ARiskRegister(this.aRiskRegister, AD_Table_ID, record_ID, user_ID, null, this.aRiskRegister.getListItmIT());
+            req.getRiskRegister();
+            req = null;
+        }
+    };
+
     APanel.prototype.cmd_letter = function () {
         var record_ID = this.curTab.getRecord_ID();
         if (record_ID == -1)	//	No Key
@@ -5366,10 +5407,12 @@
     APanel.prototype.cmd_attachment = function (isViewOnly) {
         //alert("attachment");
         if (this.curTab.getRecord_ID() < 1) {
+
             this.aAttachment.setEnabled(false);
             if (this.curGC) {
                 this.curGC.vGridPanel.setEnabled(this.aAttachment.getAction(), false);
             }
+
             return;
         }
         var self = this;

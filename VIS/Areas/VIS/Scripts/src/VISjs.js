@@ -98,6 +98,7 @@ import "../model/CalloutColumn.js";
 import "../app/ssemanager.js";
 import "../tabpanels/verinfo.js";
 import "../tabpanels/HistoryDetailsTabPanel.js";
+import "../tabpanels/GenericTabPanel.js";
 import "../tabpanels/surveyPanel.js";
 import "../TestPanel.js";
 import "../app/forms/form.js";
@@ -121,4 +122,4 @@ import "../app/Framework/VIS_SecretKeyDialog.js";
 import "../react/shared/VISReactControlsBridge/VISReactControlsBridge.js";
 
 import "../app/Framework/advanceTask.js";
-
+import "../app/Framework/ariskregister.js";

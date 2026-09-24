@@ -789,7 +789,8 @@ namespace VIS.Models
         /// <returns></returns>
         public int GetWindowID(string windowName)
         {
-            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_WINDOW_ID FROM AD_WINDOW WHERE NAME='" + windowName + "' AND ISACTIVE='Y'", null, null));
+            // SECURITY: escape single quotes in user-supplied value inside SQL literal to prevent SQL injection
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_WINDOW_ID FROM AD_WINDOW WHERE NAME='" + (windowName == null ? "" : windowName.Replace("'", "''")) + "' AND ISACTIVE='Y'", null, null));
 
         }
         /// <summary>
@@ -831,7 +832,8 @@ namespace VIS.Models
         /// <returns></returns>
         public int GetTableID(string TableName)
         {
-            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TABLENAME='" + TableName + "' AND ISACTIVE='Y'", null, null));
+            // SECURITY: escape single quotes in user-supplied value inside SQL literal to prevent SQL injection
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TABLENAME='" + (TableName == null ? "" : TableName.Replace("'", "''")) + "' AND ISACTIVE='Y'", null, null));
 
         }
     }

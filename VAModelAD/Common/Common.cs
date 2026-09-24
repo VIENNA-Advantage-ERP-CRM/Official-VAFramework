@@ -970,7 +970,13 @@ namespace VAdvantage.Common
                 //    outStr.Append(ParseContextVariable(token, po));		// replace context
                 //}
 
-                outStr.Append(ParseContextVariable(token, po));
+                // Security: ParseContextByPO output is concatenated into SQL WHERE
+                // clauses (see checkConditions). The substituted value is a raw PO
+                // column value (Name, Description, address, etc.) which may be user
+                // editable, so single quotes must be doubled to keep the value inside
+                // its string literal and prevent SQL injection. This also fixes the
+                // latent break on legitimate data such as O'Brien.
+                outStr.Append(EscapeSqlLiteral(ParseContextVariable(token, po)));
                 inStr = inStr.Substring(j + 1);
                 // from second @
                 i = inStr.IndexOf("@");
@@ -978,6 +984,16 @@ namespace VAdvantage.Common
 
             outStr.Append(inStr);           					//	add remainder
             return outStr.ToString();
+        }
+
+        /// <summary>
+        /// Escape a substituted value for safe embedding inside a SQL string literal
+        /// by doubling single quotes. Null is passed through; numeric/date values are
+        /// unaffected (they contain no quotes).
+        /// </summary>
+        private static string EscapeSqlLiteral(string value)
+        {
+            return value == null ? value : value.Replace("'", "''");
         }
 
         /// <summary>

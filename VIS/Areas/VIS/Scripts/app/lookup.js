@@ -1262,6 +1262,40 @@
         return loc.Name;
     };
     /**
+     *  Combine a master address string with the record level Additional Address
+     *  Info (flat / door / floor number etc).
+     *  The extra info is stored on the record that REFERENCES the location, not
+     *  on C_Location itself, so it can never be part of the cached lookup name.
+     *  Every place that paints an address - location control, grid cell, location
+     *  form - routes through here so the formatting stays identical: the info is
+     *  prefixed, comma separated, the way a flat number is normally written in
+     *  front of the street address.
+     *  @param address master address string
+     *  @param additionalInfo record level qualifier, may be null/empty
+     *  @return combined string
+     */
+    MLocationLookup.combineAddress = function (address, additionalInfo) {
+        var addr = (address == null) ? "" : String(address);
+        var info = (additionalInfo == null) ? "" : String(additionalInfo).trim();
+        // Nothing to add, or no address to qualify - a control with no location
+        // selected must stay blank rather than show a dangling qualifier.
+        if (info.length == 0 || addr.length == 0) {
+            return addr;
+        }
+        return info + ", " + addr;
+    };
+
+    /**
+     *	Display string of a location combined with the record's additional info
+     *  @param value C_Location_ID
+     *  @param additionalInfo AdditionalAddressInfo value, may be null
+     *  @return combined display string
+     */
+    MLocationLookup.prototype.getDisplayWithAddlInfo = function (value, additionalInfo) {
+        return MLocationLookup.combineAddress(this.getDisplay(value), additionalInfo);
+    };
+
+    /**
      *	Get Object of Key Value
      *  @param value value
      *  @return Object or null

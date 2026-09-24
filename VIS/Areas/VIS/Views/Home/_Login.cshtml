@@ -81,6 +81,8 @@
                     @*<input type="text" name="user" placeholder="User Name">*@
                     @Html.TextBoxFor(m => m.Login1Model.UserValue, new { id = "loginName", })
                     @Html.ValidationMessageFor(m => m.Login1Model.UserValue)
+                    @* Auto-login by link: carries the server-issued token so the password stays server-side (never rendered). *@
+                    @Html.HiddenFor(m => m.Login1Model.LoginToken, new { id = "loginToken" })
                 </div>
                 <!-- end of input-row -->
 

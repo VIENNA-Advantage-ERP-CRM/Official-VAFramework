@@ -102,11 +102,11 @@ namespace VIS.Models
         {
             try
             {
-                
+
                 //Change by mohit-to handle translation in general info.
                 //Added 2 new parametere- string AD_Language, bool IsBaseLangage.
                 //Asked by mukesh sir - 09/03/2018
-                
+
                 bool _trlTableExist = false;
                 if (!IsBaseLangage)
                 {
@@ -116,11 +116,11 @@ namespace VIS.Models
                     {
                         _trlTableExist = true;
                     }
-                }              
+                }
 
                 //"check tab id against table id"
                 int tabId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Tab_ID FROM AD_Tab WHERE AD_Table_ID= " + AD_Table_ID, null, null));
-                bool hasWindowAndTab = false; 
+                bool hasWindowAndTab = false;
 
                 if (tabId > 0)
                 {
@@ -258,8 +258,8 @@ namespace VIS.Models
                                         OR c.IsSelectionColumn='Y'
                                         OR Upper(c.ColumnName) IN ('NAME','VALUE','DESCRIPTION','DOCUMENTNO')
                                         OR Upper(c.ColumnName) Like '%_NAME'
-                                        OR Upper(c.ColumnName) Like '%_Value')";                        
-                            
+                                        OR Upper(c.ColumnName) Like '%_Value')";
+
                 }
                 sql += " AND c.IsActive = 'Y' ORDER BY c.IsKey DESC";
                 if (hasWindowAndTab)
@@ -379,8 +379,19 @@ namespace VIS.Models
             bool requery, List<InfoSearchCol> srchCtrls, string validationCode)
         {
             InfoData _iData = new InfoData();
+            // SECURITY: tableName is client-supplied and flows into the FROM/SELECT of the query below.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return _iData;
             try
-            {               
+            {
+                // Check if validationCode (where query starts with | if yes then user has send a temp table instead of data)
+                // Store it in another variable and empty the validationCode so that it should not add any wrong code
+                string withJoin = string.Empty;
+                if (validationCode!=null && validationCode.StartsWith("base64 "))
+                {
+                    withJoin = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(validationCode.Substring(7)));
+                    validationCode = "";
+                }
 
                 var sql = "SELECT ";
                 //var colName = null;
@@ -483,6 +494,12 @@ namespace VIS.Models
                         {
                             continue;
                         }
+                        // SECURITY: srchCtrls comes straight from the client; ColumnName is used as a SQL
+                        // identifier below. Skip any control whose ColumnName is not a plain identifier.
+                        if (!string.IsNullOrEmpty(srchCtrls[i].ColumnName) && !VIS.Classes.QueryValidator.IsValidIdentifier(srchCtrls[i].ColumnName))
+                        {
+                            continue;
+                        }
 
                         if (appendAND == true)
                         {
@@ -501,6 +518,10 @@ namespace VIS.Models
                         {
                             srchValue = srchValue + "●";
                         }
+                        // SECURITY: srchValue is the user search text, concatenated into a quoted SQL literal
+                        // below. Escape embedded single quotes (standard SQL) to prevent injection; the '●'
+                        // wildcard scheme (converted back to '%' on the final SQL) is unaffected.
+                        srchValue = srchValue.Replace("'", "''");
                         // Change done by mohit asked by mukesh sir to show the data on info window from translated tab if logged in with langauge other than base language- 22/03/2018
                         if (Env.IsBaseLanguage(ctx, tableName))
                         {
@@ -597,7 +618,14 @@ namespace VIS.Models
                 sql = sql.Replace('●', '%');
                 sql = MRole.GetDefault(ctx).AddAccessSQL(sql, tableName,
                                 MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
-
+                // Prepend WITH and Append Join clause
+                // Index [0] contains temp tables(with)
+                // Index [1] contains select query fetches data from above select query join clause
+                if (!string.IsNullOrEmpty(withJoin))
+                {
+                    string[] withArray = withJoin.Split(new char[] { '!' }, StringSplitOptions.RemoveEmptyEntries);
+                    sql = withArray[0] + sql + withArray[1];
+                }
 
                 int totalRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sql + " ) t", null, null));
                 int pageSize = 50;

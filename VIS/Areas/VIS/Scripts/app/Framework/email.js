@@ -3659,12 +3659,12 @@
             if (VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo) != "") {
                 $dmsheader.empty();
                 $dmsheader.append(VIS.Msg.getMsg("Documents"));
-                docLst = VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo).split(",");
+                docLst = VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo).split("|");
                 for (var i = 0; i < docLst.length; i++) {
                     if (docLst[i].trim() == "") {
                         continue;
                     }
-                    a = docLst[i].split("-");
+                    a = docLst[i].split(":");
                     attachDocUl.append("<Li><input type='checkbox' checked value='" + a[0] + "'> " + a[1] + "</Li>");
                 }
                 $attachDmsDoc.append(attachDocUl);
@@ -3677,7 +3677,7 @@
                 var strAttachDocs = "";
                 var id = $(this).attr("value");
                 if (!$(this).is(":checked")) {
-                    var l = VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo).split(",");
+                    var l = VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo).split("|");
                     var r = jQuery.grep(l, function (value) {
                         if (!value.trim().contains(id.toString().trim()))
                             return value;
@@ -3687,15 +3687,15 @@
                             strAttachDocs += r[i].trim();
                         }
                         else {
-                            strAttachDocs += "," + r[i].trim();
+                            strAttachDocs += "|" + r[i].trim();
                         }
                     }
                 }
                 else if ($(this).is(":checked")) {
-                    var f = id + "-" + $(this).text();
+                    var f = id + ":" + $(this).text();
                     strAttachDocs = VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo);
                     if (strAttachDocs != "") {
-                        strAttachDocs += "," + f;
+                        strAttachDocs += "|" + f;
                     }
                     else { strAttachDocs += f; }
                 }

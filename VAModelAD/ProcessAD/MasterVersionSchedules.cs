@@ -193,7 +193,7 @@ namespace VAdvantage.Process
                     }
 
                     // Change done to check for back date versions
-                    sqlSB.Clear().Append("SELECT COUNT(*) FROM " + TableName + " WHERE IsVersionApproved = 'Y'" +
+                    sqlSB.Clear().Append("SELECT COUNT(*) FROM " + TableName + " WHERE IsVersionApproved = 'Y' AND ProcessedVersion = 'N' " +
                             " AND TRUNC(VersionValidFrom) > " + GlobalVariable.TO_DATE(Util.GetValueOfDateTime(dr["VersionValidFrom"]), true)
                             + " AND " + GlobalVariable.TO_DATE(Util.GetValueOfDateTime(dr["VersionValidFrom"]), true) + " <= TRUNC(SysDate)"
                             + " AND " + whereCond);

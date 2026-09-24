@@ -644,23 +644,29 @@ namespace VAdvantage.Model
                     SetVA037_BIPassword(password);
                 }
             }
-            string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
-            if (newRecord)
+            // vis0008 Check for Unique Email for Login User only if this user is login user and email is not null or empty
+            // Check applied requested by Product Team
+            if (IsLoginUser() && !string.IsNullOrEmpty(GetEMail()))
             {
-                int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
-                if (mailExist > 0)
+                string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
+                if (newRecord)
                 {
-                    log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
-                    return false;
+                    int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                    if (mailExist > 0)
+                    {
+                        log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
+                        return false;
+                    }
                 }
-            }
-            else {
-                emailCount +=" AND AD_User_ID != " + GetAD_User_ID();
-                int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
-                if (mailExist > 0)
+                else
                 {
-                    log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
-                    return false;
+                    emailCount += " AND AD_User_ID != " + GetAD_User_ID();
+                    int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                    if (mailExist > 0)
+                    {
+                        log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
+                        return false;
+                    }
                 }
             }
             return true;

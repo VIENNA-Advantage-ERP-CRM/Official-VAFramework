@@ -466,10 +466,17 @@
                 if (lid) {
                     var ll = l.getLatLng(lid);
                     if (ll) {
-                        ll.msg = l.getDisplay(lid);
-                        ll.lid = lid;
-                        ll.ColName = colName;
-                        locIds.push(ll);
+                        // Own copy: getLatLng() hands back the cached lookup entry,
+                        // and the text below is per record - two records sharing
+                        // one address would otherwise overwrite each other.
+                        var mrk = $.extend({}, ll);
+                        // Marker text = the address as the location control paints
+                        // it, i.e. with the record's Additional Address Info (flat
+                        // number etc.) in front when the tab carries that column.
+                        mrk.msg = VIS.MLocationLookup.combineAddress(l.getDisplay(lid), records[j]["additionaladdressinfo"]);
+                        mrk.lid = lid;
+                        mrk.ColName = colName;
+                        locIds.push(mrk);
                     }
                 }
             }
