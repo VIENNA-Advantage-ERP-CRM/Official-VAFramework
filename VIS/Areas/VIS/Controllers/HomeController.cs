@@ -1019,12 +1019,117 @@ namespace VIS.Controllers
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
-        public JsonResult GetUserWidgets(int windowID)
+        public JsonResult GetUserWidgets(int windowID, int dashboardID = 0)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx, windowID)));
+            return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx, windowID, dashboardID)));
 
+        }
+
+        /// <summary>
+        /// Dashboards offered on Home: the user's own and those shared with the signed-in role
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetDashboards()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(JsonConvert.SerializeObject(homeModels.GetDashboards(ctx)));
+        }
+
+        /// <summary>
+        /// Set the user's default dashboard for the current role (0 = legacy home, below 0 clears it)
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult SetDefaultDashboard(int dashboardID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(homeModels.SetDefaultDashboard(ctx, dashboardID));
+        }
+
+        /// <summary>
+        /// Create a dashboard; copyFrom >= 0 duplicates that dashboard's layout (0 = legacy home).
+        /// With roleIDs it is a shared dashboard for those roles (readWriteRoleIDs may change it), else owned by the user.
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult CreateDashboard(string name, int copyFrom = -1, List<int> roleIDs = null, List<int> readWriteRoleIDs = null)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(homeModels.CreateDashboard(ctx, name, copyFrom, roleIDs, readWriteRoleIDs));
+        }
+
+        /// <summary>
+        /// Turn a dashboard the user owns into a shared dashboard for the given roles
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult ShareDashboard(int dashboardID, List<int> roleIDs, List<int> readWriteRoleIDs = null)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(homeModels.ShareDashboard(ctx, dashboardID, roleIDs, readWriteRoleIDs));
+        }
+
+        /// <summary>
+        /// Roles of the client for the share / edit roles checklist, with read / write; the login role is locked
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetDashboardRoles(int dashboardID = 0)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(JsonConvert.SerializeObject(homeModels.GetDashboardRoles(ctx, dashboardID)));
+        }
+
+        /// <summary>
+        /// Change the roles a shared dashboard is offered to and which of them may change it
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult SetDashboardRoles(int dashboardID, List<int> roleIDs, List<int> readWriteRoleIDs = null)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(homeModels.SetDashboardRoles(ctx, dashboardID, roleIDs, readWriteRoleIDs));
+        }
+
+        /// <summary>
+        /// Rename an own dashboard, or a shared one the user may maintain
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult RenameDashboard(int dashboardID, string name)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(homeModels.RenameDashboard(ctx, dashboardID, name));
+        }
+
+        /// <summary>
+        /// Delete an own dashboard, or a shared one with read / write access (with its layouts)
+        /// </summary>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult DeleteDashboard(int dashboardID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return Json(homeModels.DeleteDashboard(ctx, dashboardID));
         }
 
         /// <summary>
@@ -1032,11 +1137,14 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSizes"></param>
         /// <returns></returns>
-        public int SaveDashboard(List<WidgetSize> widgetSizes, int windowID)
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public int SaveDashboard(List<WidgetSize> widgetSizes, int windowID, int dashboardID = 0)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            return homeModels.SaveDashboard(ctx, widgetSizes, windowID);
+            return homeModels.SaveDashboard(ctx, widgetSizes, windowID, dashboardID);
         }
 
         /// <summary>
@@ -1044,11 +1152,14 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSizes"></param>
         /// <returns></returns>
-        public int SaveSingleWidget(List<WidgetSize> widgetSizes, int windowID)
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public int SaveSingleWidget(List<WidgetSize> widgetSizes, int windowID, int dashboardID = 0)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            return homeModels.SaveSingleWidget(ctx, widgetSizes, windowID);
+            return homeModels.SaveSingleWidget(ctx, widgetSizes, windowID, dashboardID);
         }
 
         /// <summary>
@@ -1056,6 +1167,9 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="id">Widget ID</param>
         /// <returns></returns>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
         public int DeleteWidgetFromHome(int id)
         {
             Ctx ctx = Session["ctx"] as Ctx;

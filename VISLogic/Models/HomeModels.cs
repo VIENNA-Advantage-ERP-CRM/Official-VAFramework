@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using VAdvantage.Classes;
 using VAdvantage.Controller;
@@ -509,8 +510,21 @@ namespace VIS.Models
         /// <returns></returns>
         public List<HomeWidget> GetUserWidgets(Ctx ctx, int windowID)
         {
+            return GetUserWidgets(ctx, windowID, 0);
+        }
+
+        /// <summary>
+        /// Layout of a window/dashboard. dashboardID = 0 is the legacy home layout (the user's rows for
+        /// the role); a dashboard has one layout keyed by AD_Dashboard_ID, readable by its owner or, when
+        /// shared, by the roles it is assigned to.
+        /// </summary>
+        public List<HomeWidget> GetUserWidgets(Ctx ctx, int windowID, int dashboardID)
+        {
+            string filter = LayoutFilter(ctx, windowID, dashboardID, null);
+            if (filter == null)
+                return new List<HomeWidget>();
             string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO,AdditionalInfo FROM AD_UserHomeWidget
-                           WHERE AD_UserHomeWidget.IsActive='Y' AND AD_Window_ID='" + windowID + "' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND  AD_User_ID=" + ctx.GetAD_User_ID();
+                           WHERE AD_UserHomeWidget.IsActive='Y' AND " + filter;
 
             sql += " ORDER BY SRNO";
 
@@ -538,6 +552,444 @@ namespace VIS.Models
                 }
             }
             return list;
+        }
+
+        /// <summary>
+        /// WHERE clause selecting the AD_UserHomeWidget rows that make up a layout, null when the
+        /// dashboard does not exist or is not offered to the user. Legacy home / window layouts are the
+        /// user's rows for the current role (AD_User_ID / AD_Role_ID); dashboard rows are keyed by
+        /// AD_Dashboard_ID only - who may see them is decided by AD_Dashboard.AD_User_ID and
+        /// AD_Dashboard_Access, their AD_User_ID / AD_Role_ID merely record who saved them.
+        /// </summary>
+        private string LayoutFilter(Ctx ctx, int windowID, int dashboardID, VAdvantage.DataBase.Trx trx)
+        {
+            if (windowID != 0 || dashboardID <= 0)
+                return "AD_Window_ID=" + windowID + " AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND AD_Dashboard_ID IS NULL";
+
+            MDashboard dashboard = LoadDashboard(ctx, dashboardID, trx);
+            if (dashboard == null || !(IsOwner(ctx, dashboard) || (IsShared(dashboard) && HasRoleAccess(ctx, dashboardID, trx))))
+                return null;
+            return "AD_Window_ID=0 AND AD_Dashboard_ID=" + dashboardID;
+        }
+
+        private MDashboard LoadDashboard(Ctx ctx, int dashboardID, VAdvantage.DataBase.Trx trx)
+        {
+            if (dashboardID <= 0)
+                return null;
+            MDashboard dashboard = new MDashboard(ctx, dashboardID, trx);
+            return dashboard.Get_ID() == 0 ? null : dashboard;
+        }
+
+        /// <summary>No owner: offered to the roles in AD_Dashboard_Access.</summary>
+        private static bool IsShared(MDashboard dashboard)
+        {
+            return dashboard.Get_Value("AD_User_ID") == null;
+        }
+
+        private static bool IsOwner(Ctx ctx, MDashboard dashboard)
+        {
+            return !IsShared(dashboard) && dashboard.GetAD_User_ID() == ctx.GetAD_User_ID();
+        }
+
+        private static bool HasRoleAccess(Ctx ctx, int dashboardID, VAdvantage.DataBase.Trx trx)
+        {
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM AD_Dashboard_Access WHERE IsActive='Y' AND AD_Dashboard_ID=" + dashboardID
+                + " AND AD_Role_ID=" + ctx.GetAD_Role_ID(), null, trx)) > 0;
+        }
+
+        private static bool HasReadWriteAccess(Ctx ctx, int dashboardID, VAdvantage.DataBase.Trx trx)
+        {
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM AD_Dashboard_Access WHERE IsActive='Y' AND IsReadWrite='Y' AND AD_Dashboard_ID=" + dashboardID
+                + " AND AD_Role_ID=" + ctx.GetAD_Role_ID(), null, trx)) > 0;
+        }
+
+        /// <summary>
+        /// Shared dashboard whose assignment to the current role is read / write: full control (layout,
+        /// name, roles, delete). Read-only roles only view it and may copy it.
+        /// </summary>
+        private bool CanManageShared(Ctx ctx, MDashboard dashboard, VAdvantage.DataBase.Trx trx)
+        {
+            return dashboard != null && IsShared(dashboard) && HasReadWriteAccess(ctx, dashboard.GetAD_Dashboard_ID(), trx);
+        }
+
+        /// <summary>Own dashboard, or a shared one with read / write access for the role.</summary>
+        private bool CanModify(Ctx ctx, MDashboard dashboard, VAdvantage.DataBase.Trx trx)
+        {
+            return dashboard != null && (IsOwner(ctx, dashboard) || CanManageShared(ctx, dashboard, trx));
+        }
+
+        /// <summary>
+        /// Dashboards offered to the signed-in user: the user's own dashboards (AD_Dashboard.AD_User_ID)
+        /// and shared dashboards (no owner) assigned to the role in AD_Dashboard_Access. Only when there
+        /// is none of either the legacy home layout (ID 0) is offered, so users without dashboards keep
+        /// the old Home. Carries the role default, the user's own default (AD_Preference), widget counts
+        /// and whether the user may change the dashboard.
+        /// </summary>
+        public List<DashboardInfo> GetDashboards(Ctx ctx)
+        {
+            var list = new List<DashboardInfo>();
+            // ids come from the session context, inlined because Oracle binds positionally
+            // and the same value is needed several times in the statement
+            int role = ctx.GetAD_Role_ID();
+            int user = ctx.GetAD_User_ID();
+            int client = ctx.GetAD_Client_ID();
+
+            // legacy layout without a dashboard row, offered only when no dashboard applies
+            DashboardInfo legacy = new DashboardInfo() { AD_Dashboard_ID = 0, Name = "Home", CanEdit = true };
+
+            // one layout per dashboard, whoever saved it
+            string layoutRows = " FROM AD_UserHomeWidget u WHERE u.IsActive='Y' AND u.AD_Window_ID=0 AND u.AD_Dashboard_ID=d.AD_Dashboard_ID";
+            string sql = @"SELECT d.AD_Dashboard_ID, d.Name, d.Description, d.AD_User_ID, d.Updated, a.IsDefault, a.IsReadWrite, a.SeqNo,
+                                  (SELECT COUNT(*)" + layoutRows + @") AS WidgetRows,
+                                  (SELECT MAX(u.Updated)" + layoutRows + @") AS LayoutUpdated,
+                                  (SELECT COUNT(*) FROM AD_Dashboard_Access x WHERE x.IsActive='Y' AND x.AD_Dashboard_ID=d.AD_Dashboard_ID) AS RoleCount
+                           FROM AD_Dashboard d
+                           LEFT JOIN AD_Dashboard_Access a ON (a.AD_Dashboard_ID=d.AD_Dashboard_ID AND a.IsActive='Y' AND a.AD_Role_ID=" + role + @")
+                           WHERE d.IsActive='Y' AND d.AD_Client_ID IN (0, " + client + @")
+                             AND ((d.AD_User_ID IS NULL AND a.AD_Dashboard_Access_ID IS NOT NULL) OR d.AD_User_ID=" + user + @")
+                           ORDER BY COALESCE(a.SeqNo, 999999), d.Name";
+            DataSet ds = null;
+            try
+            {
+                legacy.WidgetCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(*) FROM AD_UserHomeWidget u WHERE u.IsActive='Y' AND u.AD_Window_ID=0
+                    AND u.AD_Role_ID=" + role + " AND u.AD_User_ID=" + user + " AND u.AD_Dashboard_ID IS NULL", null, null));
+                ds = DB.ExecuteDataset(sql, null);
+            }
+            catch (Exception ex)
+            {
+                // dashboard tables not installed yet: Home keeps working with the legacy layout only
+                log.Log(Level.WARNING, "GetDashboards", ex);
+            }
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                foreach (DataRow row in ds.Tables[0].Rows)
+                {
+                    bool shared = row["AD_User_ID"] == DBNull.Value;
+                    object updated = row["LayoutUpdated"] != DBNull.Value ? row["LayoutUpdated"] : row["Updated"];
+                    list.Add(new DashboardInfo()
+                    {
+                        AD_Dashboard_ID = Util.GetValueOfInt(row["AD_Dashboard_ID"]),
+                        Name = Util.GetValueOfString(row["Name"]),
+                        Description = Util.GetValueOfString(row["Description"]),
+                        IsOwner = !shared,
+                        IsShared = shared,
+                        // shared rows are only listed when the role has access
+                        CanEdit = !shared || Util.GetValueOfString(row["IsReadWrite"]) == "Y",
+                        CanShare = !shared,
+                        RoleCount = shared ? Util.GetValueOfInt(row["RoleCount"]) : 0,
+                        IsRoleDefault = Util.GetValueOfString(row["IsDefault"]) == "Y",
+                        SeqNo = Util.GetValueOfInt(row["SeqNo"]),
+                        WidgetCount = Util.GetValueOfInt(row["WidgetRows"]),
+                        Updated = updated == DBNull.Value ? null : Convert.ToDateTime(updated).ToString("yyyy-MM-ddTHH:mm:ss")
+                    });
+                }
+            }
+
+            if (list.Count == 0)
+                list.Add(legacy);
+
+            // the user's own default is only honoured while that dashboard is still offered
+            int userDefault = GetUserDefaultDashboard(ctx);
+            foreach (DashboardInfo d in list)
+                d.IsUserDefault = d.AD_Dashboard_ID == userDefault;
+            return list;
+        }
+
+        /// <summary>Preference attribute holding the user's default dashboard for the current role.</summary>
+        private static string DefaultDashboardAttribute(Ctx ctx)
+        {
+            return "DefaultDashboard_" + ctx.GetAD_Role_ID();
+        }
+
+        private int GetUserDefaultDashboard(Ctx ctx)
+        {
+            SqlParameter[] param = new SqlParameter[2];
+            param[0] = new SqlParameter("@userid", ctx.GetAD_User_ID());
+            param[1] = new SqlParameter("@attr", DefaultDashboardAttribute(ctx));
+            object value = DB.ExecuteScalar("SELECT Value FROM AD_Preference WHERE IsActive='Y' AND AD_User_ID=@userid AND Attribute=@attr", param, null);
+            return value == null || value == DBNull.Value ? -1 : Util.GetValueOfInt(value);
+        }
+
+        /// <summary>
+        /// Stores the user's default dashboard for the current role (0 = legacy home layout);
+        /// dashboardID below 0 clears it so the role default applies again.
+        /// </summary>
+        public bool SetDefaultDashboard(Ctx ctx, int dashboardID)
+        {
+            string attribute = DefaultDashboardAttribute(ctx);
+            if (dashboardID > 0 && !GetDashboards(ctx).Exists(d => d.AD_Dashboard_ID == dashboardID))
+                return false;
+
+            SqlParameter[] param = new SqlParameter[2];
+            param[0] = new SqlParameter("@userid", ctx.GetAD_User_ID());
+            param[1] = new SqlParameter("@attr", attribute);
+            int AD_Preference_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Preference_ID FROM AD_Preference WHERE AD_User_ID=@userid AND Attribute=@attr", param, null));
+
+            if (dashboardID < 0)
+            {
+                if (AD_Preference_ID > 0)
+                    DB.ExecuteQuery("DELETE FROM AD_Preference WHERE AD_Preference_ID=" + AD_Preference_ID);
+                return true;
+            }
+
+            MPreference pref = new MPreference(ctx, AD_Preference_ID, null);
+            if (AD_Preference_ID == 0)
+            {
+                pref.SetClientOrg(ctx.GetAD_Client_ID(), 0);
+                pref.SetAD_User_ID(ctx.GetAD_User_ID());
+                pref.SetAttribute(attribute);
+            }
+            pref.SetValue(dashboardID.ToString());
+            return pref.Save();
+        }
+
+        /// <summary>
+        /// Creates a dashboard. Without roles it is owned by the signed-in user; with roles it is a shared
+        /// dashboard offered to those roles (readWriteRoleIDs may change it, the login role always can).
+        /// With copyFrom >= 0 the layout of that dashboard (0 = legacy home) is copied over. Returns the
+        /// new AD_Dashboard_ID, 0 on failure.
+        /// </summary>
+        public int CreateDashboard(Ctx ctx, string name, int copyFrom, List<int> roleIDs, List<int> readWriteRoleIDs)
+        {
+            name = (name ?? "").Trim();
+            bool shared = roleIDs != null && roleIDs.Count > 0;
+            if (name.Length == 0)
+                return 0;
+
+            List<HomeWidget> source = copyFrom >= 0 ? GetUserWidgets(ctx, 0, copyFrom) : null;
+            VAdvantage.DataBase.Trx trx = VAdvantage.DataBase.Trx.Get("CreateDashboard" + DateTime.Now.Ticks);
+            try
+            {
+                MDashboard dashboard = new MDashboard(ctx, 0, trx);
+                if (dashboard.Get_ColumnIndex("AD_User_ID") < 0)
+                {
+                    // Set_Value on an unknown column is ignored, the dashboard would be saved without an owner
+                    log.Severe("AD_Dashboard.AD_User_ID is not defined in the Application Dictionary (AD_Column)");
+                    return 0;
+                }
+                dashboard.SetClientOrg(ctx.GetAD_Client_ID(), 0);
+                dashboard.SetName(name);
+                dashboard.SetAD_User_ID(shared ? -1 : ctx.GetAD_User_ID());
+                if (!dashboard.Save() || (shared && !SetRoles(ctx, dashboard.GetAD_Dashboard_ID(), roleIDs, readWriteRoleIDs, trx)))
+                {
+                    trx.Rollback();
+                    return 0;
+                }
+                if (source != null)
+                {
+                    for (int i = 0; i < source.Count; i++)
+                    {
+                        MUserHomeWidget row = NewUserHomeWidget(ctx, source[i], 0, dashboard.GetAD_Dashboard_ID(), trx);
+                        row.SetAdditionalInfo(source[i].AdditionalInfo);
+                        if (!row.Save())
+                        {
+                            trx.Rollback();
+                            return 0;
+                        }
+                    }
+                }
+                trx.Commit();
+                return dashboard.GetAD_Dashboard_ID();
+            }
+            finally
+            {
+                trx.Close();
+            }
+        }
+
+        /// <summary>
+        /// Turns a dashboard the user owns into a shared dashboard for the given roles: the owner is removed
+        /// from AD_Dashboard and the layout stays as it is.
+        /// </summary>
+        public bool ShareDashboard(Ctx ctx, int dashboardID, List<int> roleIDs, List<int> readWriteRoleIDs)
+        {
+            if (roleIDs == null || roleIDs.Count == 0)
+                return false;
+            VAdvantage.DataBase.Trx trx = VAdvantage.DataBase.Trx.Get("ShareDashboard" + DateTime.Now.Ticks);
+            try
+            {
+                MDashboard dashboard = LoadDashboard(ctx, dashboardID, trx);
+                if (dashboard == null || !IsOwner(ctx, dashboard))
+                    return false;
+                dashboard.SetAD_User_ID(-1);
+                if (!dashboard.Save() || !SetRoles(ctx, dashboardID, roleIDs, readWriteRoleIDs, trx))
+                {
+                    trx.Rollback();
+                    return false;
+                }
+                trx.Commit();
+                return true;
+            }
+            finally
+            {
+                trx.Close();
+            }
+        }
+
+        /// <summary>
+        /// Active roles of the login client for the role checklist. Selected / read-write = the shared
+        /// dashboard's assignment; for a new / not yet shared dashboard (dashboardID 0 or own) nothing but
+        /// the login role. The login role is always selected, read / write and locked, so the user cannot
+        /// take away their own access and a shared dashboard always keeps a role that may change it.
+        /// </summary>
+        public List<DashboardRole> GetDashboardRoles(Ctx ctx, int dashboardID)
+        {
+            var list = new List<DashboardRole>();
+            MDashboard dashboard = LoadDashboard(ctx, dashboardID, null);
+            if (dashboardID > 0 && !CanModify(ctx, dashboard, null))
+                return list;
+            bool assigned = dashboard != null && IsShared(dashboard);
+            int loginRole = ctx.GetAD_Role_ID();
+
+            string access = "FROM AD_Dashboard_Access a WHERE a.IsActive='Y' AND a.AD_Role_ID=r.AD_Role_ID AND a.AD_Dashboard_ID=" + dashboardID;
+            string sql = "SELECT r.AD_Role_ID, r.Name, "
+                + (assigned ? "(SELECT COUNT(*) " + access + ") AS IsSelected, (SELECT COUNT(*) " + access + " AND a.IsReadWrite='Y') AS IsReadWrite"
+                            : "0 AS IsSelected, 0 AS IsReadWrite")
+                + " FROM AD_Role r WHERE r.IsActive='Y' AND r.AD_Role_ID>0 AND r.AD_Client_ID=" + ctx.GetAD_Client_ID()
+                + " ORDER BY r.Name";
+            DataSet ds = DB.ExecuteDataset(sql, null);
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                foreach (DataRow row in ds.Tables[0].Rows)
+                {
+                    int roleID = Util.GetValueOfInt(row["AD_Role_ID"]);
+                    bool locked = roleID == loginRole;
+                    list.Add(new DashboardRole()
+                    {
+                        AD_Role_ID = roleID,
+                        Name = Util.GetValueOfString(row["Name"]),
+                        IsSelected = locked || Util.GetValueOfInt(row["IsSelected"]) > 0,
+                        IsReadWrite = locked || Util.GetValueOfInt(row["IsReadWrite"]) > 0,
+                        IsLocked = locked
+                    });
+                }
+            }
+            return list;
+        }
+
+        /// <summary>Changes the roles a shared dashboard is offered to (user who may maintain it).</summary>
+        public bool SetDashboardRoles(Ctx ctx, int dashboardID, List<int> roleIDs, List<int> readWriteRoleIDs)
+        {
+            VAdvantage.DataBase.Trx trx = VAdvantage.DataBase.Trx.Get("SetDashboardRoles" + DateTime.Now.Ticks);
+            try
+            {
+                if (!CanManageShared(ctx, LoadDashboard(ctx, dashboardID, trx), trx) || !SetRoles(ctx, dashboardID, roleIDs, readWriteRoleIDs, trx))
+                {
+                    trx.Rollback();
+                    return false;
+                }
+                trx.Commit();
+                return true;
+            }
+            finally
+            {
+                trx.Close();
+            }
+        }
+
+        /// <summary>
+        /// Syncs AD_Dashboard_Access with the given roles (active roles of the login client only) and their
+        /// read / write flag. The login role is always kept and read / write, whatever the client sent, so
+        /// the user cannot lock themselves out and the dashboard always has a role that may maintain it.
+        /// Existing rows keep their default flag and sequence.
+        /// </summary>
+        private bool SetRoles(Ctx ctx, int dashboardID, List<int> roleIDs, List<int> readWriteRoleIDs, VAdvantage.DataBase.Trx trx)
+        {
+            if (roleIDs == null || roleIDs.Count == 0)
+                return false;
+            int loginRole = ctx.GetAD_Role_ID();
+            roleIDs = new List<int>(roleIDs);
+            if (!roleIDs.Contains(loginRole))
+                roleIDs.Add(loginRole);
+            var readWrite = new HashSet<int>(readWriteRoleIDs ?? new List<int>());
+            readWrite.Add(loginRole);
+            // ints only, so the list is safe to inline
+            DataSet ds = DB.ExecuteDataset("SELECT AD_Role_ID FROM AD_Role WHERE IsActive='Y' AND AD_Role_ID>0 AND AD_Client_ID=" + ctx.GetAD_Client_ID()
+                + " AND AD_Role_ID IN (" + string.Join(",", roleIDs) + ")", null, trx);
+            var valid = new List<int>();
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                foreach (DataRow row in ds.Tables[0].Rows)
+                    valid.Add(Util.GetValueOfInt(row[0]));
+            }
+            // the login role belongs to the login client, so it is only missing when it is inactive
+            if (!valid.Contains(loginRole))
+                return false;
+
+            DB.ExecuteQuery("DELETE FROM AD_Dashboard_Access WHERE AD_Dashboard_ID=" + dashboardID + " AND AD_Role_ID NOT IN (" + string.Join(",", valid) + ")", null, trx);
+            var existing = new Dictionary<int, int>();
+            ds = DB.ExecuteDataset("SELECT AD_Role_ID, AD_Dashboard_Access_ID FROM AD_Dashboard_Access WHERE AD_Dashboard_ID=" + dashboardID, null, trx);
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                foreach (DataRow row in ds.Tables[0].Rows)
+                    existing[Util.GetValueOfInt(row[0])] = Util.GetValueOfInt(row[1]);
+            }
+            foreach (int roleID in valid)
+            {
+                bool rw = readWrite.Contains(roleID);
+                MDashboardAccess access;
+                if (existing.ContainsKey(roleID))
+                {
+                    access = new MDashboardAccess(ctx, existing[roleID], trx);
+                    if (access.IsActive() && access.IsReadWrite() == rw)
+                        continue;
+                }
+                else
+                {
+                    access = new MDashboardAccess(ctx, 0, trx);
+                    access.SetClientOrg(ctx.GetAD_Client_ID(), 0);
+                    access.SetAD_Dashboard_ID(dashboardID);
+                    access.SetAD_Role_ID(roleID);
+                    access.SetIsDefault(false);
+                    access.SetSeqNo(10);
+                }
+                access.SetIsActive(true);
+                access.SetIsReadWrite(rw);
+                if (!access.Save())
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>Renames an own dashboard, or a shared one the user may maintain.</summary>
+        public bool RenameDashboard(Ctx ctx, int dashboardID, string name)
+        {
+            name = (name ?? "").Trim();
+            MDashboard dashboard = LoadDashboard(ctx, dashboardID, null);
+            if (name.Length == 0 || !CanModify(ctx, dashboard, null))
+                return false;
+            dashboard.SetName(name);
+            return dashboard.Save();
+        }
+
+        /// <summary>
+        /// Deletes an own dashboard, or a shared one with read / write access for the role, together with
+        /// every layout, role assignment and default pointing at it.
+        /// </summary>
+        public bool DeleteDashboard(Ctx ctx, int dashboardID)
+        {
+            VAdvantage.DataBase.Trx trx = VAdvantage.DataBase.Trx.Get("DeleteDashboard" + DateTime.Now.Ticks);
+            try
+            {
+                MDashboard dashboard = LoadDashboard(ctx, dashboardID, trx);
+                if (!CanModify(ctx, dashboard, trx))
+                    return false;
+                SqlParameter[] param = new SqlParameter[] { new SqlParameter("@dashboard", dashboardID) };
+                DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_Dashboard_ID=@dashboard", param, trx);
+                DB.ExecuteQuery("DELETE FROM AD_Dashboard_Access WHERE AD_Dashboard_ID=@dashboard", param, trx);
+                DB.ExecuteQuery("DELETE FROM AD_Preference WHERE Attribute LIKE 'DefaultDashboard_%' AND Value='" + dashboardID + "'", null, trx);
+                if (!dashboard.Delete(true))
+                {
+                    trx.Rollback();
+                    return false;
+                }
+                trx.Commit();
+                return true;
+            }
+            finally
+            {
+                trx.Close();
+            }
         }
 
         /// <summary>
@@ -1059,20 +1511,65 @@ namespace VIS.Models
         /// <returns></returns>
         public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes, int windowID)
         {
-            DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_Window_ID=" + windowID + " AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND AD_Role_ID=" + ctx.GetAD_Role_ID());
-            for (int i = 0; i < widgetSizes.Count; i++)
+            return SaveDashboard(ctx, widgetSizes, windowID, 0);
+        }
+
+        /// <summary>
+        /// Replaces the layout of a window/dashboard (dashboardID = 0: legacy home) in one transaction.
+        /// For dashboards the client also sends back the rows it could not render for the current role
+        /// (not in that role's catalogue), so they survive a save made under another role.
+        /// </summary>
+        public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes, int windowID, int dashboardID)
+        {
+            if (!CanWriteLayout(ctx, windowID, dashboardID))
+                return 0;
+            VAdvantage.DataBase.Trx trx = VAdvantage.DataBase.Trx.Get("SaveDashboard" + DateTime.Now.Ticks);
+            try
             {
-                MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
-                mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
-                mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
-                mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
-                mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
-                mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
-                mUserHomeWidget.Set_Value("AD_Window_ID", windowID);
-                mUserHomeWidget.Set_Value("AdditionalInfo", widgetSizes[i].AdditionalInfo);
-                mUserHomeWidget.Save();
+                DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE " + LayoutFilter(ctx, windowID, dashboardID, trx), null, trx);
+                for (int i = 0; i < widgetSizes.Count; i++)
+                {
+                    MUserHomeWidget mUserHomeWidget = NewUserHomeWidget(ctx, widgetSizes[i], windowID, dashboardID, trx);
+                    mUserHomeWidget.SetAdditionalInfo(widgetSizes[i].AdditionalInfo);
+                    if (!mUserHomeWidget.Save())
+                    {
+                        trx.Rollback();
+                        return 0;
+                    }
+                }
+                trx.Commit();
+                return 1;
             }
-            return 1;
+            finally
+            {
+                trx.Close();
+            }
+        }
+
+        /// <summary>
+        /// Legacy home / window layouts are always writable; a dashboard by its owner, or when shared with
+        /// read / write access for the role (read-only roles view it and may copy it).
+        /// </summary>
+        private bool CanWriteLayout(Ctx ctx, int windowID, int dashboardID)
+        {
+            return windowID != 0 || dashboardID <= 0 || CanModify(ctx, LoadDashboard(ctx, dashboardID, null), null);
+        }
+
+        /// <summary>
+        /// New layout row. AD_User_ID / AD_Role_ID key the legacy layouts; on dashboard rows they only
+        /// record who saved them.
+        /// </summary>
+        private MUserHomeWidget NewUserHomeWidget(Ctx ctx, WidgetSize item, int windowID, int dashboardID, VAdvantage.DataBase.Trx trx)
+        {
+            MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, trx);
+            mUserHomeWidget.SetSRNO(item.SRNO);
+            mUserHomeWidget.SetComponentID(item.KeyID);
+            mUserHomeWidget.SetComponentType(item.Type);
+            mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
+            mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
+            mUserHomeWidget.SetAD_Window_ID(windowID);
+            mUserHomeWidget.SetAD_Dashboard_ID(dashboardID);
+            return mUserHomeWidget;
         }
 
         /// <summary>
@@ -1083,18 +1580,24 @@ namespace VIS.Models
         /// <returns></returns>
         public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes, int windowID)
         {
-            MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
+            return SaveSingleWidget(ctx, widgetSizes, windowID, 0);
+        }
+
+        /// <summary>
+        /// Adds dropped widget(s) to the layout; returns the id of the last row saved.
+        /// </summary>
+        public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes, int windowID, int dashboardID)
+        {
+            int id = 0;
+            if (!CanWriteLayout(ctx, windowID, dashboardID))
+                return id;
             for (int i = 0; i < widgetSizes.Count; i++)
             {
-                mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
-                mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
-                mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
-                mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
-                mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
-                mUserHomeWidget.Set_Value("AD_Window_ID", windowID);
-                mUserHomeWidget.Save();
+                MUserHomeWidget mUserHomeWidget = NewUserHomeWidget(ctx, widgetSizes[i], windowID, dashboardID, null);
+                if (mUserHomeWidget.Save())
+                    id = mUserHomeWidget.Get_ID();
             }
-            return mUserHomeWidget.Get_ID();
+            return id;
         }
 
         /// <summary>
@@ -1105,7 +1608,15 @@ namespace VIS.Models
         /// <returns></returns>
         public int DeleteWidgetFromHome(Ctx ctx, int id)
         {
-            DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE  AD_UserHomeWidget_ID=" + id);
+            MUserHomeWidget row = new MUserHomeWidget(ctx, id, null);
+            if (row.Get_ID() == 0)
+                return 1;
+            // dashboard rows: whoever may change the dashboard; legacy rows: the user's own for the role
+            bool allowed = row.GetAD_Dashboard_ID() > 0
+                ? CanModify(ctx, LoadDashboard(ctx, row.GetAD_Dashboard_ID(), null), null)
+                : row.GetAD_User_ID() == ctx.GetAD_User_ID() && row.GetAD_Role_ID() == ctx.GetAD_Role_ID();
+            if (allowed)
+                DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_UserHomeWidget_ID=" + id);
             return 1;
         }
 
@@ -1235,6 +1746,42 @@ namespace VIS.Models
         public string IsShowAdvanced { get; set; }
         public int AD_WidgetSize_ID { get; set; }
         public int AD_Widget_ID { get; set; }
+    }
+
+    /// <summary>A dashboard as offered to the signed-in user (switcher sheet on Home).</summary>
+    public class DashboardInfo
+    {
+        public int AD_Dashboard_ID { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int SeqNo { get; set; }
+        /// <summary>Created by the signed-in user and not shared (listed under My dashboards).</summary>
+        public bool IsOwner { get; set; }
+        /// <summary>No owner: offered to the roles in AD_Dashboard_Access (listed under Shared).</summary>
+        public bool IsShared { get; set; }
+        /// <summary>Layout, name, roles and deletion: own dashboard, or shared with read / write access for the role.</summary>
+        public bool CanEdit { get; set; }
+        /// <summary>Own dashboard the user may turn into a shared one.</summary>
+        public bool CanShare { get; set; }
+        /// <summary>Roles a shared dashboard is assigned to.</summary>
+        public int RoleCount { get; set; }
+        public bool IsRoleDefault { get; set; }
+        public bool IsUserDefault { get; set; }
+        public int WidgetCount { get; set; }
+        /// <summary>Last change to the layout (ISO 8601), null for the legacy home.</summary>
+        public string Updated { get; set; }
+    }
+
+    /// <summary>Role in the share / edit roles checklist.</summary>
+    public class DashboardRole
+    {
+        public int AD_Role_ID { get; set; }
+        public string Name { get; set; }
+        public bool IsSelected { get; set; }
+        /// <summary>The role may change the shared dashboard.</summary>
+        public bool IsReadWrite { get; set; }
+        /// <summary>Login role: always selected and read / write, cannot be changed in the checklist.</summary>
+        public bool IsLocked { get; set; }
     }
 
     public class HomeWidget : WidgetSize
