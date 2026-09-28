@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -64,8 +66,6 @@ namespace VIS.Controllers
                 //var stLogin = new Stopwatch();
                 //stLogin.Start();
 
-                CCache<string, string> msgs = Msg.Get().GetMsgMap(ctx.GetAD_Language());
-
                 sb.Append("; var VIS = {");
                 sb.Append("Application: {contextUrl:'").Append(@Url.Content("~/")).Append("',").Append(" contextFullUrl:'").Append(fullUrl).Append("',")
                          .Append("isMobile:").Append(Request.Browser.IsMobileDevice ? "1" : "0")
@@ -107,54 +107,16 @@ namespace VIS.Controllers
 
                 sb.Append(" VIS.context.ctx = ").Append(Newtonsoft.Json.JsonConvert.SerializeObject(ctx.GetMap())).Append("; ");
 
-                /* Message */
-                sb.Append(" VIS.I18N.labels = { ");
-
-
-                if (msgs != null)
-                {
-                    int total = msgs.Keys.Count;
-                    foreach (var key in msgs.Keys)
-                    {
-                        --total;
-                        
-                        string msg = (string)msgs.Get(key) ?? "";
-                        msg = msg.Replace("\n", " ").Replace("\r", " ").Replace("\"", "'");
-                        sb.Append("\"").Append(key).Append("\": ").Append("\"").Append(msg).Append("\"");
-                        if (total != 0)
-                        {
-                            sb.Append(",");
-                        }
-
-                    }
-
-                }
-
-                /* purpose: right window action translation with search key
-                 * VIS0228      08-Aug-2021 
+                /* Message
+                 * AD_Message texts are served by Messages() (cacheable, loaded right after this script);
+                 * only the per-session labels stay here.
+                 * purpose: right window action translation with search key
+                 * VIS0228      08-Aug-2021
                  */
-
-                ValueNamePair[] refList = MRefList.GetList(435, false, ctx);
-                int refListTotal = refList.Length;
-                if (refListTotal > 0)
-                {
-                    if (msgs.Keys.Count > 0)
-                    {
-                        sb.Append(", ");
-                    }
-
-                    for (int i = 0; i < refList.Length; i++)
-                    {
-                        sb.Append("\"").Append(refList[i].GetValue()).Append("\": ").Append("\"").Append(refList[i].GetName()).Append("\"");
-                        if (i != (refListTotal - 1))
-                        {
-                            sb.Append(", ");
-                        }
-
-                    }
-                }
-
-                sb.Append("};");
+                var refLabels = new Dictionary<string, string>();
+                foreach (ValueNamePair pair in MRefList.GetList(435, false, ctx))
+                    refLabels[pair.GetValue()] = pair.GetName();
+                sb.Append(" VIS.I18N.labels = ").Append(ToScriptJson(refLabels)).Append(";");
 
                 // sb.Append(" console.log(VIS.I18N.labels)");
                 //return View();
@@ -174,6 +136,116 @@ namespace VIS.Controllers
             }
 
             return JavaScript(sb.ToString());
+        }
+
+        /// <summary>
+        /// AD_Message texts of the session language as a script that fills VIS.I18N.labels (loaded right
+        /// after Application()). Messages change rarely, so unlike Application() the browser caches this:
+        /// the page references it with the content hash (MessagesVersion) and new texts mean a new URL.
+        /// A request for any other hash (texts changed after the page was rendered) is not cached.
+        /// </summary>
+        /// <param name="lang">language of the page, part of the URL only</param>
+        /// <param name="v">content hash of the texts the page expects</param>
+        public ActionResult Messages(string lang, string v)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            if (ctx == null)
+            {
+                // session expired: Application() reloads the page
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetNoStore();
+                return JavaScript("");
+            }
+
+            MessagesScript script = GetMessagesScript(ctx.GetAD_Language());
+            if (v == script.Version)
+            {
+                Response.Cache.SetCacheability(HttpCacheability.Private);
+                Response.Cache.SetMaxAge(TimeSpan.FromDays(365));
+                Response.Cache.AppendCacheExtension("immutable");
+            }
+            else
+            {
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetNoStore();
+            }
+
+            Response.AppendHeader("Vary", "Accept-Encoding");
+            string acceptEncoding = Request.Headers["Accept-Encoding"] ?? "";
+            if (acceptEncoding.IndexOf("gzip", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                Response.AppendHeader("Content-Encoding", "gzip");
+                return File(script.Gzip, "application/javascript; charset=utf-8");
+            }
+            return File(script.Bytes, "application/javascript; charset=utf-8");
+        }
+
+        /// <summary>Content hash of the session language's messages, for the Messages() URL.</summary>
+        public static string MessagesVersion(string AD_Language)
+        {
+            return GetMessagesScript(AD_Language).Version;
+        }
+
+        /// <summary>Messages() script of one language, built from one load of the server message map.</summary>
+        private sealed class MessagesScript
+        {
+            /// <summary>The Msg map it was built from; a reload of the map (120 minute expiry, cache reset) is a new object.</summary>
+            public object Source;
+            public byte[] Bytes;
+            public byte[] Gzip;
+            public string Version;
+        }
+
+        private static readonly ConcurrentDictionary<string, MessagesScript> _messagesScripts = new ConcurrentDictionary<string, MessagesScript>();
+
+        /// <summary>
+        /// Script for the language, rebuilt only when Msg has reloaded its map. The version is a hash of
+        /// the content, so a reload that brings no new texts keeps the browser's cached copy valid.
+        /// </summary>
+        private static MessagesScript GetMessagesScript(string AD_Language)
+        {
+            string lang = AD_Language ?? "";
+            CCache<string, string> msgs = Msg.Get().GetMsgMap(lang);
+            MessagesScript cached;
+            if (_messagesScripts.TryGetValue(lang, out cached) && ReferenceEquals(cached.Source, msgs))
+                return cached;
+
+            var labels = new Dictionary<string, string>();
+            if (msgs != null)
+            {
+                foreach (string key in msgs.Keys)
+                {
+                    // single line, double quotes as single: labels are also placed into HTML attributes
+                    string msg = (string)msgs.Get(key) ?? "";
+                    labels[key] = msg.Replace("\n", " ").Replace("\r", " ").Replace("\"", "'");
+                }
+            }
+
+            // keys already set by Application() (window action translations) take precedence
+            string script = "(function (labels, msgs) { for (var k in msgs) { if (msgs.hasOwnProperty(k) && !labels.hasOwnProperty(k)) labels[k] = msgs[k]; } })"
+                + "(VIS.I18N.labels = VIS.I18N.labels || {}, " + ToScriptJson(labels) + ");";
+
+            var built = new MessagesScript() { Source = msgs, Bytes = Encoding.UTF8.GetBytes(script) };
+            using (var sha = SHA1.Create())
+                built.Version = BitConverter.ToString(sha.ComputeHash(built.Bytes)).Replace("-", "").Substring(0, 12).ToLowerInvariant();
+            using (var output = new MemoryStream())
+            {
+                using (var gzip = new GZipStream(output, CompressionLevel.Optimal))
+                    gzip.Write(built.Bytes, 0, built.Bytes.Length);
+                built.Gzip = output.ToArray();
+            }
+            _messagesScripts[lang] = built;
+            return built;
+        }
+
+        /// <summary>
+        /// Labels as a JavaScript object literal: JSON escaping (backslashes, quotes, control characters)
+        /// plus the line / paragraph separators that older browsers do not accept inside string literals.
+        /// </summary>
+        private static string ToScriptJson(Dictionary<string, string> labels)
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(labels)
+                .Replace("\u2028", "\\u2028").Replace("\u2029", "\\u2029");
         }
 
         /// <summary>
