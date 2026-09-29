@@ -659,10 +659,11 @@
                     } else {
                         $('#vis_editHome').show();
                     }
+                    $('#vis_switchDashboard').show();
                     return;
 
                 } else {
-                    $('#vis_editHome').hide();
+                    $('#vis_editHome, #vis_switchDashboard').hide();
                 }
 
                 //if (itm[0].id == "vis_lhome")

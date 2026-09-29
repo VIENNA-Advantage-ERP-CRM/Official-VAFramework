@@ -7,6 +7,14 @@
 
 VIS.Msg.elements = {};
 
+/**
+ *	Key present in VIS.I18N.labels (filled by Resource/Application and Resource/Messages); an existing
+ *  key with an empty text counts as present, inherited names such as "constructor" do not
+ */
+VIS.I18N.hasLabel = function (key) {
+    return !!VIS.I18N.labels && Object.prototype.hasOwnProperty.call(VIS.I18N.labels, key);
+};
+
 
 /**
  *	Get translated text for AD_Message
@@ -16,7 +24,7 @@ VIS.Msg.elements = {};
 VIS.I18N.getLabel = function (key, params, object, property) {
     var label, i;
 
-    if (!VIS.I18N.labels[key]) {
+    if (!VIS.I18N.hasLabel(key)) {
         if (object && property) {
             VIS.I18N.getLabelFromServer(key, params, object, property);
         }
@@ -66,10 +74,10 @@ VIS.I18N.getLabelFromServer = function (key, params, object, property) {
  */
 VIS.Msg.getMsg = function (key, msgPlusToolTip, onlyToolTip) {
 
-    if (!VIS.I18N.labels[key]) {
+    if (!VIS.I18N.hasLabel(key)) {
         return '[' + key + ']';
     }
-    label = VIS.Utility.Util.cleanMnemonic(VIS.I18N.labels[key]); //Edited by sarab
+    var label = VIS.Utility.Util.cleanMnemonic(VIS.I18N.labels[key]); //Edited by sarab
 
     var lbs = label.split('      ');
     if (!msgPlusToolTip) {

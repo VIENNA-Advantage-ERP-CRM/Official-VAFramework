@@ -1,4 +1,4 @@
-namespace ViennaAdvantage.Model{
+﻿namespace ViennaAdvantage.Model{
     /** Generated Model - DO NOT CHANGE */
     using System;
     using System.Text;
@@ -112,5 +112,18 @@ namespace ViennaAdvantage.Model{
         public void SetSRNO(int SRNO) { Set_Value("SRNO", SRNO); }/** Get SRNO.
 @return SRNO */
         public int GetSRNO() { Object ii = Get_Value("SRNO"); if (ii == null) return 0; return Convert.ToInt32(ii); }
+        /** Set Dashboard (null = legacy home layout without dashboards).
+@param AD_Dashboard_ID Dashboard */
+        public void SetAD_Dashboard_ID(int AD_Dashboard_ID)
+        {
+            if (AD_Dashboard_ID <= 0) Set_Value("AD_Dashboard_ID", null);
+            else Set_Value("AD_Dashboard_ID", AD_Dashboard_ID);
+        }/** Get Dashboard.
+@return Dashboard */
+        public int GetAD_Dashboard_ID() { Object ii = Get_Value("AD_Dashboard_ID"); if (ii == null) return 0; return Convert.ToInt32(ii); }/** Set Window (0 = home page).
+@param AD_Window_ID Window */
+        public void SetAD_Window_ID(int AD_Window_ID) { Set_Value("AD_Window_ID", AD_Window_ID); }/** Get Window.
+@return Window */
+        public int GetAD_Window_ID() { Object ii = Get_Value("AD_Window_ID"); if (ii == null) return 0; return Convert.ToInt32(ii); }
     }
 }

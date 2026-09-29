@@ -468,6 +468,8 @@
 
         @*Dynamic content js*@
         <script src="@Url.Action("Application", "Resource")"></script>
+        @*Messages (VIS.I18N.labels): cached by the browser, the hash changes when the texts do*@
+        <script src="@Url.Action("Messages", "Resource", new { lang = (string)ViewBag.culture, v = VIS.Controllers.ResourceController.MessagesVersion((string)ViewBag.culture) })"></script>
         @{
 
             foreach (string b in ViewBag.ScriptsPath)
