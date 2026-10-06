@@ -23,6 +23,7 @@
         var $sheet = null;           // switcher sheet (built on first open)
         var $spot = null;            // Ctrl+K jump dialog
         var formMode = null;         // sheet form: 'create' | 'rename' | 'share' (own -> shared) | 'roles' (shared)
+        var rolesSelectedOnly = false;  // role checklist shows only the selected roles (review)
         var formTarget = null;       // dashboard the rename / share / roles form is for
         var rowMenuTarget = null;    // AD_Dashboard_ID the row menu is open for
         var spotCursor = 0;
@@ -798,8 +799,12 @@
                     + '      </div>'
                     + '      <label class="vis-dsw-share" style="display:none"><input type="checkbox" /><span></span></label>'
                     + '      <div class="vis-dsw-roles" style="display:none">'
-                    + '        <div class="vis-dsw-roles-head"><input type="text" class="vis-dsw-input vis-dsw-roles-search" /><span class="vis-dsw-roles-count"></span></div>'
+                    + '        <div class="vis-dsw-roles-head">'
+                    + '          <span class="vis-dsw-roles-searchbox"><i class="fa fa-search"></i><input type="text" class="vis-dsw-input vis-dsw-roles-search" /><button type="button" class="vis-dsw-roles-clear" style="display:none"><i class="fa fa-times"></i></button></span>'
+                    + '          <button type="button" class="vis-dsw-roles-count"></button>'
+                    + '        </div>'
                     + '        <div class="vis-dsw-roles-list"></div>'
+                    + '        <div class="vis-dsw-roles-nomatch" style="display:none"><span></span> <button type="button" class="vis-dsw-roles-showall"></button></div>'
                     + '      </div>'
                     + '      <div class="vis-dsw-form-actions">'
                     + '        <button type="button" class="vis-dsw-btn vis-dsw-cancel"></button>'
@@ -831,7 +836,26 @@
                 $sheet.find('.vis-dsw-share input').on('change', function () {
                     toggleRoles(this.checked, 0);
                 });
-                $sheet.find('.vis-dsw-roles-search').on('input', filterRoles);
+                $sheet.find('.vis-dsw-roles-clear').attr('title', msg("VA_ClearSearch", "Clear search"));
+                $sheet.find('.vis-dsw-roles-showall').text(msg("VA_DashboardShowAllRoles", "Show all roles"));
+                $sheet.find('.vis-dsw-roles-search').on('input', function () {
+                    rolesSelectedOnly = false;
+                    filterRoles();
+                });
+                // the count reviews the selection: only the selected roles, whatever was searched
+                $sheet.find('.vis-dsw-roles-count').on('click', function () {
+                    rolesSelectedOnly = !rolesSelectedOnly;
+                    $sheet.find('.vis-dsw-roles-search').val("");
+                    filterRoles();
+                });
+                $sheet.find('.vis-dsw-roles-clear, .vis-dsw-roles-showall').on('click', function () {
+                    rolesSelectedOnly = false;
+                    $sheet.find('.vis-dsw-roles-search').val("").focus();
+                    filterRoles();
+                });
+                // the row menu is positioned on the viewport: drop it when its row moves away
+                $sheet.find('.vis-dsw-body').on('scroll', hideRowMenu);
+                $(window).on('resize', hideRowMenu);
                 // read / write needs the role; taking the role away drops read / write too
                 $sheet.find('.vis-dsw-roles-list').on('change', 'input', function () {
                     var $role = $(this).closest('.vis-dsw-role');
@@ -955,6 +979,8 @@
                 var save = { create: msg("Create", "Create"), rename: msg("VA_Rename", "Rename"), share: msg("VA_DashboardShare", "Share"), roles: msg("Save", "Save") };
                 $form.find('.vis-dsw-save').text(save[mode]);
                 $form.show();
+                // the form sits at the top of the sheet: bring it back into view when the list was scrolled
+                $sheet.find('.vis-dsw-body').scrollTop(0);
                 if (withName) setTimeout(function () { $form.find('.vis-dsw-name-input').focus(); }, 40);
             }
 
@@ -971,6 +997,8 @@
                 var $roles = $sheet.find('.vis-dsw-roles').removeClass('is-invalid').toggle(show);
                 if (!show) return;
                 $roles.find('.vis-dsw-roles-search').val("");
+                rolesSelectedOnly = false;
+                $roles.find('.vis-dsw-roles-clear, .vis-dsw-roles-nomatch').hide();
                 var $list = $roles.find('.vis-dsw-roles-list').empty();
                 updateRoleCount();
                 VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/GetDashboardRoles", { dashboardID: dashboardID }, function (result) {
@@ -991,14 +1019,37 @@
                         $list.append($row);
                     }
                     updateRoleCount();
+                    // keep the checklist in sight (e.g. "Share with roles" ticked below the name)
+                    if ($roles[0].scrollIntoView) $roles[0].scrollIntoView({ block: 'nearest' });
                 });
             }
 
+            // search text and the "selected only" review; when nothing matches the user is told so and
+            // can get the list back, so the selection is never hidden behind a search
             function filterRoles() {
-                var q = $.trim($(this).val()).toLowerCase();
+                var q = $.trim($sheet.find('.vis-dsw-roles-search').val()).toLowerCase();
+                var visible = 0;
                 $sheet.find('.vis-dsw-role').each(function () {
-                    $(this).toggle(!q || $(this).find('.vis-dsw-role-name').text().toLowerCase().indexOf(q) >= 0);
+                    var $role = $(this);
+                    var show = rolesSelectedOnly
+                        ? $role.find('.vis-dsw-role-sel').is(':checked')
+                        : (!q || $role.find('.vis-dsw-role-name').text().toLowerCase().indexOf(q) >= 0);
+                    $role.toggle(show);
+                    if (show) visible++;
                 });
+                $sheet.find('.vis-dsw-roles-clear').toggle(q.length > 0);
+                $sheet.find('.vis-dsw-roles-count').toggleClass('is-active', rolesSelectedOnly)
+                    .attr('title', rolesSelectedOnly ? msg("VA_DashboardShowAllRoles", "Show all roles") : msg("VA_DashboardShowSelectedRoles", "Show selected roles"));
+                var $none = $sheet.find('.vis-dsw-roles-nomatch');
+                if (visible == 0 && $sheet.find('.vis-dsw-role').length > 0) {
+                    $none.find('span').text(rolesSelectedOnly
+                        ? msg("VA_DashboardNoRoleSelected", "No role selected.")
+                        : msg("VA_DashboardNoRoleMatch", "No role matches") + " “" + q + "”.");
+                    $none.show();
+                }
+                else {
+                    $none.hide();
+                }
             }
 
             function selectedRoles() {
@@ -1088,8 +1139,15 @@
                         .append('<i class="fa ' + items[i].icon + '"></i> ')
                         .append($('<span>').text(items[i].text)));
                 }
+                // below the button, or above it when it would run past the bottom of the viewport
                 var rect = $btn[0].getBoundingClientRect();
-                $menu.css({ top: rect.bottom + 4, left: Math.max(8, rect.right - 190) }).show();
+                $menu.css({ top: 0, left: 0, visibility: 'hidden' }).show();
+                var height = $menu.outerHeight(), width = $menu.outerWidth();
+                var top = rect.bottom + 4;
+                if (top + height > window.innerHeight - 8)
+                    top = Math.max(8, rect.top - height - 4);
+                var left = Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8));
+                $menu.css({ top: top, left: left, visibility: '' });
                 $sheet.find('.vis-dsw-row-more.is-open').removeClass('is-open');
                 $btn.addClass('is-open');
             }
