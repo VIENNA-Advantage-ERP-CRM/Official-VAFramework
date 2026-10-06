@@ -3391,7 +3391,7 @@
         if (window.VADMS) {
             if (action == 'CDT') {
                 var frame = new VIS.CFrame();
-                var editDoc = new window.VADMS.editDocument(0, "", 0, "", 0, null, "", aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.curWindowNo, aPanel.curTab.getAD_Tab_ID());
+                var editDoc = new window.VADMS.SyncfusionDocEditor(0, "", 0, "", 0, null, "", aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.curWindowNo, aPanel.curTab.getAD_Tab_ID());
                 frame.setName(VIS.Msg.getMsg("VADMS_CreateDocument"));
                 frame.setTitle(VIS.Msg.getMsg("VADMS_CreateDocument"));
                 frame.hideHeader(true);

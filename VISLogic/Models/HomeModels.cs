@@ -208,7 +208,7 @@ namespace VIS.Models
 
             sql += " ORDER BY AD_ModuleInfo.name";
 
-            
+
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
             {
@@ -249,7 +249,7 @@ namespace VIS.Models
                                 img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String(imageData) + "' />";
                             }
                         }
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -772,6 +772,14 @@ namespace VIS.Models
                 dashboard.SetAD_User_ID(shared ? -1 : ctx.GetAD_User_ID());
                 if (!dashboard.Save() || (shared && !SetRoles(ctx, dashboard.GetAD_Dashboard_ID(), roleIDs, readWriteRoleIDs, trx)))
                 {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    string error = "";
+                    if (vnp != null)
+                    {
+                        error = vnp.GetName();
+                        if (error == "" && vnp.GetValue() != null)
+                            error = vnp.GetValue();
+                    }
                     trx.Rollback();
                     return 0;
                 }
@@ -845,7 +853,7 @@ namespace VIS.Models
             string sql = "SELECT r.AD_Role_ID, r.Name, "
                 + (assigned ? "(SELECT COUNT(*) " + access + ") AS IsSelected, (SELECT COUNT(*) " + access + " AND a.IsReadWrite='Y') AS IsReadWrite"
                             : "0 AS IsSelected, 0 AS IsReadWrite")
-                + " FROM AD_Role r WHERE r.IsActive='Y' AND r.AD_Role_ID>0 AND r.AD_Client_ID=" + ctx.GetAD_Client_ID()
+                + " FROM AD_Role r WHERE r.IsActive='Y' AND r.AD_Role_ID >= 0 AND r.AD_Client_ID=" + ctx.GetAD_Client_ID()
                 + " ORDER BY r.Name";
             DataSet ds = DB.ExecuteDataset(sql, null);
             if (ds != null && ds.Tables.Count > 0)
@@ -904,7 +912,7 @@ namespace VIS.Models
             var readWrite = new HashSet<int>(readWriteRoleIDs ?? new List<int>());
             readWrite.Add(loginRole);
             // ints only, so the list is safe to inline
-            DataSet ds = DB.ExecuteDataset("SELECT AD_Role_ID FROM AD_Role WHERE IsActive='Y' AND AD_Role_ID>0 AND AD_Client_ID=" + ctx.GetAD_Client_ID()
+            DataSet ds = DB.ExecuteDataset("SELECT AD_Role_ID FROM AD_Role WHERE IsActive='Y' AND AD_Role_ID>=0 AND AD_Client_ID=" + ctx.GetAD_Client_ID()
                 + " AND AD_Role_ID IN (" + string.Join(",", roleIDs) + ")", null, trx);
             var valid = new List<int>();
             if (ds != null && ds.Tables.Count > 0)
@@ -939,7 +947,8 @@ namespace VIS.Models
                     access = new MDashboardAccess(ctx, 0, trx);
                     access.SetClientOrg(ctx.GetAD_Client_ID(), 0);
                     access.SetAD_Dashboard_ID(dashboardID);
-                    access.SetAD_Role_ID(roleID);
+                    if (roleID > 0)
+                        access.SetAD_Role_ID(roleID);
                     access.SetIsDefault(false);
                     access.SetSeqNo(10);
                 }
@@ -947,6 +956,13 @@ namespace VIS.Models
                 access.SetIsReadWrite(rw);
                 if (!access.Save())
                     return false;
+                else
+                {
+                    if (roleID == 0)
+                    {
+                        DB.ExecuteQuery("UPDATE AD_Dashboard_Access SET AD_Role_ID=" + roleID + " WHERE AD_Dashboard_Access_ID=" + access.GetAD_Dashboard_Access_ID(), null, trx);
+                    }
+                }
             }
             return true;
         }
@@ -1172,7 +1188,7 @@ namespace VIS.Models
                                                     clk = JsonConvert.DeserializeObject<ActionParams>(clonedJson);
                                                 }
 
-                                                if (IsInteger(dsObj[j].ID) && dsObj[j].DisplayType !=DisplayType.List)
+                                                if (IsInteger(dsObj[j].ID) && dsObj[j].DisplayType != DisplayType.List)
                                                 {
                                                     where = tableName + "." + columnName + " = " + dsObj[j].ID;
                                                 }
