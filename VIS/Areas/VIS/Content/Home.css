@@ -3805,15 +3805,85 @@ ul.vis-userLinks-ListMenu li a i {
     border-bottom: 1px solid #EDF2F6;
 }
 
-    .vis-dsw-roles-head .vis-dsw-input {
-        flex: 1 1 auto;
-        height: 28px;
+.vis-dsw-roles-searchbox {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+    .vis-dsw-roles-searchbox > .fa-search {
+        position: absolute;
+        left: 9px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        color: #9AA8B5;
+        pointer-events: none;
     }
 
+    .vis-dsw-roles-head .vis-dsw-roles-searchbox .vis-dsw-input {
+        width: 100%;
+        height: 28px;
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+
+.vis-dsw-roles-clear {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #9AA8B5;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+    .vis-dsw-roles-clear:hover {
+        background: #EDF2F6;
+        color: #3A4A5A;
+    }
+
+/* "N selected": click to review only the selected roles */
 .vis-dsw-roles-count {
     font-size: 0.7rem;
-    color: #748494;
+    color: rgba(var(--v-c-primary), 1);
     white-space: nowrap;
+    border: 1px solid #D5E3EE;
+    border-radius: 12px;
+    background: #fff;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+    .vis-dsw-roles-count:hover {
+        background: #EEF5FB;
+    }
+
+    .vis-dsw-roles-count.is-active {
+        background: rgba(var(--v-c-primary), 1);
+        border-color: rgba(var(--v-c-primary), 1);
+        color: #fff;
+    }
+
+.vis-dsw-roles-nomatch {
+    padding: 10px 8px;
+    font-size: 0.75rem;
+    color: #748494;
+}
+
+.vis-dsw-roles-showall {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: rgba(var(--v-c-primary), 1);
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .vis-dsw-roles-list {
