@@ -1,11 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using System.IO;
+using System.Net;
+using System.ServiceModel;
+using System.ServiceModel.Web;
 using System.Web.Security;
 using VAdvantage.Model;
 using VAdvantage.Utility;
+using VAModelAD.Classes;
 
 ////// <summary>
 /// login Models
@@ -219,8 +225,12 @@ namespace VIS.Models
                 //System.Net.ServicePointManager.Expect100Continue = false;
                 try
                 {
-                    System.Net.ServicePointManager.Expect100Continue = false;
-                    retUrl = cloud.isAllowedToContinue(url, SecureEngine.Encrypt(System.Web.Configuration.WebConfigurationManager.AppSettings["accesskey"].ToString()));
+                    using (new OperationContextScope(cloud.InnerChannel))
+                    {
+                        WebOperationContext.Current.OutgoingRequest.Headers.Add("AuthToken", GetAuthToken());
+                        System.Net.ServicePointManager.Expect100Continue = false;
+                        retUrl = cloud.isAllowedToContinue(url, SecureEngine.Encrypt(System.Web.Configuration.WebConfigurationManager.AppSettings["accesskey"].ToString()));
+                    }
                 }
                 catch
                 {
@@ -231,7 +241,6 @@ namespace VIS.Models
                 {
                     if (retUrl != "True")
                     {
-
                         return retUrl;
                     }
                     else
@@ -246,10 +255,37 @@ namespace VIS.Models
             }
             catch
             {
-
                 return retUrl;
             }
             return retUrl;
+        }
+
+        private static string GetAuthToken()
+        {
+            try
+            {
+                var url = "https://tamgmtapi.viennaadvantage.com/api/auth/token";
+                var httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                httpRequest.Method = "GET";
+                httpRequest.Accept = "application/json";
+                httpRequest.ContentType = "application/json";
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                httpRequest.ProtocolVersion = HttpVersion.Version10;
+                ServicePointManager.Expect100Continue = true;
+                var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                string token = null;
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    token = JsonConvert.DeserializeObject<AuthData>(streamReader.ReadToEnd()).token;
+                }
+                return token;
+            }
+            catch (Exception e)
+            {
+                VAdvantage.Logging.VLogger.Get().Severe("UnabletogenerateAuthToken=>" + e.Message);
+            }
+            VAdvantage.Logging.VLogger.Get().Severe("UnabletogenerateAuthToken.");
+            return null;
         }
 
         private static string GenerateUrl(string urlIn)
