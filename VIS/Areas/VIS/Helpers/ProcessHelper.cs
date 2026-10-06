@@ -811,6 +811,8 @@ namespace VIS.Helpers
 
                 //report = null;
                 ProcessCtl ctl = new ProcessCtl();
+                // Print icon: the user picked a file type, so engines that can embed must export a file
+                ctl.IsFileOutput = true;
                 //ctl.SetIsPrintFormat(true);
                 //ctl.IsArabicReportFromOutside = false;
                 //ctl.SetIsPrintCsv(csv);
@@ -831,6 +833,14 @@ namespace VIS.Helpers
                 ret.AD_Process_ID = pi.GetAD_Process_ID();
                 ret.RecordIDs = pi.GetRecIds();
                 ctl.ReportString = null;
+
+                // the report engine failed and produced nothing: show its message instead of doing nothing
+                if (pi.IsError() && string.IsNullOrEmpty(rptFilePath) && report == null)
+                {
+                    ret.IsError = true;
+                    ret.Message = pi.GetSummary();
+                    ret.ErrorText = pi.GetSummary();
+                }
 
 
                 //Env.GetCtx().Clear();
@@ -1057,6 +1067,13 @@ namespace VIS.Helpers
                     }
                 }
 
+            }
+
+            // Onfinity Analytics (module VA149) can deliver PDF and CSV only
+            if ("O".Equals(Util.GetValueOfString(DB.ExecuteScalar("SELECT IsCrystalReport FROM AD_Process WHERE AD_Process_ID=" + AD_Process_ID))))
+            {
+                list.RemoveAll(v => !v.Key.Equals(ProcessCtl.ReportType_PDF) && !v.Key.Equals(ProcessCtl.ReportType_CSV));
+                return list;
             }
 
             bool isHtmlSupported = IsHtmlSupported(AD_Process_ID);

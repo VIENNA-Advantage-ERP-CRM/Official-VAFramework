@@ -1082,6 +1082,7 @@ namespace VAdvantage.WF
                                               && process.GetAD_ReportFormat_ID() == 0
                                               && !process.Get_Value("IsCrystalReport").Equals("B")
                                               && !process.Get_Value("IsCrystalReport").Equals("J")
+                                              && !process.Get_Value("IsCrystalReport").Equals("O")   // Onfinity Analytics (module VA149)
                                                  && process.GetAD_ReportMaster_ID() == 0))
 
                 // if (!process.IsReport() || process.GetAD_ReportView_ID() == 0)

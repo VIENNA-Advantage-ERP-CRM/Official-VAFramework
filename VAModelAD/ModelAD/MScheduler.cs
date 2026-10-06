@@ -606,10 +606,9 @@ namespace VAdvantage.Model
             }
             else if (m_process.GetIsCrystalReport() == "O")
             {
-                // Onfinity Analytics: PDF exported through the Analytics API (service account)
-                re = new VAdvantage.Analytics.AnalyticsReportEngine(false);
-                if (!re.StartReport(p_ctx, pi, trx))
-                    re = null;   // pi summary carries the reason, reported below
+                // Onfinity Analytics (module VA149): PDF exported through the Analytics API (service account);
+                // null when StartReport fails, pi summary carries the reason (reported below)
+                re = VAdvanatge.Report.ReportEngine.GetReportEngine(p_ctx, pi, trx, "VA149Svc", "VA149Svc.Classes.AnalyticsReportEngine");
             }
             else
             {

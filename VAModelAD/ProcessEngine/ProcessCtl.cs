@@ -953,10 +953,11 @@ namespace VAdvantage.ProcessEngine
                 }
                 else if (IsAnalyticsReport)
                 {
-                    // Onfinity Analytics: interactive viewer gets a signed embed URL, CSV requests export a file
-                    re = new VAdvantage.Analytics.AnalyticsReportEngine(true);
-                    if (!re.StartReport(_ctx, _pi, _trx))
-                        re = null;   // summary/error already set on pi
+                    // Onfinity Analytics (module VA149): interactive viewer gets a signed embed URL
+                    // (ReportType_EMBED), CSV requests export a file; the Print icon (IsFileOutput) always gets a file.
+                    // null when StartReport fails (summary set on pi)
+                    re = VAdvanatge.Report.ReportEngine.GetReportEngine(_ctx, pi, _trx, "VA149Svc",
+                        IsFileOutput ? "VA149Svc.Classes.AnalyticsReportEngine" : "VA149Svc.Classes.AnalyticsEmbedReportEngine");
                 }
                 else if (!IsCrystalReport)
                 {
@@ -1368,6 +1369,16 @@ namespace VAdvantage.ProcessEngine
         }
 
         public string ReportString
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The caller needs a file (Print icon of a window): engines that can embed (Onfinity Analytics)
+        /// export PDF / CSV instead of returning an embed URL.
+        /// </summary>
+        public bool IsFileOutput
         {
             get;
             set;

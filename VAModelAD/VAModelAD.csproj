@@ -231,9 +231,6 @@
     <Compile Include="Controller\GridWindowVO.cs" />
     <Compile Include="Controller\GridWorkbench.cs" />
     <Compile Include="Controller\HeaderPanelItemsVO.cs" />
-    <Compile Include="Analytics\AnalyticsApiClient.cs" />
-    <Compile Include="Analytics\AnalyticsEmbed.cs" />
-    <Compile Include="Analytics\AnalyticsReportEngine.cs" />
     <Compile Include="CrystalReport\BiReportEngine.cs" />
     <Compile Include="CrystalReport\CrystalParams.cs" />
     <Compile Include="CrystalReport\CrystalReportEngine.cs" />

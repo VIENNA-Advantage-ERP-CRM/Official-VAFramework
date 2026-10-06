@@ -356,9 +356,9 @@ namespace VAdvantage.Common
                 }
                 else if ("O".Equals(reportEngineType))
                 {
-                    // Onfinity Analytics: export the file through the Analytics API (service account)
-                    rpe = new VAdvantage.Analytics.AnalyticsReportEngine(false);
-                    if (!rpe.StartReport(p_ctx, _pi, _trx))
+                    // Onfinity Analytics (module VA149): export the file through the Analytics API (service account)
+                    rpe = VAdvanatge.Report.ReportEngine.GetReportEngine(p_ctx, _pi, _trx, "VA149Svc", "VA149Svc.Classes.AnalyticsReportEngine");
+                    if (rpe == null)
                     {
                         // keep the engine's error message instead of the generic "Report" summary below
                         System.Threading.Thread.CurrentThread.CurrentCulture = original;
