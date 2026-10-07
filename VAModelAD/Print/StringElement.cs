@@ -196,7 +196,9 @@ namespace VAdvantage.Print
             {
                 int x = (int)(location.X + width + 1);
                 int y = (int)(location.Y);
-                g2D.DrawImage((bool)m_check ? LayoutEngine.IMAGE_TRUE : LayoutEngine.IMAGE_FALSE, x, y);
+                System.Drawing.Image check = (bool)m_check ? LayoutEngine.IMAGE_TRUE : LayoutEngine.IMAGE_FALSE;
+                lock (check)    // shared GDI+ image: reports render in parallel, an image may only be drawn by one thread at a time
+                    g2D.DrawImage(check, x, y);
             }
         }
 
