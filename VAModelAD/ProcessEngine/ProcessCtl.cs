@@ -555,7 +555,7 @@ namespace VAdvantage.ProcessEngine
                 //Updated by raghu to open reports from work flow
 
                 byte[] repByt = null;
-                re = ReportCtl.Report;
+                re = _pi.GetWorkflowReport();   // the report of this run only (was the server-wide ReportCtl.Report)
                 if (re != null)
                 {
                     // int reportTable_ID = 0;
@@ -802,7 +802,7 @@ namespace VAdvantage.ProcessEngine
                 //Updated by raghu to open reports from work flow
 
                 byte[] repByt = null;
-                re = ReportCtl.Report;
+                re = _pi.GetWorkflowReport();   // the report of this run only (was the server-wide ReportCtl.Report)
                 if (re != null)
                 {
                     // int reportTable_ID = 0;
@@ -1545,7 +1545,7 @@ namespace VAdvantage.ProcessEngine
             if (AD_Workflow_ID > 0)
             {
                 StartWorkflow(AD_Workflow_ID);
-                re = ReportCtl.Report;
+                re = _pi.GetWorkflowReport();   // the report of this run only (was the server-wide ReportCtl.Report)
 
                 Unlock();
                 return;

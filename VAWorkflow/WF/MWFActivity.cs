@@ -927,7 +927,6 @@ namespace VAdvantage.WF
         /// <returns>true if completed, false otherwise and throws Exception if error</returns>
         private bool PerformWork(Trx trx)
         {
-            ReportCtl.Report = null;
             // AD_ReportFormat_ID = 0;
 
             log.Info(_node + " [" + trx + "]");
@@ -2340,7 +2339,12 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             VAdvantage.Common.Common com = new Common.Common();
             re = com.ReportRun(_pi, p_ctx, _trx);
 
-            ReportCtl.Report = re;
+            // Hand the report to the run that started this workflow (ProcessCtl reads it from its ProcessInfo).
+            // It used to go into the static ReportCtl.Report, which concurrent workflows overwrote or cleared, so a
+            // user could receive another user's report.
+            ProcessInfo runInfo = _process != null ? _process.GetProcessInfo() : null;
+            if (runInfo != null)
+                runInfo.SetWorkflowReport(re);
         }
 
         bool isDocxFile = false;

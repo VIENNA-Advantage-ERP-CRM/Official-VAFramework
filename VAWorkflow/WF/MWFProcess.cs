@@ -122,6 +122,15 @@ namespace VAdvantage.WF
         }
 
         /// <summary>
+        /// Process info of the run that started this workflow (null when the workflow process was loaded from the
+        /// database, e.g. resumed later)
+        /// </summary>
+        public ProcessInfo GetProcessInfo()
+        {
+            return _pi;
+        }
+
+        /// <summary>
         /// Get active Activities of Process
         /// </summary>
         /// <param name="requery">if true requery</param>
