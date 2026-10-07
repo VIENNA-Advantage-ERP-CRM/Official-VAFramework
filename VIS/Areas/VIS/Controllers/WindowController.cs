@@ -295,7 +295,7 @@ namespace VIS.Areas.VIS.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetWindowRecord(Ctx ctxp, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        public ActionResult GetWindowRecord(Ctx ctxp, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
         {
             object data = null;
             Ctx ctx = new Ctx(ctxp);
@@ -305,12 +305,22 @@ namespace VIS.Areas.VIS.Controllers
             {
                 data = w.GetWindowRecord(ctx, Columns, TableName, AD_Window_ID, AD_Tab_ID, WindowNo, WhereClause, Encryptedfields, ObscureFields);
             }
-            return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+            return JsonText(data);
+        }
+
+        /// <summary>
+        /// Record data serialized once. It used to go through Json(JsonConvert.SerializeObject(data)): serialized, then
+        /// the whole text escaped again as a JSON string, and parsed twice in the browser. Callers parse the response
+        /// themselves (JSON.parse), so it is sent as text/plain: jQuery hands it over unparsed, as before.
+        /// </summary>
+        private ContentResult JsonText(object data)
+        {
+            return Content(JsonConvert.SerializeObject(data), "text/plain", Encoding.UTF8);
         }
 
 
         [HttpPost]
-        public JsonResult GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Encryptedfields, SqlParamsIn sqlIn, int AD_Window_ID,
+        public ActionResult GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Encryptedfields, SqlParamsIn sqlIn, int AD_Window_ID,
             int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging, int KnownCount = -1)
         {
             object data = null;
@@ -320,9 +330,7 @@ namespace VIS.Areas.VIS.Controllers
                 data = w.GetWindowRecords(ctxp, Columns, TableName, WhereClause, Encryptedfields, sqlIn, AD_Window_ID,
              AD_Tab_ID, WindowNo, AD_Table_ID, ObscureFields, summaryOnly, MaxRows, DoPaging, KnownCount);
             }
-            var jsonResult =  Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
-            jsonResult.MaxJsonLength = int.MaxValue;
-            return jsonResult;
+            return JsonText(data);
         }
 
     }
