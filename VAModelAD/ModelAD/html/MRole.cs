@@ -72,8 +72,9 @@ namespace VAdvantage.Model
 
         #endregion
 
-        /**	Cache						*/
-        private static CCache<int, MRole> s_cache = new CCache<int, MRole>("AD_Role", 10);
+        /**	Cache: one role object per role and user ("role_user"); it holds user org access and the user for
+         *  private records, so a key by role only made every other user of the role reload all access rules */
+        private static CCache<string, MRole> s_cache = new CCache<string, MRole>("AD_Role", 10);
 
         /// <summary>
         ///Get Default (Client) Role
@@ -188,20 +189,21 @@ namespace VAdvantage.Model
             //if (!Ini.IsClient())	//	none for Server
             //    AD_User_ID = 0; //Form Preference
 
-            MRole role = (MRole)s_cache.Get(AD_Role_ID);
+            string key = AD_Role_ID + "_" + AD_User_ID;
+            MRole role = (MRole)s_cache.Get(key);
 
             if (reload || role == null || role.GetAD_Role_ID() != AD_Role_ID
             || role.GetAD_User_ID() != AD_User_ID)
             {
-                if (s_cache.ContainsKey(AD_Role_ID))
-                    s_cache.Remove(AD_Role_ID);
+                if (s_cache.ContainsKey(key))
+                    s_cache.Remove(key);
                 lock (_lock)
                 {
-                    role = (MRole)s_cache.Get(AD_Role_ID);
+                    role = (MRole)s_cache.Get(key);
                     if (role == null)
                     {
                         role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-                        s_cache[AD_Role_ID] = role;
+                        s_cache[key] = role;
                     }
                 }
             }
