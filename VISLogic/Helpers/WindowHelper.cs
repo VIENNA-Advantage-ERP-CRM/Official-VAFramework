@@ -778,7 +778,7 @@ namespace VIS.Helpers
                 {
                     for (int j = 0; j < imgColList.Count; j++)
                     {
-                        lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + gTableIn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                        lstColumns.Add(ImageUrlColumn(gTableIn.TableName, imgColList[j].ColumnName));
                     }
                 }
 
@@ -1218,7 +1218,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList1.Count; j++)
                 {
-                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + inn.TableName + "." + imgColList1[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList1[j].ColumnName);
+                    lstColumns.Add(ImageUrlColumn(inn.TableName, imgColList1[j].ColumnName));
                 }
             }
 
@@ -3805,7 +3805,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add(ImageUrlColumn(TableName, imgColList[j].ColumnName));
                 }
             }
 
@@ -3836,6 +3836,17 @@ namespace VIS.Helpers
                 }
             }
             return data;
+        }
+
+        /// <summary>
+        /// Select column with the URL of an image field. The query string is the image's last change
+        /// (AD_Image.Updated): browsers refetch a changed image, and the SQL text stays the same on every fetch
+        /// (it used to embed DateTime.Now.Ticks, a new statement and hard parse each time).
+        /// </summary>
+        private static string ImageUrlColumn(string tableName, string columnName)
+        {
+            return "(SELECT ImageURL||'?'||TO_CHAR(img.Updated,'YYYYMMDDHH24MISS') from AD_Image img where img.AD_Image_ID=CAST("
+                + tableName + "." + columnName + " AS INTEGER)) as imgUrlColumn" + columnName;
         }
 
         /// <param name="knownCount">row count the client already has for this exact query (page move); &gt; 0 skips the COUNT query, -1 counts</param>
@@ -3897,7 +3908,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add(ImageUrlColumn(TableName, imgColList[j].ColumnName));
                 }
             }
 
