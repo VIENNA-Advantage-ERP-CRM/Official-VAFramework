@@ -2630,7 +2630,8 @@ namespace VIS.Helpers
             }
 
             MSession session = MSession.Get(ctx, true);
-            session.QueryLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
+            // written in the background: the fetch does not wait for the audit insert
+            VAdvantage.Common.AuditLogQueue.QueryLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
                 sqlCount, rowCount);
 
             if (sqlIn.tree_id > 0)
@@ -2900,7 +2901,8 @@ namespace VIS.Helpers
 
 
             MSession session = MSession.Get(ctx, true);
-            session.QueryLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
+            // written in the background: the fetch does not wait for the audit insert
+            VAdvantage.Common.AuditLogQueue.QueryLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
                 sqlCount, rowCount);
 
 
@@ -3114,7 +3116,7 @@ namespace VIS.Helpers
         public int GetRecordCountForTreeNode(string whereClause, Ctx ctx, int AD_Table_ID, int treeID, int treeNodeID, int windowNo, bool ShowSummaryNodes)
         {
             MSession session = MSession.Get(ctx, true);
-            session.QueryLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
+            VAdvantage.Common.AuditLogQueue.QueryLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
                 "", 0);
 
             MTree tree = new MTree(ctx, treeID, null);
