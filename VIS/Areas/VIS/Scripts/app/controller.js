@@ -2061,7 +2061,8 @@
 
     GridTab.prototype.dataRefreshAll = function () {
         /* Query */
-        this.mDataStatusEvent = null; //reset 
+        this.mDataStatusEvent = null; //reset
+        this.getTableModel().pageNavigation = false;  // explicit refresh always counts again (page moves come through prepareQuery)
         this.getTableModel().dataRefreshAll();
     };
 
@@ -3971,6 +3972,15 @@
 
     GridTable.prototype.setCurrentPage = function (page) {
         this.currentPage = page;
+        this.pageNavigation = false;    // a caller setting the page (new query) counts again; page moves set it afterwards
+    };
+
+    /**
+     * The next open is only a move to another page of the same query, so it may reuse the row count
+     * (see open). Cleared by that open.
+     */
+    GridTable.prototype.setPageNavigation = function () {
+        this.pageNavigation = true;
     };
 
     GridTable.prototype.setCurrentPageRelative = function (newPage) {
@@ -3986,6 +3996,7 @@
             }
         }
         this.currentPage = cPage;
+        this.pageNavigation = false;
     };
 
     GridTable.prototype.setSortModel = function (mSort) {
@@ -4391,6 +4402,12 @@
         //    error: function (e) { }
         //});
 
+        // page move on an unchanged query (setPageNavigation): send the row count we already have so the
+        // server skips COUNT(*). A new query, refresh, save or delete opens without it and counts again.
+        var countKey = [this.whereClause, this.treeID, this.treeNode_ID, this.card_ID, this.ShowSummaryNodes, this.maxRows].join('|');
+        var knownCount = (this.pageNavigation && this.dopaging && this.lastCountKey === countKey && this.rowCount > 0) ? this.rowCount : -1;
+        this.pageNavigation = false;
+
         this.rowCount = rCount;
 
         this.bufferList.length = 0;
@@ -4424,10 +4441,13 @@
                 Encryptedfields: gFieldsIn,
                 AD_Table_ID: that.AD_Table_ID,
                 MaxRows: that.maxRows,
-                DoPaging: that.dopaging
+                DoPaging: that.dopaging,
+                KnownCount: knownCount
             },
             success: function (jString) {
                 var retObj = JSON.parse(jString);
+                // the count belongs to this query; a later page move may reuse it
+                that.lastCountKey = retObj.RecordCount > 0 ? countKey : null;
                 if (retObj.RecordCount > 0) {
                     that.rowCount = retObj.RecordCount;
                     that.isOpen = true;

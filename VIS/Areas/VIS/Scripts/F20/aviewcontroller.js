@@ -2002,6 +2002,7 @@
     VIS.GridController.prototype.navigatePageExact = function (newPage) {
 
         this.gTab.getTableModel().setCurrentPage(newPage);
+        this.gTab.getTableModel().setPageNavigation();  // same query, other page: reuse the row count
         //MRole role = MRole.GetDefault();
         this.query(this.gTab.getOnlyCurrentDays(),
             //role.GetMaxQueryRecords(), false);	//	updated
@@ -2011,6 +2012,7 @@
     VIS.GridController.prototype.navigatePage = function (newPage) {
 
         this.gTab.getTableModel().setCurrentPageRelative(newPage);
+        this.gTab.getTableModel().setPageNavigation();  // same query, other page: reuse the row count
         //MRole role = MRole.GetDefault();
         this.query(this.gTab.getOnlyCurrentDays(),
             //role.GetMaxQueryRecords(), false);	//	updated

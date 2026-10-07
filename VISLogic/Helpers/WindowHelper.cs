@@ -3836,8 +3836,9 @@ namespace VIS.Helpers
             return data;
         }
 
+        /// <param name="knownCount">row count the client already has for this exact query (page move); &gt; 0 skips the COUNT query, -1 counts</param>
         public object GetWindowRecords(Ctx ctxp, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
-       int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)
+       int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging, int knownCount = -1)
         {
             WindowRecordOut resultData = new WindowRecordOut();
 
@@ -3912,7 +3913,13 @@ namespace VIS.Helpers
             SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO,MRole.SQL_ORGRO);
 
             int rCount = 0;
-            if (sqlIn.tree_id > 0)
+            if (DoPaging && knownCount > 0)
+            {
+                // page move on an unchanged query: the client sends the count it already has, so the filter,
+                // access checks and COUNT(*) do not run again for every page (refresh and new queries still count)
+                rCount = knownCount;
+            }
+            else if (sqlIn.tree_id > 0)
             {
                 using (var w = new WindowHelper())
                 {
