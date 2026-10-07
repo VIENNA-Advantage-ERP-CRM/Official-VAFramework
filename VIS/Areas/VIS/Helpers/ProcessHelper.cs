@@ -138,8 +138,16 @@ namespace VIS.Helpers
             //string lockedidlog = lockedid + " -UserID- " + ctx.GetAD_User_ID() + " -SesstionID- " + ctx.GetAD_Session_ID();
             var isBackground = processInfo["IsBackground"].Equals("True", StringComparison.OrdinalIgnoreCase);
             var currentLock = GetLock(lockedid);
-            lock (currentLock)
+            // A report without a record only reads data, so different users may run it at the same time; everything
+            // else still runs once at a time per process and record (double clicks, batch processes)
+            bool serialize = !(Util.GetValueOfInt(processInfo["Record_ID"]) == 0
+                && MProcess.Get(ctx, Util.GetValueOfInt(processInfo["Process_ID"])).IsReport());
+            bool lockTaken = false;
+            try
             {
+                if (serialize)
+                    System.Threading.Monitor.Enter(currentLock, ref lockTaken);
+
                 if (!isBackground)
                 {
                     ret = ExecuteProcess(ctx, processInfo, pList);
@@ -208,10 +216,15 @@ namespace VIS.Helpers
 
                         //VIS.Controllers.JsonDataController.AddMessageForToastr(Convert.ToInt32(processInfo["Process_ID"]) + "_P_" + ctx.GetAD_Session_ID(), pro.GetName() + " " + Msg.GetMsg(ctx, "Completed") + ": " + ret.Result);
                         ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(),  pro.GetName() + " " + Msg.GetMsg(ctx, "Completed") + ": " + ret.Result );
-                       
+
 
                     });
                 }
+            }
+            finally
+            {
+                if (lockTaken)
+                    System.Threading.Monitor.Exit(currentLock);
             }
             return ret;
         }
@@ -514,7 +527,9 @@ namespace VIS.Helpers
             }
         }
 
-        private static object _lock = new object();
+        // Grid reports used to render one at a time for the whole server. Several may now render together; the cap
+        // keeps CPU and memory bounded. Shared drawing objects are guarded where they are used (checkbox images).
+        private static readonly System.Threading.SemaphoreSlim _renderSlots = new System.Threading.SemaphoreSlim(Math.Max(2, Environment.ProcessorCount));
         private static object _lockcsv = new object();
         private static VLogger log = VLogger.GetVLogger(typeof(ReportEngine_N).FullName);
         public GridReportInfo GenerateReport(Ctx _ctx, int id, List<string> queryInfo, Object code, bool isCreateNew, Dictionary<string, string> nProcessInfo, int pageNo, int AD_PInstance_ID, string fileType, int? nodeID, int? treeID, bool showSummary)
@@ -687,7 +702,8 @@ namespace VIS.Helpers
                     ctl.Process(pi, _ctx, out b, out re);
                     re.SetPrintFormat(pf);
                 }
-                lock (_lock)
+                _renderSlots.Wait();
+                try
                 {
                     re.GetView();
                     if (fileType == ProcessCtl.ReportType_PDF)
@@ -706,6 +722,10 @@ namespace VIS.Helpers
                         rep.ReportProcessInfo = null;
                         rep.Report = re.CreatePDF();
                     }
+                }
+                finally
+                {
+                    _renderSlots.Release();
                 }
 
                 ps.TotalPage = pf.TotalPage;
