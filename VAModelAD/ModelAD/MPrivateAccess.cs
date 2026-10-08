@@ -17,10 +17,11 @@ namespace VAdvantage.Model
         private static VLogger _log = VLogger.GetVLogger(typeof(MPrivateAccess).FullName);
 
         /** Tables that have at least one active private lock. The access filter for locked records is only added for
-         *  them. Cleared whenever a lock is saved or deleted (and by the generic AD_Private_Access reset); the expiry is
-         *  a backstop for locks changed on another application server. */
+         *  them. Cleared whenever a lock is saved or deleted (and by the generic AD_Private_Access reset). The 1-minute
+         *  expiry bounds the only gap: with several application servers, the first lock on a table that had none reaches
+         *  the other servers' lists within a minute (further locks on a listed table are always checked live). */
         private static VAdvantage.Classes.CCache<string, HashSet<int>> s_lockedTables
-            = new VAdvantage.Classes.CCache<string, HashSet<int>>("AD_Private_Access", 1, 5);
+            = new VAdvantage.Classes.CCache<string, HashSet<int>>("AD_Private_Access", 1, 1);
         private const string LOCKED_TABLES_KEY = "tables";
         #endregion
 
