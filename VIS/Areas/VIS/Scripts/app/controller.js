@@ -2006,7 +2006,9 @@
                 param[3] = new VIS.DB.SqlParam("@AD_Table_ID", this.gridTable.AD_Table_ID);
 
                 var queryCode = "";
-                var data = executeDataSet(sqlDefaultSearch, param);
+                // the user's default searches came with the window; ask the server only when they did not
+                var tabQueries = VIS.AEnv.getTabUserQueries(this.getWindowNo(), this.gridTable.AD_Tab_ID);
+                var data = tabQueries ? VIS.AEnv.userQueryDataSet(tabQueries.defaults) : executeDataSet(sqlDefaultSearch, param);
                 if (data && data.tables[0].rows && data.tables[0].rows.length > 0) {
                     for (var i = 0; i < data.tables[0].rows.length; i++) {
 

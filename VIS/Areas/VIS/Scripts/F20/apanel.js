@@ -1282,7 +1282,10 @@
             param[6] = new VIS.DB.SqlParam("@AD_Table_ID", self.curTab.getAD_Table_ID());
 
             var $selfpanel = this;
-            executeDataSet(sqlUserSearch, param, function (data) {
+            // first display per tab: the saved searches that came with the window (no request); later
+            // refreshes (after saving, deleting or changing the default) ask the server and update that copy
+            var tabQueries = VIS.AEnv.getTabUserQueries(self.curWindowNo, self.curTab.getAD_Tab_ID());
+            var fillList = function (data) {
                 var userQueries = [];
 
                 if (data && data.tables[0].rows && data.tables[0].rows.length > 0) {
@@ -1333,7 +1336,21 @@
                     $txtSearch.autocomplete("search", "");
                     $txtSearch.trigger("focus");
                 }
-            })
+            };
+            if (tabQueries && !tabQueries.listShown) {
+                tabQueries.listShown = true;
+                fillList(VIS.AEnv.userQueryDataSet(tabQueries.queries));
+            }
+            else {
+                executeDataSet(sqlUserSearch, param, function (data) {
+                    if (tabQueries && data && data.tables[0].rows) {
+                        tabQueries.queries = [];
+                        for (var r = 0; r < data.tables[0].rows.length; r++)
+                            tabQueries.queries.push(data.tables[0].rows[r].cells);
+                    }
+                    fillList(data);
+                });
+            }
         };
 
         this.findRecords = function (query) {
@@ -4127,7 +4144,10 @@
             param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
         }
 
-        var data = executeDataSet(sqlUserSearch, param);
+        // the tab's saved searches came with the window (same rows as VIS_117); a specific query (VIS_159) and
+        // windows opened without them still ask the server
+        var tabQueries = AD_UserQuery_ID > 0 ? null : VIS.AEnv.getTabUserQueries(this.curWindowNo, this.curTab.getAD_Tab_ID());
+        var data = tabQueries ? VIS.AEnv.userQueryDataSet(tabQueries.queries) : executeDataSet(sqlUserSearch, param);
 
         if (data && data.tables[0].rows && data.tables[0].rows.length > 0) {
             $selfpanel.curTab.hasSavedAdvancedSearch = true;

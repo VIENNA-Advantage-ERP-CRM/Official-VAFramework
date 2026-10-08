@@ -2831,6 +2831,80 @@ namespace VIS.Helpers
         }
 
         /// <summary>
+        /// The user's saved searches and default searches for every tab of the window, read once when the window opens
+        /// (two queries for the whole window). The browser used to read them per tab: twice with blocking calls
+        /// (VIS_107 in GridTab.prepareQuery, VIS_117 in APanel.setDefaultSearch) and once more in the background
+        /// (VIS_116, identical to VIS_117). Same filters and columns as those queries; null when a query fails, then
+        /// the browser falls back to them.
+        /// </summary>
+        /// <returns>AD_Tab_ID -> { queries = rows as VIS_117, defaults = rows as VIS_107 }; cell names in lower case</returns>
+        public Dictionary<string, object> GetTabUserQueries(Ctx ctx, GridWindowVO vo)
+        {
+            if (vo == null || vo.GetTabs() == null || vo.GetTabs().Count == 0)
+                return null;
+            var tabTable = new Dictionary<int, int>();
+            foreach (GridTabVO tab in vo.GetTabs())
+                tabTable[tab.AD_Tab_ID] = tab.AD_Table_ID;
+            string tabIds = string.Join(",", tabTable.Keys);
+            string tableIds = string.Join(",", tabTable.Values.Distinct());
+            int AD_User_ID = ctx.GetAD_User_ID();
+            int AD_Client_ID = ctx.GetAD_Client_ID();
+
+            // saved searches with the user's default for the tab (VIS_116 / VIS_117 for all tabs at once)
+            DataSet saved = DB.ExecuteDataset("SELECT uq.Name, uq.Code, uq.AD_UserQuery_ID, uq.AD_User_ID, uq.AD_Tab_ID, uq.AD_Table_ID,"
+                + " d.AD_DefaultUserQuery_ID FROM AD_UserQuery uq"
+                + " LEFT JOIN AD_DefaultUserQuery d ON (d.AD_UserQuery_ID=uq.AD_UserQuery_ID AND d.AD_Tab_ID=uq.AD_Tab_ID AND d.AD_User_ID=" + AD_User_ID + ")"
+                + " WHERE uq.AD_Client_ID=" + AD_Client_ID + " AND uq.IsActive='Y' AND uq.AD_Tab_ID IN (" + tabIds + ")"
+                + " ORDER BY UPPER(uq.Name), uq.AD_UserQuery_ID");
+            // the user's default searches matched by tab or table (VIS_107)
+            DataSet defaults = DB.ExecuteDataset("SELECT uq.Code, d.AD_User_ID, d.AD_Tab_ID, uq.AD_Tab_ID AS UQ_Tab_ID, uq.AD_Table_ID AS UQ_Table_ID"
+                + " FROM AD_UserQuery uq JOIN AD_DefaultUserQuery d ON (uq.AD_UserQuery_ID=d.AD_UserQuery_ID)"
+                + " WHERE uq.IsActive='Y' AND d.AD_User_ID=" + AD_User_ID + " AND uq.AD_Client_ID=" + AD_Client_ID
+                + " AND (uq.AD_Tab_ID IN (" + tabIds + ") OR uq.AD_Table_ID IN (" + tableIds + "))");
+            if (saved == null || saved.Tables.Count == 0 || defaults == null || defaults.Tables.Count == 0)
+                return null;
+
+            var result = new Dictionary<string, object>();
+            foreach (var tab in tabTable)
+            {
+                var queries = new List<Dictionary<string, object>>();
+                var seen = new HashSet<int>();
+                foreach (DataRow dr in saved.Tables[0].Rows)
+                {
+                    int uqID = Util.GetValueOfInt(dr["AD_UserQuery_ID"]);
+                    if (Util.GetValueOfInt(dr["AD_Tab_ID"]) != tab.Key || Util.GetValueOfInt(dr["AD_Table_ID"]) != tab.Value
+                        || !seen.Add(uqID))
+                        continue;
+                    string name = Util.GetValueOfString(dr["Name"]);
+                    queries.Add(new Dictionary<string, object>
+                    {
+                        { "name", name.Length > 25 ? name.Substring(0, 25) + "..." : name },
+                        { "title", name },
+                        { "code", Util.GetValueOfString(dr["Code"]) },
+                        { "ad_userquery_id", uqID },
+                        { "ad_user_id", Util.GetValueOfInt(dr["AD_User_ID"]) },
+                        { "ad_tab_id", tab.Key },
+                        { "ad_defaultuserquery_id", dr["AD_DefaultUserQuery_ID"] == DBNull.Value ? (object)null : Util.GetValueOfInt(dr["AD_DefaultUserQuery_ID"]) }
+                    });
+                }
+                var tabDefaults = new List<Dictionary<string, object>>();
+                foreach (DataRow dr in defaults.Tables[0].Rows)
+                {
+                    if (Util.GetValueOfInt(dr["UQ_Tab_ID"]) != tab.Key && Util.GetValueOfInt(dr["UQ_Table_ID"]) != tab.Value)
+                        continue;
+                    tabDefaults.Add(new Dictionary<string, object>
+                    {
+                        { "code", Util.GetValueOfString(dr["Code"]) },
+                        { "ad_user_id", Util.GetValueOfInt(dr["AD_User_ID"]) },
+                        { "ad_tab_id", Util.GetValueOfInt(dr["AD_Tab_ID"]) }
+                    });
+                }
+                result[tab.Key.ToString()] = new { queries = queries, defaults = tabDefaults };
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Runs a "feature ID, Record_ID" query per IN list; null when it fails (e.g. a module table is missing)
         /// </summary>
         private List<RecordMarker> ReadMarkers(List<string> inLists, Func<string, string> sql)
