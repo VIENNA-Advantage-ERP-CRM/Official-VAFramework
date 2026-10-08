@@ -319,6 +319,37 @@ namespace VIS.Areas.VIS.Controllers
         }
 
 
+        /// <summary>
+        /// Toolbar markers (attachment, chat, lock, ...) for some records of a window's tab, e.g. after the user added
+        /// a chat or attachment, or for pages loaded without markers. Context from the session; the table must belong
+        /// to the window.
+        /// </summary>
+        /// <param name="RecordIDs">comma-separated record IDs (at most a page)</param>
+        [HttpPost]
+        public ActionResult GetRecordMarkers(int AD_Window_ID, int WindowNo, int AD_Table_ID, string RecordIDs)
+        {
+            Ctx sessionCtx = Session["ctx"] as Ctx;
+            List<int> ids = new List<int>();
+            foreach (string s in (RecordIDs ?? "").Split(','))
+            {
+                int id;
+                if (int.TryParse(s.Trim(), out id) && id > 0)
+                    ids.Add(id);
+            }
+            if (sessionCtx == null || ids.Count == 0 || ids.Count > 1000)
+                return JsonText(new RecordMarkers());
+
+            Ctx ctx = new Ctx(sessionCtx.GetMap());
+            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+            if (vo == null || !vo.GetTabs().Any(tab => tab.AD_Table_ID == AD_Table_ID))
+                return JsonText(new RecordMarkers());
+
+            using (var w = new WindowHelper())
+            {
+                return JsonText(w.GetRecordMarkers(ctx, vo, AD_Table_ID, ids));
+            }
+        }
+
         [HttpPost]
         public ActionResult GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Encryptedfields, SqlParamsIn sqlIn, int AD_Window_ID,
             int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging, int KnownCount = -1)

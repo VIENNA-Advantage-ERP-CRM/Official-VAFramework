@@ -2569,6 +2569,7 @@
     /// <returns>return ID or 0, if not found</returns>
     /// <author>Karan</author>
     GridTab.prototype.getCM_ChatID = function () {
+        this.syncMarkers();    // lists of the loaded page
 
         if (this.chats == null || this.chats.length == 0)
             this.loadChats();//call chat function
@@ -2587,6 +2588,7 @@
     }
 
     GridTab.prototype.getVIS_AssignedRecordToUser_ID = function () {
+        this.syncMarkers();    // lists of the loaded page
         if (this.assignedRecord == null || this.assignedRecord.length == 0)
             this.loadAssignedRecords();//call assign function
         if (this.assignedRecord == null)
@@ -2609,6 +2611,7 @@
     /// <returns>return ID or 0, if not found</returns>
     /// <author>Karan</author>
     GridTab.prototype.getCM_SubScribedID = function () {
+        this.syncMarkers();    // lists of the loaded page
         if (this._subscribe == null || this._subscribe.length == 0)
             this.loadSubscribe();//call subscribe function
         if (this._subscribe == null)
@@ -2697,6 +2700,7 @@
     /// </summary>
     /// <returns></returns>
     GridTab.prototype.getIsLocked = function () {
+        this.syncMarkers();    // lists of the loaded page
         if (!VIS.MRole.getIsPersonalLock())
             return false;
 
@@ -2716,35 +2720,8 @@
     * 	Load Locks for Table and User
     */
     GridTab.prototype.loadLocks = function () {
-        var AD_User_ID = VIS.context.getAD_User_ID();
-        //log.Fine("#" + _vo.tabNo + " - AD_User_ID=" + AD_User_ID);
-        if (!this.canHaveAttachment())
-            return;
-
-        var sql = "VIS_108";
-
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_User_ID", AD_User_ID);
-        param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.vo.AD_Table_ID);
-
-        var dr = null;
-        try {
-            if (this._Lock == null)
-                this._Lock = []
-            else
-                this._Lock.length = 0;
-            dr = executeReader(sql, param);
-            while (dr.read()) {
-                var key = VIS.Utility.Util.getValueOfInt(dr.get("Record_ID"));
-                this._Lock.push(key);
-            }
-            dr.close();
-            dr = null;
-        }
-        catch (e) {
-            this.log.log(Level.SEVERE, sql, e);
-        }
-        this.log.fine("#" + this._Lock.length);
+        // reloads the markers of the loaded page (and the current record) instead of the own locks of the whole table
+        this.loadMarkers();
     };
 
     /// <summary>
@@ -2754,67 +2731,8 @@
     ///Date: 10-July-2014
 
     GridTab.prototype.loadSubscribe = function () {
-        //if doesn't have attachment
-        if (!this.canHaveAttachment())
-            return;//return nothing
-        //set query
-        //var sql = "SELECT CM_Subscribe_ID, Record_ID FROM CM_Subscribe WHERE AD_User_ID=" + VIS.context.getAD_User_ID() + " AND AD_Table_ID=" + this.getAD_Table_ID();
-        var sql = "VIS_109";
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_User_ID", VIS.context.getAD_User_ID());
-        param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
-
-        var dr = null;
-        try {
-            this._subscribe = [];
-
-
-            if (this._subscribe == null)
-            //create new list for chat
-            {
-                this._subscribe = {};
-            }
-            else
-            //if contain chat then clear list
-            {
-                this._subscribe.length = 0;
-            }
-
-
-
-            //execute query
-            dr = executeReader(sql, param);
-
-
-            var key, value;//for recordId and chatId
-            while (dr.read()) {
-                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
-                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                this._subscribe.push({ ID: key, value: value });
-            }
-
-            dr = null;
-
-
-            //int key, value;//for recordId and chatId
-            //while (dr.Read())
-            //{
-            //    key = Util.GetValueOfInt(dr["Record_ID"].ToString());
-            //    value = Util.GetValueOfInt(dr["CM_Subscribe_ID"].ToString());
-            //    _subscribe[key] = value;
-            //}
-            //dr.Close();
-            //dr = null;
-        }
-        catch (e) {
-            //if (dr != null)
-            //{
-            //    dr.Close();
-            //    dr = null;
-            //}
-            //// MessageBox.Show("No Chat");
-            //log.Log(Level.SEVERE, sql, e);
-        }
+        // reloads the markers of the loaded page (and the current record) instead of the subscriptions of the whole table
+        this.loadMarkers();
     };
 
     /// <summary>
@@ -2823,148 +2741,19 @@
     /// <author>Karan</author>
     ///Date: 23-May-2014
     GridTab.prototype.loadDocuments = function () {
-        //if doesn't have attachment
-        if (!this.canHaveAttachment())
-            return;//return nothing
-        //set query
-        //var sql = "SELECT vadms_windowdoclink_id,record_id FROM vadms_windowdoclink WHERE ad_table_id=" + this.getAD_Table_ID();
-        //var sql = "SELECT vadms_windowdoclink_id,record_id FROM vadms_windowdoclink wdl JOIN vadms_document doc "
-        //         + " ON wdl.VADMS_Document_ID  =doc.VADMS_Document_ID  WHERE doc.vadms_docstatus!='DD' AND ad_table_id=" + this.getAD_Table_ID();
-
-        var sql = "VIS_110";
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@ad_table_id", this.getAD_Table_ID());
-
-        var dr = null;
-        try {
-
-            this.viewDocument = [];
-
-
-            if (this.viewDocument == null)
-            //create new list for chat
-            {
-                this.viewDocument = {};
-            }
-            else
-            //if contain chat then clear list
-            {
-                this.viewDocument.length = 0;
-            }
-
-
-
-            dr = executeReader(sql, param);
-
-            var key, value;//for recordId and chatId
-            while (dr.read()) {
-                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
-                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                this.viewDocument.push({ ID: key, value: value });
-            }
-
-            dr = null;
-        }
-        catch (e) {
-
-        };
-
-
-
+        // reloads the markers of the loaded page (and the current record) instead of the document links of the whole table
+        this.loadMarkers();
     };
 
 
     GridTab.prototype.loadChats = function () {
-        //if doesn't have attachment
-        if (!this.canHaveAttachment())
-            return;//return nothing
-        //set query
-        //var sql = "SELECT CM_Chat_ID, Record_ID FROM CM_Chat WHERE AD_Table_ID=" + this.getAD_Table_ID();
-        var sql = "VIS_111";
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
-
-        var dr = null;
-        try {
-
-            this.chats = [];
-
-
-            if (this.chats == null)
-            //create new list for chat
-            {
-                this.chats = {};
-            }
-            else
-            //if contain chat then clear list
-            {
-                this.chats.length = 0;
-            }
-
-
-
-            dr = executeReader(sql, param);
-
-            var key, value;//for recordId and chatId
-            while (dr.read()) {
-                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
-                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                this.chats.push({ ID: key, value: value });
-            }
-
-            dr = null;
-        }
-        catch (e) {
-
-        };
-
-
-
+        // reloads the markers of the loaded page (and the current record) instead of the chats of the whole table
+        this.loadMarkers();
     };
 
     GridTab.prototype.loadAssignedRecords = function () {
-        //if doesn't have attachment
-        if (!this.canHaveAttachment())
-            return;//return nothing
-        //set query
-
-        var sql = "VIS_160";
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
-        var dr = null;
-        try {
-            this.assignedRecords = [];
-            if (this.assignedRecords == null)
-            //create new list for chat
-            {
-                this.assignedRecords = {};
-            }
-            else
-            //if contain chat then clear list
-            {
-                this.assignedRecords.length = 0;
-            }
-            dr = executeReader(sql, param);
-
-            var key, value, userId, createdBy;//for recordId and chatId
-            while (dr.read()) {
-                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
-                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                userId = VIS.Utility.Util.getValueOfInt(dr.getString(2));
-                createdBy = VIS.Utility.Util.getValueOfInt(dr.getString(3));
-                this.assignedRecords.push({
-                    ID: key, value: value, userId: userId, createdBy: createdBy
-                });
-            }
-
-            dr = null;
-        }
-        catch (e) {
-
-        };
-
-
-
+        // reloads the markers of the loaded page (and the current record) instead of the assignments of the whole table
+        this.loadMarkers();
     };
 
     /// <summary>
@@ -2973,6 +2762,84 @@
     /// <returns>bool type true if record can have attachment</returns>
     /// <author>Karan</author>
     ///Date: 23-May-2014
+    /**
+     * Rebuilds the per-record lists the toolbar uses (chats, attachments, locks, ...) from the markers that came with
+     * the loaded page, once per page. Without markers (e.g. tree pages) the lists are left null and the loaders
+     * fetch them for the page.
+     */
+    GridTab.prototype.syncMarkers = function () {
+        var markers = this.gridTable ? this.gridTable.markers : null;
+        if (markers === this._markersSrc)
+            return;
+        this._markersSrc = markers;
+        if (!markers) {
+            this._attachments = this.chats = this._Lock = this._subscribe = this.viewDocument = this._marking
+                = this.sharedRecords = this.assignedRecords = null;
+            return;
+        }
+        this.applyMarkers(markers);
+    };
+
+    /**
+     * Sets the lists from a markers object. Every list becomes an array (empty when the window does not use the
+     * feature), so a check never triggers another load for the same page.
+     */
+    GridTab.prototype.applyMarkers = function (markers) {
+        this._attachments = markers.Attachments || [];
+        this.chats = markers.Chats || [];
+        this._Lock = markers.Locks || [];
+        this._subscribe = markers.Subscribe || [];
+        this.viewDocument = markers.Documents || [];
+        this._marking = markers.Marking || [];
+        this.sharedRecords = markers.Shared || [];
+        this.assignedRecords = markers.Assigned || [];
+    };
+
+    /**
+     * Loads the markers of the loaded page and the current record from the server (Window/GetRecordMarkers): after the
+     * user added or removed a chat, attachment, lock, ..., or for a page that came without markers. One small request
+     * instead of one query over the whole table per feature.
+     */
+    GridTab.prototype.loadMarkers = function () {
+        var that = this;
+        var key = (this.getTableName() + "_ID").toLowerCase();
+        var ids = [];
+        var rows = this.getRecords() || [];
+        for (var i = 0; i < rows.length; i++) {
+            var id = rows[i] ? VIS.Utility.Util.getValueOfInt(rows[i][key]) : 0;
+            if (id > 0 && ids.indexOf(id) < 0)
+                ids.push(id);
+        }
+        var current = this.getRecord_ID();
+        if (current > 0 && ids.indexOf(current) < 0)
+            ids.push(current);
+
+        // keep what syncMarkers compares against, so the fresh lists are not replaced by the page's older markers
+        this._markersSrc = this.gridTable ? this.gridTable.markers : null;
+        if (!this.canHaveAttachment() || ids.length == 0) {
+            this.applyMarkers({});
+            return;
+        }
+
+        $.ajax({
+            url: baseUrl + "Window/GetRecordMarkers",
+            type: 'POST',
+            async: false,   // the toolbar checks read the result right away, as the loaders always did
+            data: {
+                AD_Window_ID: this.getAD_Window_ID(),
+                WindowNo: this.getWindowNo(),
+                AD_Table_ID: this.getAD_Table_ID(),
+                RecordIDs: ids.join(',')
+            },
+            success: function (json) {
+                that.applyMarkers(json ? JSON.parse(json) : {});
+            },
+            error: function () {
+                that.applyMarkers({});
+            }
+        });
+    };
+
     GridTab.prototype.canHaveAttachment = function () {
         if (this.keyColumnName.endsWith("_ID"))
             return true;
@@ -2987,6 +2854,7 @@
     /// <returns>Bool Type (return true if record has chat)</returns>
     ///<Date> 27-May-2014 </Date> 
     GridTab.prototype.hasChat = function () {
+        this.syncMarkers();    // lists of the loaded page
 
         if (this.isDataLoading)
             return false;
@@ -3003,6 +2871,7 @@
 
     /*assignedRecord by Rahul mittal*/
     GridTab.prototype.hasAssignedRecord = function () {
+        this.syncMarkers();    // lists of the loaded page
 
         if (this.isDataLoading)
             return false;
@@ -3017,6 +2886,7 @@
 
 
     GridTab.prototype.hasDocument = function () {
+        this.syncMarkers();    // lists of the loaded page
 
         if (this.isDataLoading)
             return false;
@@ -3036,6 +2906,7 @@
      * Check if currect record is shared with other organization or not
      * */
     GridTab.prototype.hasShared = function (reload) {
+        this.syncMarkers();    // lists of the loaded page
 
         if (this.isDataLoading)
             return false;
@@ -3059,6 +2930,7 @@
     /// <returns>Bool Type (return true if record has chat)</returns>
     ///<Date> 10-July-2014 </Date> 
     GridTab.prototype.HasSubscribed = function () {
+        this.syncMarkers();    // lists of the loaded page
 
         if (this.isDataLoading)
             return false;
@@ -3077,29 +2949,8 @@
      * 
      * */
     GridTab.prototype.loadShared = function () {
-        if (VIS.MRole.getIsShowSharedRecord() == true) {
-            var sqlQry = "VIS_157";
-            var param = [];
-            // param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
-            param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
-
-            var dr = null;
-            try {
-                this.sharedRecords = [];
-
-                dr = executeReader(sqlQry, param);
-                var key;
-                while (dr.read()) {
-                    key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                    this.sharedRecords.push({ ID: key });
-                }
-
-                dr = null;
-
-            }
-            catch (ex) {
-            }
-        }
+        // reloads the markers of the loaded page (and the current record) instead of the shared records of the whole table
+        this.loadMarkers();
     };
 
     //GridTab.prototype.loadSharedWithCurrent = function () {
@@ -3128,67 +2979,16 @@
 
     //Lakhwinder
     GridTab.prototype.loadAttachments = function () {
-        //log.fine("#" + m_vo.TabNo);
-        if (!this.canHaveAttachment())
-            return;
-
-        //var sqlQry = "SELECT distinct att.AD_Attachment_ID, att.Record_ID FROM AD_Attachment att"
-        //       + " INNER JOIN AD_Attachmentline al ON (al.AD_Attachment_id=att.AD_Attachment_id)"
-        //       + " WHERE att.AD_Table_ID=" + this.getAD_Table_ID();
-
-
-        var sqlQry = "VIS_112";
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
-
-        var dr = null;
-        try {
-            this._attachments = [];
-
-            dr = executeReader(sqlQry, param);
-            var key, value;
-            while (dr.read()) {
-                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
-                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                this._attachments.push({ ID: key, value: value });
-            }
-
-            dr = null;
-
-        }
-        catch (ex) {
-        }
-
+        // reloads the markers of the loaded page (and the current record) instead of the attachments of the whole table
+        this.loadMarkers();
     };
     GridTab.prototype.loadMarking = function () {
-        //log.fine("#" + m_vo.TabNo);
-
-
-        // var sqlQry = "SELECT AD_ExportData_ID, Record_ID FROM AD_ExportData WHERE AD_Table_ID=" + this.getAD_Table_ID()
-        var sqlQry = "VIS_113";
-        var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
-        var dr = null;
-        try {
-            this._marking = [];
-
-            dr = executeReader(sqlQry, param);
-            var key, value;
-            while (dr.read()) {
-                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
-                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                this._marking.push({ ID: key, value: value });
-            }
-
-            dr = null;
-
-        }
-        catch (ex) {
-        }
-
+        // reloads the markers of the loaded page (and the current record) instead of the export marks of the whole table
+        this.loadMarkers();
     };
 
     GridTab.prototype.hasAttachment = function () {
+        this.syncMarkers();    // lists of the loaded page
         if (this.isDataLoading)
             return false;
         if (this._attachments == null)
@@ -3200,6 +3000,7 @@
         return this.hasKey(this._attachments, key);
     };
     GridTab.prototype.hasMarked = function () {
+        this.syncMarkers();    // lists of the loaded page
         if (this.isDataLoading)
             return false;
         if (this._marking == null)
@@ -3227,15 +3028,11 @@
 
 
 
-        this._attachments = this.gTab._attachments;
-        this.chats = this.gTab._chats;
-        this._lock = this.gTab._pAccess;
-        this._subscribe = this.gTab._subscribe;
-        this.viewDocument = this.gTab._documents;
-        this.sharedRecords = this.gTab._sharedRec;
-
-        /* Assigned Record action panel by Rahul Mittal*/
-        this.assignedRecords = this.gTab.assignedRecords;
+        // The toolbar lists (attachments, chats, locks, subscriptions, documents, shared, assignments) no longer come
+        // with the window for the whole table: each page of records brings them for its own records (syncMarkers).
+        this._attachments = this.chats = this._Lock = this._subscribe = this.viewDocument = this._marking
+            = this.sharedRecords = this.assignedRecords = null;
+        this._markersSrc = undefined;
         //this.sharedRecordsWithLoginOrg = this.gTab._sharedWithLoginRec;
         //var tableIndex = {};
         //var ServerValues = {};
@@ -4454,6 +4251,7 @@
                 // the count belongs to this query; a later page move may reuse it
                 that.lastCountKey = retObj.RecordCount > 0 ? countKey : null;
                 that.sharedAccess = null;   // set by fillData for this page; never keep the previous query's
+                that.markers = null;
 
                 if (retObj.RecordCount > 0) {
                     that.rowCount = retObj.RecordCount;
@@ -4580,6 +4378,8 @@
 
         // shared-record access of this page's records (GridTab.IsSharedAccess reads it instead of calling per row)
         this.sharedAccess = retObj && retObj.SharedAccess ? retObj.SharedAccess : null;
+        // toolbar markers (attachment, chat, lock, ...) of this page's records (GridTab.syncMarkers)
+        this.markers = retObj && retObj.Markers ? retObj.Markers : null;
 
         var buffer = null;
         var that = this;

@@ -5886,8 +5886,9 @@
             return;
         }
 
-        //assigned Records
-        var assignedRecords = this.curTab.assignedRecords;
+        //assigned Records (of the loaded page; the check makes sure the list is there)
+        this.curTab.hasAssignedRecord();
+        var assignedRecords = this.curTab.assignedRecords || [];
         for (var i = 0; i < gridSelectedRows.length; i++) {
 
             recID = gridSelectedRows[i][(this.curGC.gTab.getTableName() + '_id').toLower()];
