@@ -2748,8 +2748,65 @@ namespace VIS.Helpers
 
             retVal.Tables = outO;
             retVal.LookupDirect = lookupDirect;
+            if (ds != null && ds.Tables.Count > 0)
+                retVal.SharedAccess = GetPageSharedAccess(ctx, AD_Table_ID, sqlIn.tableName, outO.Count > 0 ? outO[0] : null);
             return retVal;
         }
+
+        /** Larger pages (unpaged loads) keep the per-record call; also Oracle's IN list limit */
+        private const int MAX_SHARED_ACCESS_PAGE = 1000;
+
+        /// <summary>
+        /// Shared-record access for all records of a page in one query, so the client does not have to call
+        /// RecordShared/GetSharedRecordAccess (synchronously) on every row move. Same rule and value format as that
+        /// call: the login org's share row decides; records without one are "false_N".
+        /// </summary>
+        /// <returns>Record_ID -> "IsReadOnly_AD_ShareRecordOrg_ID" for every record on the page, or null</returns>
+        private Dictionary<int, string> GetPageSharedAccess(Ctx ctx, int AD_Table_ID, string tableName, JTable page)
+        {
+            if (page == null || AD_Table_ID <= 0 || string.IsNullOrEmpty(tableName) || page.rows.Count == 0
+                || page.rows.Count > MAX_SHARED_ACCESS_PAGE)
+                return null;
+
+            string keyColumn = (tableName + "_ID").ToLower();
+            var result = new Dictionary<int, string>();
+            foreach (JRow row in page.rows)
+            {
+                object id;
+                if (!row.cells.TryGetValue(keyColumn, out id))
+                    return null;    // no single key column: the client asks per record
+                int recordID = Util.GetValueOfInt(id);
+                if (recordID > 0)
+                    result[recordID] = "false_N";
+            }
+            if (result.Count == 0)
+                return null;
+
+            try
+            {
+                // record IDs are integers read from the page
+                string sql = "SELECT Record_ID, IsReadOnly, AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE IsActive='Y'"
+                    + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_OrgShared_ID=" + ctx.GetAD_Org_ID()
+                    + " AND Record_ID IN (" + string.Join(",", result.Keys) + ")";
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds == null || ds.Tables.Count == 0)
+                    return null;
+                var seen = new HashSet<int>();
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    int recordID = Util.GetValueOfInt(dr["Record_ID"]);
+                    if (seen.Add(recordID))     // first row per record, like GetSharedRecordAccess
+                        result[recordID] = (Util.GetValueOfString(dr["IsReadOnly"]) == "Y").ToString() + "_" + Util.GetValueOfString(dr["AD_ShareRecordOrg_ID"]);
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                log.Log(Level.WARNING, "Shared access for page", e);
+                return null;
+            }
+        }
+
         /// <summary>
         /// Set Tree Record sql in if query is for on demnad tree records
         /// </summary>

@@ -2256,6 +2256,21 @@
         }
 
         var that = this;
+        // value "IsReadOnly_AD_ShareRecordOrg_ID", e.g. "True_1000123" or "false_N"
+        var apply = function (value) {
+            var parts = value.split('_');
+            that.IsSharedReadOnly = parts[0].toLowerCase() == 'true';
+            that.isCurrentRecordShare = parts[1] == 'N' ? false : true;
+        };
+
+        // the grid fetch returns it for every record of the page: no call per row move
+        var pageAccess = this.gridTable.sharedAccess;
+        if (pageAccess && pageAccess[recordID] !== undefined) {
+            apply(pageAccess[recordID]);
+            return;
+        }
+
+        // record not on the loaded page (new, zoomed, tree, very large unpaged load): ask the server
         $.ajax({
             async: false,
             url: VIS.Application.contextUrl + "RecordShared/GetSharedRecordAccess",
@@ -2264,17 +2279,7 @@
                 Record_ID: recordID
             },
             success: function (data) {
-                data = JSON.parse(data);
-                data = data.split('_');
-
-                if (data[0].toLowerCase() == 'true') {
-                    that.IsSharedReadOnly = true;
-                }
-                else {
-                    that.IsSharedReadOnly = false;
-                }
-
-                that.isCurrentRecordShare = data[1] == 'N' ? false : true;
+                apply(JSON.parse(data));
             },
             error: function (err) {
                 console.log(err);
@@ -4448,6 +4453,8 @@
                 var retObj = JSON.parse(jString);
                 // the count belongs to this query; a later page move may reuse it
                 that.lastCountKey = retObj.RecordCount > 0 ? countKey : null;
+                that.sharedAccess = null;   // set by fillData for this page; never keep the previous query's
+
                 if (retObj.RecordCount > 0) {
                     that.rowCount = retObj.RecordCount;
                     that.isOpen = true;
@@ -4571,6 +4578,8 @@
 
     GridTable.prototype.fillData = function (retObj) {
 
+        // shared-record access of this page's records (GridTab.IsSharedAccess reads it instead of calling per row)
+        this.sharedAccess = retObj && retObj.SharedAccess ? retObj.SharedAccess : null;
 
         var buffer = null;
         var that = this;
