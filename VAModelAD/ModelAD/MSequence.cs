@@ -130,12 +130,12 @@ namespace VAdvantage.Model
                 return -1;
         }
 
-        private static readonly object _idlock = new object();
-
         //[MethodImpl(MethodImplOptions.Synchronized)]
         public static int GetNextIDOracle(int AD_Client_ID, String TableName, Trx trxName, int IncrementNo)
         {
-            lock (_idlock)
+            // one lock per table (was one lock for all tables, so every insert in the application queued here);
+            // the same table is still serialized here and, across application servers, by the row lock (FOR UPDATE)
+            lock (GetLock("ID:" + (TableName ?? "").ToUpperInvariant()))
             {
 
                 if (TableName == null || TableName.Length == 0)
@@ -159,11 +159,13 @@ namespace VAdvantage.Model
                     + "WHERE Upper(Name)=Upper('" + TableName + "')"
                     + " AND IsActive='Y' AND IsTableID='Y' AND IsAutoSequence='Y' ";
 
-                //Comment an UPDATE FOR TEST//
-                Trx trx = Trx.Get("ConnSH" + DateTime.Now.Ticks + (new Random(4)).ToString());
-
                 for (int i = 0; i < 3; i++)
                 {
+                    // new transaction and statement per attempt: the finally below closes the transaction, and the
+                    // values are filled into a copy of the template, so a retry really runs again with fresh values
+                    Trx trx = Trx.Get("ConnSH" + Guid.NewGuid().ToString("N"));
+                    string updateValues = updateSQL;
+                    retValue = -1;
                     try
                     {
                         DataSet ds = new DataSet();
@@ -188,9 +190,9 @@ namespace VAdvantage.Model
                                 retValue = int.Parse(ds.Tables[0].Rows[0]["CurrentNext"].ToString());
                                 ds.Tables[0].Rows[0]["CurrentNext"] = (retValue + incrementNo).ToString();
                             }
-                            updateSQL = updateSQL.Replace("@CurrentNext@", ds.Tables[0].Rows[0]["CurrentNext"].ToString()).Replace("@CurrentNextSys@", ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
+                            updateValues = updateSQL.Replace("@CurrentNext@", ds.Tables[0].Rows[0]["CurrentNext"].ToString()).Replace("@CurrentNextSys@", ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
 
-                            if (DataBase.DB.ExecuteQuery(updateSQL, null, trx) < 0)
+                            if (DataBase.DB.ExecuteQuery(updateValues, null, trx) < 0)
                             // if (trx.ExecuteNonQuery(updateSQL, null, trx) < 0)
                             // if (trx.ExeNonQuery(updateSQL) < 0)
                             {
@@ -213,6 +215,7 @@ namespace VAdvantage.Model
                         {
                             trx.Rollback();
                         }
+                        retValue = -1;  // the ID read in this attempt was not committed: never hand it out
                         s_log.Severe(e.ToString());
                     }
                     finally
