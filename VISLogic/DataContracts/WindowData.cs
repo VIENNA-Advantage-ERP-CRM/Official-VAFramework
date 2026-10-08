@@ -142,6 +142,12 @@ namespace VIS.DataContracts
         public Dictionary<string, Dictionary<object, string>> LookupDirect  { get;set; }
         public CardViewData CardViewTpl { get; set; }
 
+        /// <summary>
+        /// Shared-record access of every record on this page (Record_ID -> "IsReadOnly_AD_ShareRecordOrg_ID", as
+        /// RecordShared/GetSharedRecordAccess returns it); null when not computed, then the client asks per record
+        /// </summary>
+        public Dictionary<int, string> SharedAccess { get; set; }
+
         public int RecordCount = 0;
     }
 
