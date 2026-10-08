@@ -2757,6 +2757,114 @@ namespace VIS.Helpers
             return retVal;
         }
 
+        /// <summary>
+        /// Toolbar markers (attachment, chat, own lock, own subscription, document, export mark, shared, assignment)
+        /// for the given records: one indexed query per feature the window uses, limited to these records. Replaces
+        /// the whole-table lists that GridTab.LoadData sent with the window and the client re-loaded per table.
+        /// </summary>
+        /// <param name="vo">window definition (feature flags)</param>
+        /// <param name="recordIDs">records of the page, or the current record</param>
+        public RecordMarkers GetRecordMarkers(Ctx ctx, GridWindowVO vo, int AD_Table_ID, ICollection<int> recordIDs)
+        {
+            var markers = new RecordMarkers();
+            if (vo == null || AD_Table_ID <= 0 || recordIDs == null || recordIDs.Count == 0)
+                return markers;
+
+            int AD_User_ID = ctx.GetAD_User_ID();
+            string t = AD_Table_ID.ToString();
+            // record IDs are integers; queried in chunks below Oracle's IN list limit
+            List<string> inLists = new List<string>();
+            List<int> ids = recordIDs.Where(id => id > 0).Distinct().ToList();
+            for (int i = 0; i < ids.Count; i += MAX_SHARED_ACCESS_PAGE)
+                inLists.Add(string.Join(",", ids.Skip(i).Take(MAX_SHARED_ACCESS_PAGE)));
+            if (inLists.Count == 0)
+                return markers;
+
+            if (vo.IsAttachment)
+                markers.Attachments = ReadMarkers(inLists, in_ => "SELECT DISTINCT att.AD_Attachment_ID, att.Record_ID FROM AD_Attachment att"
+                    + " INNER JOIN AD_AttachmentLine al ON (al.AD_Attachment_ID=att.AD_Attachment_ID)"
+                    + " WHERE att.AD_Table_ID=" + t + " AND att.Record_ID IN (" + in_ + ")");
+            if (vo.IsChat)
+                markers.Chats = ReadMarkers(inLists, in_ => "SELECT CM_Chat_ID, Record_ID FROM CM_Chat WHERE AD_Table_ID=" + t
+                    + " AND Record_ID IN (" + in_ + ")");
+            if (vo.IsSubscribedRecord)
+                markers.Subscribe = ReadMarkers(inLists, in_ => "SELECT CM_Subscribe_ID, Record_ID FROM CM_Subscribe WHERE AD_User_ID=" + AD_User_ID
+                    + " AND AD_Table_ID=" + t + " AND Record_ID IN (" + in_ + ")");
+            if (vo.IsViewDocument)
+                markers.Documents = ReadMarkers(inLists, in_ => "SELECT wdl.VADMS_WindowDocLink_ID, wdl.Record_ID FROM VADMS_WindowDocLink wdl"
+                    + " JOIN VADMS_Document doc ON (wdl.VADMS_Document_ID=doc.VADMS_Document_ID)"
+                    + " WHERE doc.VADMS_DocStatus!='DD' AND wdl.AD_Table_ID=" + t + " AND wdl.Record_ID IN (" + in_ + ")");
+            if (vo.IsMarkToExport)
+                markers.Marking = ReadMarkers(inLists, in_ => "SELECT AD_ExportData_ID, Record_ID FROM AD_ExportData WHERE AD_Table_ID=" + t
+                    + " AND Record_ID IN (" + in_ + ")");
+            if (MRole.GetDefault(ctx).IsShowSharedRecords())
+                markers.Shared = ReadMarkers(inLists, in_ => "SELECT 0, Record_ID FROM AD_ShareRecordOrg WHERE IsActive='Y' AND AD_Table_ID=" + t
+                    + " AND Record_ID IN (" + in_ + ")");
+            if (vo.IsPrivateRecordLock)
+            {
+                List<RecordMarker> locks = ReadMarkers(inLists, in_ => "SELECT 0, Record_ID FROM AD_Private_Access WHERE AD_User_ID=" + AD_User_ID
+                    + " AND AD_Table_ID=" + t + " AND IsActive='Y' AND Record_ID IN (" + in_ + ")");
+                markers.Locks = locks == null ? null : locks.Select(m => m.ID).ToList();
+            }
+            if (vo.IsAssignRecord)
+            {
+                markers.Assigned = new List<AssignedRecordMarker>();
+                foreach (string in_ in inLists)
+                {
+                    DataSet ds = DB.ExecuteDataset("SELECT VIS_AssignedRecordToUser_ID, Record_ID, AD_User_ID, CreatedBy FROM VIS_AssignedRecordToUser"
+                        + " WHERE AD_Table_ID=" + t + " AND UPPER(Status) !='DNE' AND AD_Client_ID=" + ctx.GetAD_Client_ID()
+                        + " AND Record_ID IN (" + in_ + ")");
+                    if (ds == null || ds.Tables.Count == 0)
+                    {
+                        markers.Assigned = null;    // not readable: the client keeps asking instead of showing nothing
+                        break;
+                    }
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                        markers.Assigned.Add(new AssignedRecordMarker
+                        {
+                            value = Util.GetValueOfInt(dr[0]), ID = Util.GetValueOfInt(dr[1]),
+                            userId = Util.GetValueOfInt(dr[2]), createdBy = Util.GetValueOfInt(dr[3])
+                        });
+                }
+            }
+            return markers;
+        }
+
+        /// <summary>
+        /// Runs a "feature ID, Record_ID" query per IN list; null when it fails (e.g. a module table is missing)
+        /// </summary>
+        private List<RecordMarker> ReadMarkers(List<string> inLists, Func<string, string> sql)
+        {
+            var list = new List<RecordMarker>();
+            foreach (string in_ in inLists)
+            {
+                DataSet ds = DB.ExecuteDataset(sql(in_));
+                if (ds == null || ds.Tables.Count == 0)
+                    return null;
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                    list.Add(new RecordMarker { value = Util.GetValueOfInt(dr[0]), ID = Util.GetValueOfInt(dr[1]) });
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Record IDs (key column TableName_ID) of the first table of a page result
+        /// </summary>
+        private static List<int> PageRecordIDs(WindowRecordOut page, string tableName)
+        {
+            var ids = new List<int>();
+            if (page == null || page.Tables == null || page.Tables.Count == 0 || string.IsNullOrEmpty(tableName))
+                return ids;
+            string keyColumn = (tableName + "_ID").ToLower();
+            foreach (JRow row in page.Tables[0].rows)
+            {
+                object id;
+                if (row.cells.TryGetValue(keyColumn, out id))
+                    ids.Add(Util.GetValueOfInt(id));
+            }
+            return ids;
+        }
+
         /** Larger pages (unpaged loads) keep the per-record call; also Oracle's IN list limit */
         private const int MAX_SHARED_ACCESS_PAGE = 1000;
 
@@ -4171,6 +4279,10 @@ namespace VIS.Helpers
                         resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields);
                     }
                 }
+
+                // toolbar markers (attachment, chat, lock, ...) of this page's records, instead of whole-table lists
+                if (resultData != null)
+                    resultData.Markers = GetRecordMarkers(ctxp, vo, AD_Table_ID, PageRecordIDs(resultData, gt.TableName));
             }
             resultData.RecordCount = rCount;
 
