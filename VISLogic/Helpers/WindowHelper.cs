@@ -1018,7 +1018,11 @@ namespace VIS.Helpers
             //};
             // VIS0008 Create PO object for original screen from where record is being saved
             int Ver_Window_ID = 0;
-            PO OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, inserting, out Ver_Window_ID);
+            // only versioned windows use it (copied into the version record below); otherwise it was a full extra
+            // load of the record (incl. virtual columns and LOBs) on every save
+            PO OrigPO = null;
+            if (inn.MaintainVersions)
+                OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, inserting, out Ver_Window_ID);
 
             // check if Maintain versions property is true / else skip
             if (inn.MaintainVersions)
