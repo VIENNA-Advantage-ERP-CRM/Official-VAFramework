@@ -83,6 +83,7 @@ namespace VIS.Controllers
             string retJSON = "";
             string retError = null;
             string windowCtx = "";
+            string userQueries = null;
 
             if (Session["ctx"] != null)
             {
@@ -100,6 +101,21 @@ namespace VIS.Controllers
                     {
                         retError = ex.Message;
                     }
+                    // the user's saved / default searches of all tabs (per user, so not part of the cached window);
+                    // spares the browser its blocking per-tab lookups. Never stops the window from opening.
+                    try
+                    {
+                        using (var w = new WindowHelper())
+                        {
+                            Dictionary<string, object> uq = w.GetTabUserQueries(ctx, vo);
+                            if (uq != null)
+                                userQueries = JsonConvert.SerializeObject(uq);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        userQueries = null;     // the browser falls back to its own lookups
+                    }
                 }
                 else
                 {
@@ -111,7 +127,7 @@ namespace VIS.Controllers
             {
                 retError = "SessionExpired";
             }
-            return Json(new { result = retJSON, error = retError, wCtx = windowCtx }, JsonRequestBehavior.AllowGet);
+            return Json(new { result = retJSON, error = retError, wCtx = windowCtx, userQueries = userQueries }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
