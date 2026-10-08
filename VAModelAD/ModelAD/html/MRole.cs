@@ -2629,9 +2629,37 @@ namespace VAdvantage.Model
             return "AD_Org_ID IN(" + sb.ToString() + ")";
         }	//	getOrgWhereValue
 
+        /** Can AD_Org_ID be NULL in the table (view, missing or optional column)? By table name; reset with AD_Column */
+        private static CCache<string, bool> s_orgNullable = new CCache<string, bool>("AD_Column_OrgNullable", 50, 60);
+
+        /// <summary>
+        /// Org column for the access filter: plain AD_Org_ID where the column is mandatory on a real table, so that
+        /// indexes and statistics on it can be used; COALESCE(AD_Org_ID,0) where it can be NULL (views, optional
+        /// column, unknown table), which treats NULL as org 0 as before.
+        /// </summary>
+        private string OrgColumnSQL(string tableName, string mainTableName)
+        {
+            string column = (tableName == null ? "" : tableName + ".") + "AD_Org_ID";
+            return IsOrgNullable(mainTableName) ? "COALESCE(" + column + ",0)" : column;
+        }
+
+        private bool IsOrgNullable(string mainTableName)
+        {
+            if (string.IsNullOrEmpty(mainTableName))
+                return true;
+            bool nullable;
+            if (s_orgNullable.TryGetValue(mainTableName, out nullable))
+                return nullable;
+            MTable table = MTable.Get(GetCtx(), mainTableName);
+            MColumn column = table == null ? null : table.GetColumn("AD_Org_ID");
+            nullable = table == null || table.IsView() || column == null || !column.IsMandatory();
+            s_orgNullable[mainTableName] = nullable;
+            return nullable;
+        }
+
         /**
 	 * Get Org Where Clause Value
-	 * 
+	 *
 	 * @param rw
 	 *            read write
 	 * @return "AD_Org_ID=0" or "AD_Org_ID IN(0,1)" or null (if access all org)
@@ -2695,9 +2723,10 @@ namespace VAdvantage.Model
                 //}
             }
             //
+            string orgColumn = OrgColumnSQL(tableName, mainTableName);
             if (set.Count == 1)
             {
-                return "COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0)=" + set[0];
+                return orgColumn + "=" + set[0];
             }
             else if (set.Count == 0)
             {
@@ -2723,14 +2752,15 @@ namespace VAdvantage.Model
                     if (sql.Length > 0)
                         sql.Append(" OR ");
 
-                    sql.Append("COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0) IN(").Append(sb.ToString()).Append(")");
+                    sql.Append(orgColumn + " IN(").Append(sb.ToString()).Append(")");
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
                     if (!string.IsNullOrEmpty(mainTableName))
                     {
 
-                        string isView = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsView FROM AD_Table WHERE TableName='" + mainTableName + "'"));
+                        MTable mainTable = MTable.Get(GetCtx(), mainTableName);    // cached, was a query per call
+                        string isView = mainTable == null ? "" : (mainTable.IsView() ? "Y" : "N");
                         // Get Shared record with organisation.
                         if (isView != "Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
                         {
@@ -2755,23 +2785,10 @@ namespace VAdvantage.Model
             if (!IsUseBPRestrictions())
                 return "";
 
-            bool hasBPColumn = false;
-            string sql = "SELECT count(*) FROM AD_Table t "
-                            + "INNER JOIN AD_Column c ON (t.AD_Table_ID=c.AD_Table_ID) "
-                            + "WHERE t.TableName='" + TableName
-                            + "' AND c.ColumnName='C_BPartner_ID' ";
-            try
-            {
-                string ret = DataBase.DB.ExecuteScalar(sql).ToString();
-                if (ret != "")
-                {
-                    hasBPColumn = int.Parse(ret) != 0;
-                }
-            }
-            catch (Exception e)
-            {
-                log.Log(Level.SEVERE, sql, e);
-            }
+            // columns from the cached table definition (were two queries per call, the second one the wrong query:
+            // it re-ran the C_BPartner_ID check, so AD_User_ID was assumed on tables that do not have it)
+            MTable table = MTable.Get(GetCtx(), TableName);
+            bool hasBPColumn = table != null && table.GetColumn("C_BPartner_ID") != null;
             if (!hasBPColumn)
                 return "";
 
@@ -2786,24 +2803,7 @@ namespace VAdvantage.Model
                                         + " WHERE u.AD_User_ID=" + AD_User_ID
                                         + " AND bpr.C_BPartner_ID=" + TableName + ".C_BPartner_ID)";
 
-            bool hasUserColumn = false;
-            string sql1 = "SELECT count(*) FROM AD_Table t "
-                            + "INNER JOIN AD_Column c ON (t.AD_Table_ID=c.AD_Table_ID) "
-                            + "WHERE t.tableName='" + TableName
-                            + "' AND c.ColumnName='AD_User_ID' ";
-            try
-            {
-
-                string ret = DataBase.DB.ExecuteScalar(sql).ToString();
-                if (ret != "")
-                {
-                    hasUserColumn = int.Parse(ret) != 0;
-                }
-            }
-            catch (Exception e)
-            {
-                log.Log(Level.SEVERE, sql, e);
-            }
+            bool hasUserColumn = table.GetColumn("AD_User_ID") != null;
 
             if (hasUserColumn)
                 docAccess += " OR " + TableName + ".AD_User_ID =" + AD_User_ID;
@@ -2890,15 +2890,17 @@ namespace VAdvantage.Model
             {
                 //Lakhwinder
                 MTable table = MTable.Get(GetCtx(), AD_Table_ID);
-                if (!table.IsView() && table.Haskey(AD_Table_ID))
+                // only tables with at least one private lock get the filter (cached, reset when a lock changes)
+                if (!table.IsView() && table.Haskey(AD_Table_ID) && MPrivateAccess.HasLocks(AD_Table_ID))
                 {
-                    string lockedIDs = MPrivateAccess.GetLockedRecordWhere(AD_Table_ID, _AD_User_ID);
-                    if (lockedIDs != null)
-                    {
-                        if (sb.Length > 0)
-                            sb.Append(" AND ");
-                        sb.Append(keyColumnName).Append(lockedIDs);
-                    }
+                    // NOT EXISTS needs the qualified key; an unqualified one (e.g. AD_User_ID) would bind to a column of
+                    // AD_Private_Access inside the subquery, so that case keeps NOT IN
+                    string lockedWhere = keyColumnName.IndexOf('.') > 0
+                        ? MPrivateAccess.GetLockedRecordNotExists(AD_Table_ID, _AD_User_ID, keyColumnName)
+                        : keyColumnName + MPrivateAccess.GetLockedRecordWhere(AD_Table_ID, _AD_User_ID);
+                    if (sb.Length > 0)
+                        sb.Append(" AND ");
+                    sb.Append(lockedWhere);
                 }
             }
             //
@@ -3226,9 +3228,11 @@ namespace VAdvantage.Model
         /// <param name="tableName"></param>
         public void GetShareRecord(ref StringBuilder sql, string tableName, string mainTableName)
         {
-            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(mainTableName);
-            DataSet ds = DB.ExecuteDataset(qry);
-            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            int AD_Table_ID = GetAD_Table_ID(mainTableName);
+            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + AD_Table_ID;
+            // cached "is anything shared with this org for the table" instead of running the query on every call;
+            // the subquery added below is still evaluated live by the database
+            if (MShareRecordOrg.HasShares(GetCtx().GetAD_Org_ID(), AD_Table_ID))
             {
                 sql.Append(" OR (");
 
