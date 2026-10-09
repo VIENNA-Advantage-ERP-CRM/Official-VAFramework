@@ -2558,7 +2558,9 @@ namespace VIS.Helpers
         /// <param name="encryptedColnames">lsit encrypted column of window</param>
         /// <param name="ctx">context</param>
         /// <returns>Json cutom equalvalent to dataset</returns>
-        public WindowRecordOut GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
+        /// <param name="directSelect">SELECT part (lookup display subqueries) of sqlIn.sqlDirect; when given, the display texts
+        /// are read for the page's records by key instead of re-running sqlIn.sqlDirect</param>
+        public WindowRecordOut GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields, string directSelect = null)
         {
             WindowRecordOut retVal = new WindowRecordOut();
 
@@ -2709,8 +2711,15 @@ namespace VIS.Helpers
             //Direct Query
             if (sqlIn.sqlDirect != "")
             {
+                // display texts for the rows just read: the same lookup subqueries, driven by the page's record IDs instead
+                // of running the whole filter, access rules and sort a second time
+                string pageSql = PageDisplaySql(directSelect, sqlIn.tableName, ds);
                 bool doPaging = sqlIn.pageSize > 0;
-                if (!doPaging)
+                if (pageSql != null)
+                {
+                    ds = new SqlHelper().ExecuteDataSet(pageSql);
+                }
+                else if (!doPaging)
                 {
                     ds = new SqlHelper().ExecuteDataSet(sqlIn.sqlDirect);
                 }
@@ -2919,6 +2928,31 @@ namespace VIS.Helpers
                     list.Add(new RecordMarker { value = Util.GetValueOfInt(dr[0]), ID = Util.GetValueOfInt(dr[1]) });
             }
             return list;
+        }
+
+        /// <summary>
+        /// Display-text query for exactly the records of a page: the lookup subqueries (directSelect) over
+        /// "FROM table WHERE key IN (page ids)". The rows already passed the filter and access rules in the main query.
+        /// Null when it cannot be used (no select part, no single key column in the page, empty or very large page):
+        /// then the original query runs.
+        /// </summary>
+        private static string PageDisplaySql(string directSelect, string tableName, DataSet page)
+        {
+            if (string.IsNullOrEmpty(directSelect) || string.IsNullOrEmpty(tableName) || page == null || page.Tables.Count == 0)
+                return null;
+            DataTable dt = page.Tables[0];
+            string keyColumn = tableName + "_ID";
+            if (!dt.Columns.Contains(keyColumn) || dt.Rows.Count == 0 || dt.Rows.Count > MAX_SHARED_ACCESS_PAGE)
+                return null;
+            var ids = new HashSet<int>();
+            foreach (DataRow row in dt.Rows)
+            {
+                if (row[keyColumn] != DBNull.Value)
+                    ids.Add(Util.GetValueOfInt(row[keyColumn]));   // 0 is a valid key for some tables
+            }
+            if (ids.Count == 0)
+                return null;
+            return directSelect + " FROM " + tableName + " WHERE " + tableName + "." + keyColumn + " IN (" + string.Join(",", ids) + ")";
         }
 
         /// <summary>
@@ -4350,7 +4384,8 @@ namespace VIS.Helpers
                 {
                     using (var w = new WindowHelper())
                     {
-                        resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields);
+                        resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields,
+                            selectDirect != null ? selectDirect.ToString() : null);
                     }
                 }
 
