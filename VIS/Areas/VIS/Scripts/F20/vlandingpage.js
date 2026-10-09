@@ -488,10 +488,9 @@
             //$container.append(openRightPanel);
             //$root.find('.vis-home-leftPanel').append($container);
             $root.find('.vis-widget-body').empty();
-            var url = VIS.Application.contextUrl + "Home/GetWidgets";
             $busy.show();
             widgetList = {};
-            VIS.dataContext.getJSONData(url, { windowID: windowID }, function (result) {
+            getWidgetData("widgets", "Home/GetWidgets", function (result) {
                 $busy.hide();
                 if (!result) {
                     return;
@@ -559,8 +558,7 @@
         function loadHomeWidgets() {
             $busy.show();
             $root.find('.vis-widget-container .vis-widget-item').remove();
-            var url = VIS.Application.contextUrl + "Home/GetUserWidgets";
-            VIS.dataContext.getJSONData(url, { windowID: windowID }, function (result) {
+            getWidgetData("userWidgets", "Home/GetUserWidgets", function (result) {
                 $busy.hide();
                 if (result && result.length > 0) {
                     $root.find('.vis-add-widgetContainer').hide();
@@ -638,6 +636,28 @@
 
                 });
             }
+        }
+
+        // The widget catalog and the user's widgets need only the window, so both requests start together with the page
+        // HTML instead of one after the other once it has loaded; the first loadWidgets uses these answers, a refresh asks again.
+        var widgetPrefetch = {
+            widgets: requestWidgetData("Home/GetWidgets"),
+            userWidgets: requestWidgetData("Home/GetUserWidgets")
+        };
+
+        function requestWidgetData(action) {
+            var answer = $.Deferred();
+            VIS.dataContext.getJSONData(VIS.Application.contextUrl + action, { windowID: windowID }, function (result) {
+                answer.resolve(result);
+            });
+            return answer;
+        }
+
+        /** the prefetched answer the first time, a new request after that (refresh) */
+        function getWidgetData(key, action, callback) {
+            var pending = widgetPrefetch[key];
+            widgetPrefetch[key] = null;
+            (pending || requestWidgetData(action)).done(callback);
         }
 
         $root.load(VIS.Application.contextUrl + 'LandingPage/Index', function () {
