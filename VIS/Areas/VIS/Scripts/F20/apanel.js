@@ -258,7 +258,7 @@
             });
 
             $windowpage.on('click', function () {
-                self.showLandingPage(false);
+                self.showLandingPage(false, null, true);   // window icon: keep the loaded records
             });
 
         };
@@ -1012,8 +1012,10 @@
          * Handle Landing page hide/show and manage event
          * @param {any} show
          * @param {any} actionParams
+         * @param {any} keepRecords true from the Window icon: show the records already loaded (the first tab is
+         *        fetched when the window opens) instead of fetching them again; widgets still refresh them
          */
-        this.showLandingPage = function (show, actionParams) {
+        this.showLandingPage = function (show, actionParams, keepRecords) {
             if (show) {
                 this.cmd_ignore();
                 this.landingPage.getRoot().show();
@@ -1033,7 +1035,8 @@
                     if (!this.isFromSearch) {
                         this.isFromSearch = false;
                     }
-                    this.cmd_find('');
+                    if (!keepRecords)
+                        this.cmd_find('');
                 }
                 //this.setTabNavigation();
                 this.refresh();

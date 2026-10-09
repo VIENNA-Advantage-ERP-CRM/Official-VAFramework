@@ -176,7 +176,7 @@
             });
 
             $root.find('.vis-windowpage').on('click', function () {
-                apanel.showLandingPage(false);
+                apanel.showLandingPage(false, null, true);   // window icon: keep the loaded records
             });
 
             $btnClose.on('click', function (e) {
