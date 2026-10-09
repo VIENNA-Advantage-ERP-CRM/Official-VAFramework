@@ -765,6 +765,15 @@ namespace VAdvantage.Model
                     selectSQL = selectSQL.Replace("@param1", "'" + calendarYearMonth + "'").Replace("@param2", docOrg_ID.ToString());
                     rs = trx.ExecuteDataSet(selectSQL, null);
 
+                    // First document of this year/org: FOR UPDATE locked nothing, so two documents could both create the
+                    // number row and get the start number. Lock the sequence itself and look again; the second one waits
+                    // here and then finds the row the first one created.
+                    if (rs == null || rs.Tables.Count == 0 || rs.Tables[0].Rows.Count == 0)
+                    {
+                        trx.ExecuteDataSet("SELECT AD_Sequence_ID FROM AD_Sequence WHERE AD_Sequence_ID = " + AD_Sequence_ID + " FOR UPDATE", null);
+                        rs = trx.ExecuteDataSet(selectSQL, null);
+                    }
+
                     // Check organization level document sequence settings and if exist then override general settings.
                     if (rs != null && rs.Tables[0].Rows.Count > 0)
                     {
@@ -837,12 +846,26 @@ namespace VAdvantage.Model
                     {	// create sequence (CurrentNo = StartNo + IncrementNo) for this year/org and return first number (=StartNo)
                         next = startNo;
 
-                        X_AD_Sequence_No seqno = new X_AD_Sequence_No(po.GetCtx(), 0, trxName);
+                        // created in the sequence transaction (was the document's), so with a separate transaction the
+                        // row is committed - and the sequence lock released - before the next document asks
+                        X_AD_Sequence_No seqno = new X_AD_Sequence_No(po.GetCtx(), 0, trx);
                         seqno.SetAD_Sequence_ID(AD_Sequence_ID);
                         seqno.SetAD_Org_ID(docOrg_ID);
                         seqno.SetCalendarYear(calendarYearMonth);
                         seqno.SetCurrentNext(startNo + incrementNo);
-                        seqno.Save();
+                        if (!seqno.Save())
+                        {
+                            s_log.Severe("Sequence number row not created - " + seq + " " + calendarYearMonth + " Org=" + docOrg_ID);
+                            next = -2;     // no number rather than a duplicate one
+                        }
+
+                        if (isUseSeparateTrx || trxName == null || !trxName.UseSameTrxForDocNo)
+                        {
+                            if (next == -2)
+                                trx.Rollback();
+                            else
+                                trx.Commit();
+                        }
                     }
                     else	// standard
                     {
