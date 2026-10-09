@@ -2474,10 +2474,21 @@
                 if (prop.startsWith(keyStart))
                     delete this.s_windowRecordLookup[prop];
             }
+
+            // deferred lookups of tabs never opened, and which tabs were released
+            delete this.s_windowLookup[windowNo];
+            delete this.s_releasedTabs[windowNo];
         },
 
-        addWindowLookup: function (windowNo, lookup) {
+        /** windowNo -> { AD_Tab_ID: true } for tabs whose deferred lookups were released (see initTabLookup) */
+        s_releasedTabs: {},
 
+        addWindowLookup: function (windowNo, lookup) {
+            // tab already loading data: nothing to wait for
+            if (this.s_releasedTabs[windowNo] && this.s_releasedTabs[windowNo][lookup.AD_Tab_ID]) {
+                lookup.initialize();
+                return;
+            }
             if (this.s_windowLookup[windowNo]) {
                 this.s_windowLookup[windowNo].push(lookup);
             }
@@ -2488,15 +2499,40 @@
             }
         },
 
+        /**
+         * Window opened. The deferred lookups of the other tabs used to be loaded here, all at once, competing with the
+         * first tab's records; each tab now loads its own right before its first data fetch (initTabLookup).
+         */
         initWindowLookup: function (windowNo) {
-            if (this.s_windowLookup[windowNo]) {
-                var arr = this.s_windowLookup[windowNo];
-                for (var i = 0, j = arr.length; i < j; i++) {
+            if (!this.s_releasedTabs[windowNo])
+                this.s_releasedTabs[windowNo] = {};
+        },
+
+        /**
+         * Loads the deferred lookups of one tab; called by GridTable.open before the tab's first data fetch, so the
+         * lookups are there when its rows (selected or shown inline) are drawn. Later calls do nothing.
+         */
+        initTabLookup: function (windowNo, AD_Tab_ID) {
+            if (!this.s_releasedTabs[windowNo])
+                this.s_releasedTabs[windowNo] = {};
+            if (this.s_releasedTabs[windowNo][AD_Tab_ID])
+                return;
+            this.s_releasedTabs[windowNo][AD_Tab_ID] = true;
+
+            var arr = this.s_windowLookup[windowNo];
+            if (!arr)
+                return;
+            var waiting = [];
+            for (var i = 0, j = arr.length; i < j; i++) {
+                if (arr[i].AD_Tab_ID == AD_Tab_ID)
                     arr[i].initialize();
-                }
-                arr.length = 0;
-                delete this.s_windowLookup[windowNo];
+                else
+                    waiting.push(arr[i]);
             }
+            if (waiting.length > 0)
+                this.s_windowLookup[windowNo] = waiting;
+            else
+                delete this.s_windowLookup[windowNo];
         },
 
         /**

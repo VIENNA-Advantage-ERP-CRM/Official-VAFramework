@@ -4147,6 +4147,9 @@
     GridTable.prototype.open = function (maxRows) {
         //TODO
         //log.Info("MaxRows=" + maxRows);
+        // this tab is about to show records: load its deferred lookups now (only the first time), instead of every
+        // tab's lookups when the window opened
+        VIS.MLookupCache.initTabLookup(this.gTable._windowNo, this.AD_Tab_ID);
         this.maxRows = maxRows;
         if (this.isOpen) {
             //log.Fine("already open");
