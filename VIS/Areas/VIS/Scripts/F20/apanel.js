@@ -5984,6 +5984,10 @@
         }
         this.vTabbedPane.dispose();
         this.vTabbedPane = null;
+        if (this.landingPage) {
+            this.landingPage.dispose();
+            this.landingPage = null;
+        }
         if (this.gridWindow) {
             this.gridWindow.dispose();
             this.gridWindow = null;

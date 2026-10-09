@@ -643,11 +643,24 @@
         $root.load(VIS.Application.contextUrl + 'LandingPage/Index', function () {
             init();
             adjustWidgetDivSize();
-            $(window).resize(adjustWidgetDivSize);
+            // namespaced per window so dispose can remove it (it kept every closed window alive)
+            $(window).on('resize.visLanding' + curWindowNo, adjustWidgetDivSize);
         });
 
         this.getRoot = function () {
             return $root;
+        }
+
+        this.dispose = function () {
+            $(window).off('resize.visLanding' + curWindowNo);
+            for (var id in homeItems) {
+                if (homeItems[id] && homeItems[id].wform && homeItems[id].wform.dispose) {
+                    try { homeItems[id].wform.dispose(); } catch (ex) { }
+                }
+            }
+            homeItems = {};
+            $root.remove();
+            self.apanel = null;
         }
 
     }
