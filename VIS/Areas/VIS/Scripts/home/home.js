@@ -522,8 +522,7 @@
                 $home.find('.vis-widget-body').empty();
                 $home.find('#divfeedbsy').show();
                 widgetList = {};
-                var url = VIS.Application.contextUrl + "Home/GetWidgets";
-                VIS.dataContext.getJSONData(url, { windowID: 0 }, function (result) {
+                getWidgetData("widgets", "Home/GetWidgets", function (result) {
                     $home.find('#divfeedbsy').hide();
                     if (!result) {
                         return;
@@ -592,7 +591,6 @@
 
             function loadHomeWidgets() {
                 $home.find('.vis-widget-container .vis-widget-item').remove();
-                var url = VIS.Application.contextUrl + "Home/GetUserWidgets";
                 $home.find('#divfeedbsy').show();
                 hiddenRows = [];
                 VIS.dataContext.getJSONData(url, { windowID: 0, dashboardID: currentDashboardID }, function (result) {
