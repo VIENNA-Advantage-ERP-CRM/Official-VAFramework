@@ -4627,7 +4627,9 @@
 
         if (!e.getIsInserting()) {
             //var trxInfo = VIS.GridTab.prototype.getTrxInfo(this.curTab.getTableName(), VIS.context, this.curTab.getWindowNo(), this.curTab.getTabNo());
-            this.setStatusInfo(e.getRecord_ID());
+            // an unsaved field edit does not change the saved totals the footer reads (a request per keystroke-change)
+            if (!(e.getChangedColumn() >= 0 && e.getIsChanged()))
+                this.setStatusInfo(e.getRecord_ID());
 
             //if (trxInfo != null)
             //    this.statusBar.setInfo(trxInfo);
@@ -4640,12 +4642,22 @@
             VIS.context.setContext(this.curWindowNo, "tb_Index", this.curTabIndex);
             this.curWinTab.evaluate(null);
             if (e.getChangedColumn() < 0 || !e.getIsInserting()) {
-                this.curWinTab.notifyDataChanged(e);
+                // composite view: the child grid is re-queried here, so only when the parent record changed or
+                // after save/refresh/undo (col < 0, nothing pending) - not on every edit of an existing record
+                var depKey = this.curTab.getAD_Tab_ID() + "_" + this.curTab.getRecord_ID();
+                if (depKey !== this._depKey || (e.getChangedColumn() < 0 && !e.getIsChanged())) {
+                    this._depKey = depKey;
+                    this.curWinTab.notifyDataChanged(e);
+                }
             }
         }
 
         if (this.curTab.getParentTab() && this.aSharedRecord) {
-            this.curTab.loadShared();
+            // A row move or a field edit does not change what is shared (the page's markers come with the page);
+            // reload (a blocking request) only after save, delete, refresh and the like.
+            var rowMoveOrEdit = e.getAD_Message() == "NavigateOrUpdate" || (e.getChangedColumn() >= 0 && e.getIsChanged());
+            if (!rowMoveOrEdit)
+                this.curTab.loadShared();
             this.aSharedRecord.setPressed(this.curTab.hasShared());
         }
 

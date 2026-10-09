@@ -1943,9 +1943,8 @@
             this.vCardView.navigate(recid, true);
         }
 
-        if (this.vHeaderPanel) {
-            this.vHeaderPanel.navigate();
-        }
+        // Header panel: gTab.navigate -> setCurrentRow always fires dataStatusChanged, which already updated it
+        // (it was redrawn twice per row move); if the row did not move (save failed) it does not need to change.
 
 
         if (recid == -1) {

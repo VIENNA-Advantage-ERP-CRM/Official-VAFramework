@@ -3349,15 +3349,24 @@
         if (isNaN(identifier)) {
             if (identifier == null || identifier.length == 0)
                 return null;
+            // Called per field per row move (display logic): index by lower-case name instead of a scan with
+            // two toLowerCase per comparison. Rebuilt when fields are added; the first field of a name wins as before.
             var cols = this.gridFields.length;
-            for (var i = 0; i < cols; i++) {
-                var field = this.gridFields[i];
-                if (identifier.equals(field.getColumnName(), true)) {
-                    return field;
+            if (!this._fieldIndex || this._fieldIndexCount !== cols) {
+                var index = {};
+                for (var i = 0; i < cols; i++) {
+                    var name = this.gridFields[i].getColumnName();
+                    if (name != null) {
+                        name = name.toLowerCase();
+                        if (!index.hasOwnProperty(name))
+                            index[name] = this.gridFields[i];
+                    }
                 }
+                this._fieldIndex = index;
+                this._fieldIndexCount = cols;
             }
-            //log.Log(Level.WARNING, "Not found: '" + identifier + "'");
-            return null;
+            var key = identifier.toString().toLowerCase();
+            return this._fieldIndex.hasOwnProperty(key) ? this._fieldIndex[key] : null;
         }
 
         else {
@@ -6018,6 +6027,7 @@
         this.gridFields.length = 0;
         this.gTable = null;
         this.gridFields = null;
+        this._fieldIndex = null;
         this.gFieldLessData = null;
         this.gFieldData = null;
         this.gFieldUnique = null;
