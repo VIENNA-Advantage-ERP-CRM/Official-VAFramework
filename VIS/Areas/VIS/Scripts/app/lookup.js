@@ -949,34 +949,43 @@
             pageSize = 0;
         }
 
-        $.ajax({
-            url: VIS.Application.contextUrl + "Lookup/GetLookupData",
-            async: async,
-            type: 'post',
-            data: {
-                WindowNo: self.getWindowNo(),
-                AD_Window_ID: self.AD_Window_ID,
-                AD_Tab_ID: self.AD_Tab_ID,
-                AD_Field_ID: self.AD_Field_ID,
-                Values: JSON.stringify(validation),
-                PageSize: pageSize,
-                LookupData: JSON.stringify(self.lookupData)
-            },
-            success: function (data) {
-                var dr = new VIS.DB.DataReader().toJson(data);
-                self.readData(dr, isNumber);
-                if (checkCache) {
+        var requestData = {
+            WindowNo: self.getWindowNo(),
+            AD_Window_ID: self.AD_Window_ID,
+            AD_Tab_ID: self.AD_Tab_ID,
+            AD_Field_ID: self.AD_Field_ID,
+            Values: JSON.stringify(validation),
+            PageSize: pageSize,
+            LookupData: JSON.stringify(self.lookupData)
+        };
+        var onSuccess = function (data) {
+            var dr = new VIS.DB.DataReader().toJson(data);
+            self.readData(dr, isNumber);
+            if (checkCache) {
 
-                    VIS.MLookupCache.loadEnd(self.info, self);
-                }
-                self.loading = false;
-                self = null;
-            },
-            error: function (e) {
-                self.log.log(VIS.Logging.Level.SEVERE, self.info.keyColumn + ": Loader - " + sql, e);
+                VIS.MLookupCache.loadEnd(self.info, self);
             }
+            self.loading = false;
+            self = null;
+        };
+        var onError = function (e) {
+            self.log.log(VIS.Logging.Level.SEVERE, self.info.keyColumn + ": Loader - " + sql, e);
+        };
 
-        });
+        if (async) {
+            // sent together with the other lookups loaded in this turn (one request per tab instead of per field)
+            VIS.MLookupCache.enqueueLookupLoad(requestData, onSuccess, onError);
+        }
+        else {
+            $.ajax({
+                url: VIS.Application.contextUrl + "Lookup/GetLookupData",
+                async: false,
+                type: 'post',
+                data: requestData,
+                success: onSuccess,
+                error: onError
+            });
+        }
 
         //try {
         //    dr = executeDReader(sql, null);
@@ -1402,6 +1411,62 @@
 
 
     //3. MLocatorLookup
+    /**
+     * Locator lists shared by all locator fields: key = the request's filter. Every locator field used to download
+     * the whole list itself (up to 10000 rows) when it was created. A list is reused for a minute; while one request
+     * is under way, other fields asking for the same list wait for its answer.
+     */
+    var s_locatorLists = {};
+    var LOCATOR_LIST_MS = 60000;
+
+    /**
+     * Calls back with the raw GetWareProWiseLocator response for the filter.
+     * @param {any} params request data (colName, orgId, warehouseId, productId, onlyIsSOTrx)
+     * @param {boolean} sync explicit refresh: synchronous and always from the server
+     * @param {function} callback receives the response
+     */
+    function loadLocatorData(params, sync, callback) {
+        var key = [params.colName, params.orgId, params.warehouseId, params.productId, params.onlyIsSOTrx].join('|');
+        var entry = s_locatorLists[key];
+        if (!sync && entry) {
+            if (entry.data != null && (new Date().getTime() - entry.time) < LOCATOR_LIST_MS) {
+                callback(entry.data);
+                return;
+            }
+            if (entry.waiting) {
+                entry.waiting.push(callback);
+                return;
+            }
+        }
+
+        // new request; fields already waiting for this list are answered by it too
+        var waiting = entry && entry.waiting ? entry.waiting : [];
+        if (!sync)
+            waiting.push(callback);
+        entry = s_locatorLists[key] = { time: 0, data: null, waiting: waiting };
+        $.ajax({
+            type: 'Get',
+            async: !sync,
+            url: VIS.Application.contextUrl + "Form/GetWareProWiseLocator",
+            data: params,
+            success: function (data) {
+                entry.data = data;
+                entry.time = new Date().getTime();
+                var answer = entry.waiting;
+                entry.waiting = null;
+                if (sync)
+                    callback(data);
+                for (var i = 0; i < answer.length; i++)
+                    answer[i](data);
+            },
+            error: function () {
+                // nothing cached; the next field asks again (a failed request never called back before either)
+                if (s_locatorLists[key] === entry)
+                    delete s_locatorLists[key];
+            }
+        });
+    };
+
     function MLocatorLookup(ctx, windowNo) {
         Lookup.call(this, null, null, ctx, windowNo, VIS.DisplayType.TableDir);
 
@@ -1488,7 +1553,8 @@
         dr.dispose();
         var retValue = { Key: keyValue, Name: VIS.Utility.encodeText(value) };
         if (saveInCache) {
-            this.lookup[" " + keyValue] = retValue;
+            // same key get() reads (Number); it was stored as " " + key, so every display asked the server again
+            this.lookup[Number(keyValue)] = retValue;
         }
         return retValue;
     };
@@ -1597,22 +1663,19 @@
             var ds = null;
 
 
+            var locatorParams = {
+                colName: colName,
+                orgId: orgId,
+                warehouseId: warehouseId,
+                productId: productId,
+                onlyIsSOTrx: onlyIsSOTrx
+            };
+
             if (sync) {
 
-                $.ajax({
-                    type: 'Get',
-                    async: false,
-                    url: VIS.Application.contextUrl + "Form/GetWareProWiseLocator",
-                    data: {
-                        colName: colName,
-                        orgId: orgId,
-                        warehouseId: warehouseId,
-                        productId: productId,
-                        onlyIsSOTrx: onlyIsSOTrx
-                    },
-                    success: function (data) {
-                        ds = new VIS.DB.DataSet().toJson(data);
-                    },
+                // explicit refresh: always from the server (also completes other fields waiting for the same list)
+                loadLocatorData(locatorParams, true, function (data) {
+                    ds = new VIS.DB.DataSet().toJson(data);
                 });
 
 
@@ -1637,18 +1700,8 @@
             else {
                 var self = this;
 
-                $.ajax({
-                    type: 'Get',
-                    async: true,
-                    url: VIS.Application.contextUrl + "Form/GetWareProWiseLocator",
-                    data: {
-                        colName: colName,
-                        orgId: orgId,
-                        warehouseId: warehouseId,
-                        productId: productId,
-                        onlyIsSOTrx: onlyIsSOTrx
-                    },
-                    success: function (data) {
+                // shared by all locator fields asking for the same list (one request, reused for a minute)
+                loadLocatorData(locatorParams, false, function (data) {
                         ds = new VIS.DB.DataSet().toJson(data);
                         try {
                             var dt = ds.getTable(0);
@@ -1671,9 +1724,6 @@
                             self.log(VIS.Logging.Level.SEVERE, "", ex);
                         }
                         self = null;
-
-
-                    },
                 });
 
 
@@ -2482,6 +2532,68 @@
 
         /** windowNo -> { AD_Tab_ID: true } for tabs whose deferred lookups were released (see initTabLookup) */
         s_releasedTabs: {},
+
+        /** async GetLookupData loads waiting to go to the server together (see enqueueLookupLoad) */
+        s_loadQueue: [],
+        s_loadTimer: null,
+
+        /**
+         * Queues an async lookup load. All loads queued in the same JavaScript turn (the fields of a tab being built)
+         * are sent as one request (Lookup/GetLookupDataBatch) instead of one per field, which the server's per-user
+         * session lock answered one after another. onSuccess gets exactly what a single GetLookupData request gave.
+         */
+        enqueueLookupLoad: function (data, onSuccess, onError) {
+            this.s_loadQueue.push({ data: data, onSuccess: onSuccess, onError: onError });
+            if (!this.s_loadTimer) {
+                var that = this;
+                this.s_loadTimer = setTimeout(function () { that.flushLookupLoads(); }, 0);
+            }
+        },
+
+        flushLookupLoads: function () {
+            var queue = this.s_loadQueue;
+            this.s_loadQueue = [];
+            this.s_loadTimer = null;
+            if (queue.length == 1) {    // nothing to combine: the usual request
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Lookup/GetLookupData",
+                    type: 'post',
+                    data: queue[0].data,
+                    success: queue[0].onSuccess,
+                    error: queue[0].onError
+                });
+                return;
+            }
+            var BATCH = 200;    // server limit per batch
+            for (var start = 0; start < queue.length; start += BATCH) {
+                (function (chunk) {
+                    $.ajax({
+                        url: VIS.Application.contextUrl + "Lookup/GetLookupDataBatch",
+                        type: 'post',
+                        data: { Items: JSON.stringify($.map(chunk, function (q) { return q.data; })) },
+                        success: function (text) {
+                            var results = null;
+                            try {
+                                results = JSON.parse(text);
+                            }
+                            catch (e) {
+                                results = null;
+                            }
+                            for (var i = 0; i < chunk.length; i++) {
+                                if (results && results[i] != null)
+                                    chunk[i].onSuccess(results[i]);
+                                else
+                                    chunk[i].onError(null);
+                            }
+                        },
+                        error: function (e) {
+                            for (var i = 0; i < chunk.length; i++)
+                                chunk[i].onError(e);
+                        }
+                    });
+                })(queue.slice(start, start + BATCH));
+            }
+        },
 
         addWindowLookup: function (windowNo, lookup) {
             // tab already loading data: nothing to wait for
