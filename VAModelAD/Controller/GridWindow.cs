@@ -155,7 +155,8 @@ namespace VAdvantage.Model
         private void LogAccess()
         {
             MSession session = MSession.Get(_vo.GetCtx(), true);
-            session.WindowLog(_vo.GetCtx().GetAD_Client_ID(), _vo.GetCtx().GetAD_Org_ID(),
+            // written in the background: opening the window does not wait for the audit insert
+            VAdvantage.Common.AuditLogQueue.WindowLog(session, _vo.GetCtx().GetAD_Client_ID(), _vo.GetCtx().GetAD_Org_ID(),
                 GetAD_Window_ID(), 0);
         }	//
 

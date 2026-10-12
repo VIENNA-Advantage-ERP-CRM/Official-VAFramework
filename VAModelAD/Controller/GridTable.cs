@@ -758,7 +758,7 @@ namespace VAdvantage.Model
             if (_rowCount > 0)
             {
                 MSession session = MSession.Get(_ctx, true);
-                session.QueryLog(_ctx.GetAD_Client_ID(), _ctx.GetAD_Org_ID(), _AD_Table_ID,
+                VAdvantage.Common.AuditLogQueue.QueryLog(session, _ctx.GetAD_Client_ID(), _ctx.GetAD_Org_ID(), _AD_Table_ID,
                     _SQL_Count, _rowCount);
             }
             return true;
