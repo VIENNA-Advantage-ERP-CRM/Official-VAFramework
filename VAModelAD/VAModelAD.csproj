@@ -460,6 +460,7 @@
     <Compile Include="ProcessAD\MasterVersionFields.cs" />
     <Compile Include="ProcessAD\MasterVersions.cs" />
     <Compile Include="ProcessAD\MasterVersionSchedules.cs" />
+    <Compile Include="ProcessAD\MultipleEmailSendLink.cs" />
     <Compile Include="ProcessAD\NativeSequence.cs" />
     <Compile Include="ProcessAD\PrepareModuleSchema.cs" />
     <Compile Include="ProcessAD\RoleAccessUpdate.cs" />
