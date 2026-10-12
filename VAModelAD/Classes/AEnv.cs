@@ -45,6 +45,18 @@ namespace VAdvantage.Classes
             = new CCache<string, GridWindowVO>("AD_Window", 10);
 
         /// <summary>
+        /// Window cache key: everything the window definition depends on (role access unless skipRole, org, language,
+        /// the user's show translation/accounting/advanced preferences), separated so that IDs cannot run together
+        /// (window 1 + client 11 and window 11 + client 1 used to share a key).
+        /// </summary>
+        private static string WindowCacheKey(Ctx ctx, int AD_Window_ID)
+        {
+            return string.Join("|", AD_Window_ID, ctx.GetAD_Client_ID(), ctx.GetAD_Role_ID(), ctx.GetAD_Org_ID(),
+                ctx.GetAD_Language(), ctx.GetContext("#AD_FilteredOrg"), ctx.GetContext("skipRole"),
+                ctx.GetContext("#ShowTrl"), ctx.GetContext("#ShowAcct"), ctx.GetContext("#ShowAdvanced"));
+        }
+
+        /// <summary>
         /// Get Window Model object from cache 
         /// </summary>
         /// <param name="WindowNo">window Number </param>
@@ -55,9 +67,7 @@ namespace VAdvantage.Classes
         {
             log.Config("Window=" + windowNo + ", AD_Window_ID=" + AD_Window_ID);
             GridWindowVO mWindowVO = null;
-            string format = string.Format("{0}{1}{2}{3}{4}{5}", AD_Window_ID, ctx.GetAD_Client_ID(), ctx.GetAD_Role_ID(), ctx.GetAD_Org_ID(), ctx.GetAD_Language(),
-                                              ctx.GetContext("#AD_FilteredOrg")); // added filtered org also
-                                                                     ;          //JID_1238: Addedd language to reset cache
+            string format = WindowCacheKey(ctx, AD_Window_ID);
             if (AD_Window_ID != 0)// && Ini.IsCacheWindow())	//	try cache always
             {
 
@@ -75,7 +85,13 @@ namespace VAdvantage.Classes
                 log.Config("create local");
                 mWindowVO = GridWindowVO.Create(ctx, windowNo, AD_Window_ID, AD_Menu_ID);
                 if (mWindowVO != null)
+                {
                     s_windows[format] = mWindowVO;
+                    // the caller gets a copy, as on a cache hit, so its changes never reach the cached definition
+                    GridWindowVO copy = mWindowVO.Clone(ctx, windowNo);
+                    if (copy != null)
+                        mWindowVO = copy;
+                }
             }	//	from Client
             if (mWindowVO == null)
                 return null;
@@ -92,7 +108,7 @@ namespace VAdvantage.Classes
         {
             log.Config("Window=" + windowNo + ", AD_Window_ID=" + AD_Window_ID);
             GridWindowVO mWindowVO = null;
-            string format = string.Format("{0}{1}{2}{3}{4}", AD_Window_ID, ctx.GetAD_Client_ID(), ctx.GetAD_Role_ID(), ctx.GetAD_Org_ID(), ctx.GetAD_Language());          //JID_1238: Addedd language to reset cache
+            string format = WindowCacheKey(ctx, AD_Window_ID);
             if (AD_Window_ID != 0)// && Ini.IsCacheWindow())	//	try cache always
             {
 

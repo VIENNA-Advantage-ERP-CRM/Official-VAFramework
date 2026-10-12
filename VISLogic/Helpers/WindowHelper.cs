@@ -778,7 +778,7 @@ namespace VIS.Helpers
                 {
                     for (int j = 0; j < imgColList.Count; j++)
                     {
-                        lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + gTableIn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                        lstColumns.Add(ImageUrlColumn(gTableIn.TableName, imgColList[j].ColumnName));
                     }
                 }
 
@@ -1018,7 +1018,11 @@ namespace VIS.Helpers
             //};
             // VIS0008 Create PO object for original screen from where record is being saved
             int Ver_Window_ID = 0;
-            PO OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, inserting, out Ver_Window_ID);
+            // only versioned windows use it (copied into the version record below); otherwise it was a full extra
+            // load of the record (incl. virtual columns and LOBs) on every save
+            PO OrigPO = null;
+            if (inn.MaintainVersions)
+                OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, inserting, out Ver_Window_ID);
 
             // check if Maintain versions property is true / else skip
             if (inn.MaintainVersions)
@@ -1218,7 +1222,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList1.Count; j++)
                 {
-                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + inn.TableName + "." + imgColList1[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList1[j].ColumnName);
+                    lstColumns.Add(ImageUrlColumn(inn.TableName, imgColList1[j].ColumnName));
                 }
             }
 
@@ -2554,7 +2558,9 @@ namespace VIS.Helpers
         /// <param name="encryptedColnames">lsit encrypted column of window</param>
         /// <param name="ctx">context</param>
         /// <returns>Json cutom equalvalent to dataset</returns>
-        public WindowRecordOut GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
+        /// <param name="directSelect">SELECT part (lookup display subqueries) of sqlIn.sqlDirect; when given, the display texts
+        /// are read for the page's records by key instead of re-running sqlIn.sqlDirect</param>
+        public WindowRecordOut GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields, string directSelect = null)
         {
             WindowRecordOut retVal = new WindowRecordOut();
 
@@ -2630,7 +2636,8 @@ namespace VIS.Helpers
             }
 
             MSession session = MSession.Get(ctx, true);
-            session.QueryLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
+            // written in the background: the fetch does not wait for the audit insert
+            VAdvantage.Common.AuditLogQueue.QueryLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
                 sqlCount, rowCount);
 
             if (sqlIn.tree_id > 0)
@@ -2704,8 +2711,15 @@ namespace VIS.Helpers
             //Direct Query
             if (sqlIn.sqlDirect != "")
             {
+                // display texts for the rows just read: the same lookup subqueries, driven by the page's record IDs instead
+                // of running the whole filter, access rules and sort a second time
+                string pageSql = PageDisplaySql(directSelect, sqlIn.tableName, ds);
                 bool doPaging = sqlIn.pageSize > 0;
-                if (!doPaging)
+                if (pageSql != null)
+                {
+                    ds = new SqlHelper().ExecuteDataSet(pageSql);
+                }
+                else if (!doPaging)
                 {
                     ds = new SqlHelper().ExecuteDataSet(sqlIn.sqlDirect);
                 }
@@ -2747,8 +2761,272 @@ namespace VIS.Helpers
 
             retVal.Tables = outO;
             retVal.LookupDirect = lookupDirect;
+            if (ds != null && ds.Tables.Count > 0)
+                retVal.SharedAccess = GetPageSharedAccess(ctx, AD_Table_ID, sqlIn.tableName, outO.Count > 0 ? outO[0] : null);
             return retVal;
         }
+
+        /// <summary>
+        /// Toolbar markers (attachment, chat, own lock, own subscription, document, export mark, shared, assignment)
+        /// for the given records: one indexed query per feature the window uses, limited to these records. Replaces
+        /// the whole-table lists that GridTab.LoadData sent with the window and the client re-loaded per table.
+        /// </summary>
+        /// <param name="vo">window definition (feature flags)</param>
+        /// <param name="recordIDs">records of the page, or the current record</param>
+        public RecordMarkers GetRecordMarkers(Ctx ctx, GridWindowVO vo, int AD_Table_ID, ICollection<int> recordIDs)
+        {
+            var markers = new RecordMarkers();
+            if (vo == null || AD_Table_ID <= 0 || recordIDs == null || recordIDs.Count == 0)
+                return markers;
+
+            int AD_User_ID = ctx.GetAD_User_ID();
+            string t = AD_Table_ID.ToString();
+            // record IDs are integers; queried in chunks below Oracle's IN list limit
+            List<string> inLists = new List<string>();
+            List<int> ids = recordIDs.Where(id => id > 0).Distinct().ToList();
+            for (int i = 0; i < ids.Count; i += MAX_SHARED_ACCESS_PAGE)
+                inLists.Add(string.Join(",", ids.Skip(i).Take(MAX_SHARED_ACCESS_PAGE)));
+            if (inLists.Count == 0)
+                return markers;
+
+            if (vo.IsAttachment)
+                markers.Attachments = ReadMarkers(inLists, in_ => "SELECT DISTINCT att.AD_Attachment_ID, att.Record_ID FROM AD_Attachment att"
+                    + " INNER JOIN AD_AttachmentLine al ON (al.AD_Attachment_ID=att.AD_Attachment_ID)"
+                    + " WHERE att.AD_Table_ID=" + t + " AND att.Record_ID IN (" + in_ + ")");
+            if (vo.IsChat)
+                markers.Chats = ReadMarkers(inLists, in_ => "SELECT CM_Chat_ID, Record_ID FROM CM_Chat WHERE AD_Table_ID=" + t
+                    + " AND Record_ID IN (" + in_ + ")");
+            if (vo.IsSubscribedRecord)
+                markers.Subscribe = ReadMarkers(inLists, in_ => "SELECT CM_Subscribe_ID, Record_ID FROM CM_Subscribe WHERE AD_User_ID=" + AD_User_ID
+                    + " AND AD_Table_ID=" + t + " AND Record_ID IN (" + in_ + ")");
+            if (vo.IsViewDocument)
+                markers.Documents = ReadMarkers(inLists, in_ => "SELECT wdl.VADMS_WindowDocLink_ID, wdl.Record_ID FROM VADMS_WindowDocLink wdl"
+                    + " JOIN VADMS_Document doc ON (wdl.VADMS_Document_ID=doc.VADMS_Document_ID)"
+                    + " WHERE doc.VADMS_DocStatus!='DD' AND wdl.AD_Table_ID=" + t + " AND wdl.Record_ID IN (" + in_ + ")");
+            if (vo.IsMarkToExport)
+                markers.Marking = ReadMarkers(inLists, in_ => "SELECT AD_ExportData_ID, Record_ID FROM AD_ExportData WHERE AD_Table_ID=" + t
+                    + " AND Record_ID IN (" + in_ + ")");
+            if (MRole.GetDefault(ctx).IsShowSharedRecords())
+                markers.Shared = ReadMarkers(inLists, in_ => "SELECT 0, Record_ID FROM AD_ShareRecordOrg WHERE IsActive='Y' AND AD_Table_ID=" + t
+                    + " AND Record_ID IN (" + in_ + ")");
+            if (vo.IsPrivateRecordLock)
+            {
+                List<RecordMarker> locks = ReadMarkers(inLists, in_ => "SELECT 0, Record_ID FROM AD_Private_Access WHERE AD_User_ID=" + AD_User_ID
+                    + " AND AD_Table_ID=" + t + " AND IsActive='Y' AND Record_ID IN (" + in_ + ")");
+                markers.Locks = locks == null ? null : locks.Select(m => m.ID).ToList();
+            }
+            if (vo.IsAssignRecord)
+            {
+                markers.Assigned = new List<AssignedRecordMarker>();
+                foreach (string in_ in inLists)
+                {
+                    DataSet ds = DB.ExecuteDataset("SELECT VIS_AssignedRecordToUser_ID, Record_ID, AD_User_ID, CreatedBy FROM VIS_AssignedRecordToUser"
+                        + " WHERE AD_Table_ID=" + t + " AND UPPER(Status) !='DNE' AND AD_Client_ID=" + ctx.GetAD_Client_ID()
+                        + " AND Record_ID IN (" + in_ + ")");
+                    if (ds == null || ds.Tables.Count == 0)
+                    {
+                        markers.Assigned = null;    // not readable: the client keeps asking instead of showing nothing
+                        break;
+                    }
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                        markers.Assigned.Add(new AssignedRecordMarker
+                        {
+                            value = Util.GetValueOfInt(dr[0]), ID = Util.GetValueOfInt(dr[1]),
+                            userId = Util.GetValueOfInt(dr[2]), createdBy = Util.GetValueOfInt(dr[3])
+                        });
+                }
+            }
+            return markers;
+        }
+
+        /// <summary>
+        /// The user's saved searches and default searches for every tab of the window, read once when the window opens
+        /// (two queries for the whole window). The browser used to read them per tab: twice with blocking calls
+        /// (VIS_107 in GridTab.prepareQuery, VIS_117 in APanel.setDefaultSearch) and once more in the background
+        /// (VIS_116, identical to VIS_117). Same filters and columns as those queries; null when a query fails, then
+        /// the browser falls back to them.
+        /// </summary>
+        /// <returns>AD_Tab_ID -> { queries = rows as VIS_117, defaults = rows as VIS_107 }; cell names in lower case</returns>
+        public Dictionary<string, object> GetTabUserQueries(Ctx ctx, GridWindowVO vo)
+        {
+            if (vo == null || vo.GetTabs() == null || vo.GetTabs().Count == 0)
+                return null;
+            var tabTable = new Dictionary<int, int>();
+            foreach (GridTabVO tab in vo.GetTabs())
+                tabTable[tab.AD_Tab_ID] = tab.AD_Table_ID;
+            string tabIds = string.Join(",", tabTable.Keys);
+            string tableIds = string.Join(",", tabTable.Values.Distinct());
+            int AD_User_ID = ctx.GetAD_User_ID();
+            int AD_Client_ID = ctx.GetAD_Client_ID();
+
+            // saved searches with the user's default for the tab (VIS_116 / VIS_117 for all tabs at once)
+            DataSet saved = DB.ExecuteDataset("SELECT uq.Name, uq.Code, uq.AD_UserQuery_ID, uq.AD_User_ID, uq.AD_Tab_ID, uq.AD_Table_ID,"
+                + " d.AD_DefaultUserQuery_ID FROM AD_UserQuery uq"
+                + " LEFT JOIN AD_DefaultUserQuery d ON (d.AD_UserQuery_ID=uq.AD_UserQuery_ID AND d.AD_Tab_ID=uq.AD_Tab_ID AND d.AD_User_ID=" + AD_User_ID + ")"
+                + " WHERE uq.AD_Client_ID=" + AD_Client_ID + " AND uq.IsActive='Y' AND uq.AD_Tab_ID IN (" + tabIds + ")"
+                + " ORDER BY UPPER(uq.Name), uq.AD_UserQuery_ID");
+            // the user's default searches matched by tab or table (VIS_107)
+            DataSet defaults = DB.ExecuteDataset("SELECT uq.Code, d.AD_User_ID, d.AD_Tab_ID, uq.AD_Tab_ID AS UQ_Tab_ID, uq.AD_Table_ID AS UQ_Table_ID"
+                + " FROM AD_UserQuery uq JOIN AD_DefaultUserQuery d ON (uq.AD_UserQuery_ID=d.AD_UserQuery_ID)"
+                + " WHERE uq.IsActive='Y' AND d.AD_User_ID=" + AD_User_ID + " AND uq.AD_Client_ID=" + AD_Client_ID
+                + " AND (uq.AD_Tab_ID IN (" + tabIds + ") OR uq.AD_Table_ID IN (" + tableIds + "))");
+            if (saved == null || saved.Tables.Count == 0 || defaults == null || defaults.Tables.Count == 0)
+                return null;
+
+            var result = new Dictionary<string, object>();
+            foreach (var tab in tabTable)
+            {
+                var queries = new List<Dictionary<string, object>>();
+                var seen = new HashSet<int>();
+                foreach (DataRow dr in saved.Tables[0].Rows)
+                {
+                    int uqID = Util.GetValueOfInt(dr["AD_UserQuery_ID"]);
+                    if (Util.GetValueOfInt(dr["AD_Tab_ID"]) != tab.Key || Util.GetValueOfInt(dr["AD_Table_ID"]) != tab.Value
+                        || !seen.Add(uqID))
+                        continue;
+                    string name = Util.GetValueOfString(dr["Name"]);
+                    queries.Add(new Dictionary<string, object>
+                    {
+                        { "name", name.Length > 25 ? name.Substring(0, 25) + "..." : name },
+                        { "title", name },
+                        { "code", Util.GetValueOfString(dr["Code"]) },
+                        { "ad_userquery_id", uqID },
+                        { "ad_user_id", Util.GetValueOfInt(dr["AD_User_ID"]) },
+                        { "ad_tab_id", tab.Key },
+                        { "ad_defaultuserquery_id", dr["AD_DefaultUserQuery_ID"] == DBNull.Value ? (object)null : Util.GetValueOfInt(dr["AD_DefaultUserQuery_ID"]) }
+                    });
+                }
+                var tabDefaults = new List<Dictionary<string, object>>();
+                foreach (DataRow dr in defaults.Tables[0].Rows)
+                {
+                    if (Util.GetValueOfInt(dr["UQ_Tab_ID"]) != tab.Key && Util.GetValueOfInt(dr["UQ_Table_ID"]) != tab.Value)
+                        continue;
+                    tabDefaults.Add(new Dictionary<string, object>
+                    {
+                        { "code", Util.GetValueOfString(dr["Code"]) },
+                        { "ad_user_id", Util.GetValueOfInt(dr["AD_User_ID"]) },
+                        { "ad_tab_id", Util.GetValueOfInt(dr["AD_Tab_ID"]) }
+                    });
+                }
+                result[tab.Key.ToString()] = new { queries = queries, defaults = tabDefaults };
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Runs a "feature ID, Record_ID" query per IN list; null when it fails (e.g. a module table is missing)
+        /// </summary>
+        private List<RecordMarker> ReadMarkers(List<string> inLists, Func<string, string> sql)
+        {
+            var list = new List<RecordMarker>();
+            foreach (string in_ in inLists)
+            {
+                DataSet ds = DB.ExecuteDataset(sql(in_));
+                if (ds == null || ds.Tables.Count == 0)
+                    return null;
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                    list.Add(new RecordMarker { value = Util.GetValueOfInt(dr[0]), ID = Util.GetValueOfInt(dr[1]) });
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Display-text query for exactly the records of a page: the lookup subqueries (directSelect) over
+        /// "FROM table WHERE key IN (page ids)". The rows already passed the filter and access rules in the main query.
+        /// Null when it cannot be used (no select part, no single key column in the page, empty or very large page):
+        /// then the original query runs.
+        /// </summary>
+        private static string PageDisplaySql(string directSelect, string tableName, DataSet page)
+        {
+            if (string.IsNullOrEmpty(directSelect) || string.IsNullOrEmpty(tableName) || page == null || page.Tables.Count == 0)
+                return null;
+            DataTable dt = page.Tables[0];
+            string keyColumn = tableName + "_ID";
+            if (!dt.Columns.Contains(keyColumn) || dt.Rows.Count == 0 || dt.Rows.Count > MAX_SHARED_ACCESS_PAGE)
+                return null;
+            var ids = new HashSet<int>();
+            foreach (DataRow row in dt.Rows)
+            {
+                if (row[keyColumn] != DBNull.Value)
+                    ids.Add(Util.GetValueOfInt(row[keyColumn]));   // 0 is a valid key for some tables
+            }
+            if (ids.Count == 0)
+                return null;
+            return directSelect + " FROM " + tableName + " WHERE " + tableName + "." + keyColumn + " IN (" + string.Join(",", ids) + ")";
+        }
+
+        /// <summary>
+        /// Record IDs (key column TableName_ID) of the first table of a page result
+        /// </summary>
+        private static List<int> PageRecordIDs(WindowRecordOut page, string tableName)
+        {
+            var ids = new List<int>();
+            if (page == null || page.Tables == null || page.Tables.Count == 0 || string.IsNullOrEmpty(tableName))
+                return ids;
+            string keyColumn = (tableName + "_ID").ToLower();
+            foreach (JRow row in page.Tables[0].rows)
+            {
+                object id;
+                if (row.cells.TryGetValue(keyColumn, out id))
+                    ids.Add(Util.GetValueOfInt(id));
+            }
+            return ids;
+        }
+
+        /** Larger pages (unpaged loads) keep the per-record call; also Oracle's IN list limit */
+        private const int MAX_SHARED_ACCESS_PAGE = 1000;
+
+        /// <summary>
+        /// Shared-record access for all records of a page in one query, so the client does not have to call
+        /// RecordShared/GetSharedRecordAccess (synchronously) on every row move. Same rule and value format as that
+        /// call: the login org's share row decides; records without one are "false_N".
+        /// </summary>
+        /// <returns>Record_ID -> "IsReadOnly_AD_ShareRecordOrg_ID" for every record on the page, or null</returns>
+        private Dictionary<int, string> GetPageSharedAccess(Ctx ctx, int AD_Table_ID, string tableName, JTable page)
+        {
+            if (page == null || AD_Table_ID <= 0 || string.IsNullOrEmpty(tableName) || page.rows.Count == 0
+                || page.rows.Count > MAX_SHARED_ACCESS_PAGE)
+                return null;
+
+            string keyColumn = (tableName + "_ID").ToLower();
+            var result = new Dictionary<int, string>();
+            foreach (JRow row in page.rows)
+            {
+                object id;
+                if (!row.cells.TryGetValue(keyColumn, out id))
+                    return null;    // no single key column: the client asks per record
+                int recordID = Util.GetValueOfInt(id);
+                if (recordID > 0)
+                    result[recordID] = "false_N";
+            }
+            if (result.Count == 0)
+                return null;
+
+            try
+            {
+                // record IDs are integers read from the page
+                string sql = "SELECT Record_ID, IsReadOnly, AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE IsActive='Y'"
+                    + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_OrgShared_ID=" + ctx.GetAD_Org_ID()
+                    + " AND Record_ID IN (" + string.Join(",", result.Keys) + ")";
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds == null || ds.Tables.Count == 0)
+                    return null;
+                var seen = new HashSet<int>();
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    int recordID = Util.GetValueOfInt(dr["Record_ID"]);
+                    if (seen.Add(recordID))     // first row per record, like GetSharedRecordAccess
+                        result[recordID] = (Util.GetValueOfString(dr["IsReadOnly"]) == "Y").ToString() + "_" + Util.GetValueOfString(dr["AD_ShareRecordOrg_ID"]);
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                log.Log(Level.WARNING, "Shared access for page", e);
+                return null;
+            }
+        }
+
         /// <summary>
         /// Set Tree Record sql in if query is for on demnad tree records
         /// </summary>
@@ -2900,7 +3178,8 @@ namespace VIS.Helpers
 
 
             MSession session = MSession.Get(ctx, true);
-            session.QueryLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
+            // written in the background: the fetch does not wait for the audit insert
+            VAdvantage.Common.AuditLogQueue.QueryLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
                 sqlCount, rowCount);
 
 
@@ -3114,7 +3393,7 @@ namespace VIS.Helpers
         public int GetRecordCountForTreeNode(string whereClause, Ctx ctx, int AD_Table_ID, int treeID, int treeNodeID, int windowNo, bool ShowSummaryNodes)
         {
             MSession session = MSession.Get(ctx, true);
-            session.QueryLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
+            VAdvantage.Common.AuditLogQueue.QueryLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), AD_Table_ID,
                 "", 0);
 
             MTree tree = new MTree(ctx, treeID, null);
@@ -3803,7 +4082,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add(ImageUrlColumn(TableName, imgColList[j].ColumnName));
                 }
             }
 
@@ -3836,8 +4115,20 @@ namespace VIS.Helpers
             return data;
         }
 
+        /// <summary>
+        /// Select column with the URL of an image field. The query string is the image's last change
+        /// (AD_Image.Updated): browsers refetch a changed image, and the SQL text stays the same on every fetch
+        /// (it used to embed DateTime.Now.Ticks, a new statement and hard parse each time).
+        /// </summary>
+        private static string ImageUrlColumn(string tableName, string columnName)
+        {
+            return "(SELECT ImageURL||'?'||TO_CHAR(img.Updated,'YYYYMMDDHH24MISS') from AD_Image img where img.AD_Image_ID=CAST("
+                + tableName + "." + columnName + " AS INTEGER)) as imgUrlColumn" + columnName;
+        }
+
+        /// <param name="knownCount">row count the client already has for this exact query (page move); &gt; 0 skips the COUNT query, -1 counts</param>
         public object GetWindowRecords(Ctx ctxp, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
-       int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)
+       int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging, int knownCount = -1)
         {
             WindowRecordOut resultData = new WindowRecordOut();
 
@@ -3894,7 +4185,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add(ImageUrlColumn(TableName, imgColList[j].ColumnName));
                 }
             }
 
@@ -3912,7 +4203,13 @@ namespace VIS.Helpers
             SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO,MRole.SQL_ORGRO);
 
             int rCount = 0;
-            if (sqlIn.tree_id > 0)
+            if (DoPaging && knownCount > 0)
+            {
+                // page move on an unchanged query: the client sends the count it already has, so the filter,
+                // access checks and COUNT(*) do not run again for every page (refresh and new queries still count)
+                rCount = knownCount;
+            }
+            else if (sqlIn.tree_id > 0)
             {
                 using (var w = new WindowHelper())
                 {
@@ -4087,9 +4384,14 @@ namespace VIS.Helpers
                 {
                     using (var w = new WindowHelper())
                     {
-                        resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields);
+                        resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields,
+                            selectDirect != null ? selectDirect.ToString() : null);
                     }
                 }
+
+                // toolbar markers (attachment, chat, lock, ...) of this page's records, instead of whole-table lists
+                if (resultData != null)
+                    resultData.Markers = GetRecordMarkers(ctxp, vo, AD_Table_ID, PageRecordIDs(resultData, gt.TableName));
             }
             resultData.RecordCount = rCount;
 

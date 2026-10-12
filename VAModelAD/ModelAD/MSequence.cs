@@ -130,12 +130,12 @@ namespace VAdvantage.Model
                 return -1;
         }
 
-        private static readonly object _idlock = new object();
-
         //[MethodImpl(MethodImplOptions.Synchronized)]
         public static int GetNextIDOracle(int AD_Client_ID, String TableName, Trx trxName, int IncrementNo)
         {
-            lock (_idlock)
+            // one lock per table (was one lock for all tables, so every insert in the application queued here);
+            // the same table is still serialized here and, across application servers, by the row lock (FOR UPDATE)
+            lock (GetLock("ID:" + (TableName ?? "").ToUpperInvariant()))
             {
 
                 if (TableName == null || TableName.Length == 0)
@@ -159,11 +159,13 @@ namespace VAdvantage.Model
                     + "WHERE Upper(Name)=Upper('" + TableName + "')"
                     + " AND IsActive='Y' AND IsTableID='Y' AND IsAutoSequence='Y' ";
 
-                //Comment an UPDATE FOR TEST//
-                Trx trx = Trx.Get("ConnSH" + DateTime.Now.Ticks + (new Random(4)).ToString());
-
                 for (int i = 0; i < 3; i++)
                 {
+                    // new transaction and statement per attempt: the finally below closes the transaction, and the
+                    // values are filled into a copy of the template, so a retry really runs again with fresh values
+                    Trx trx = Trx.Get("ConnSH" + Guid.NewGuid().ToString("N"));
+                    string updateValues = updateSQL;
+                    retValue = -1;
                     try
                     {
                         DataSet ds = new DataSet();
@@ -188,9 +190,9 @@ namespace VAdvantage.Model
                                 retValue = int.Parse(ds.Tables[0].Rows[0]["CurrentNext"].ToString());
                                 ds.Tables[0].Rows[0]["CurrentNext"] = (retValue + incrementNo).ToString();
                             }
-                            updateSQL = updateSQL.Replace("@CurrentNext@", ds.Tables[0].Rows[0]["CurrentNext"].ToString()).Replace("@CurrentNextSys@", ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
+                            updateValues = updateSQL.Replace("@CurrentNext@", ds.Tables[0].Rows[0]["CurrentNext"].ToString()).Replace("@CurrentNextSys@", ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
 
-                            if (DataBase.DB.ExecuteQuery(updateSQL, null, trx) < 0)
+                            if (DataBase.DB.ExecuteQuery(updateValues, null, trx) < 0)
                             // if (trx.ExecuteNonQuery(updateSQL, null, trx) < 0)
                             // if (trx.ExeNonQuery(updateSQL) < 0)
                             {
@@ -213,6 +215,7 @@ namespace VAdvantage.Model
                         {
                             trx.Rollback();
                         }
+                        retValue = -1;  // the ID read in this attempt was not committed: never hand it out
                         s_log.Severe(e.ToString());
                     }
                     finally
@@ -762,6 +765,15 @@ namespace VAdvantage.Model
                     selectSQL = selectSQL.Replace("@param1", "'" + calendarYearMonth + "'").Replace("@param2", docOrg_ID.ToString());
                     rs = trx.ExecuteDataSet(selectSQL, null);
 
+                    // First document of this year/org: FOR UPDATE locked nothing, so two documents could both create the
+                    // number row and get the start number. Lock the sequence itself and look again; the second one waits
+                    // here and then finds the row the first one created.
+                    if (rs == null || rs.Tables.Count == 0 || rs.Tables[0].Rows.Count == 0)
+                    {
+                        trx.ExecuteDataSet("SELECT AD_Sequence_ID FROM AD_Sequence WHERE AD_Sequence_ID = " + AD_Sequence_ID + " FOR UPDATE", null);
+                        rs = trx.ExecuteDataSet(selectSQL, null);
+                    }
+
                     // Check organization level document sequence settings and if exist then override general settings.
                     if (rs != null && rs.Tables[0].Rows.Count > 0)
                     {
@@ -834,12 +846,26 @@ namespace VAdvantage.Model
                     {	// create sequence (CurrentNo = StartNo + IncrementNo) for this year/org and return first number (=StartNo)
                         next = startNo;
 
-                        X_AD_Sequence_No seqno = new X_AD_Sequence_No(po.GetCtx(), 0, trxName);
+                        // created in the sequence transaction (was the document's), so with a separate transaction the
+                        // row is committed - and the sequence lock released - before the next document asks
+                        X_AD_Sequence_No seqno = new X_AD_Sequence_No(po.GetCtx(), 0, trx);
                         seqno.SetAD_Sequence_ID(AD_Sequence_ID);
                         seqno.SetAD_Org_ID(docOrg_ID);
                         seqno.SetCalendarYear(calendarYearMonth);
                         seqno.SetCurrentNext(startNo + incrementNo);
-                        seqno.Save();
+                        if (!seqno.Save())
+                        {
+                            s_log.Severe("Sequence number row not created - " + seq + " " + calendarYearMonth + " Org=" + docOrg_ID);
+                            next = -2;     // no number rather than a duplicate one
+                        }
+
+                        if (isUseSeparateTrx || trxName == null || !trxName.UseSameTrxForDocNo)
+                        {
+                            if (next == -2)
+                                trx.Rollback();
+                            else
+                                trx.Commit();
+                        }
                     }
                     else	// standard
                     {

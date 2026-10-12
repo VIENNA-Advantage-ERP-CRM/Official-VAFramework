@@ -258,7 +258,7 @@
             });
 
             $windowpage.on('click', function () {
-                self.showLandingPage(false);
+                self.showLandingPage(false, null, true);   // window icon: keep the loaded records
             });
 
         };
@@ -1012,8 +1012,10 @@
          * Handle Landing page hide/show and manage event
          * @param {any} show
          * @param {any} actionParams
+         * @param {any} keepRecords true from the Window icon: show the records already loaded (the first tab is
+         *        fetched when the window opens) instead of fetching them again; widgets still refresh them
          */
-        this.showLandingPage = function (show, actionParams) {
+        this.showLandingPage = function (show, actionParams, keepRecords) {
             if (show) {
                 this.cmd_ignore();
                 this.landingPage.getRoot().show();
@@ -1033,7 +1035,8 @@
                     if (!this.isFromSearch) {
                         this.isFromSearch = false;
                     }
-                    this.cmd_find('');
+                    if (!keepRecords)
+                        this.cmd_find('');
                 }
                 //this.setTabNavigation();
                 this.refresh();
@@ -1282,7 +1285,10 @@
             param[6] = new VIS.DB.SqlParam("@AD_Table_ID", self.curTab.getAD_Table_ID());
 
             var $selfpanel = this;
-            executeDataSet(sqlUserSearch, param, function (data) {
+            // first display per tab: the saved searches that came with the window (no request); later
+            // refreshes (after saving, deleting or changing the default) ask the server and update that copy
+            var tabQueries = VIS.AEnv.getTabUserQueries(self.curWindowNo, self.curTab.getAD_Tab_ID());
+            var fillList = function (data) {
                 var userQueries = [];
 
                 if (data && data.tables[0].rows && data.tables[0].rows.length > 0) {
@@ -1333,7 +1339,21 @@
                     $txtSearch.autocomplete("search", "");
                     $txtSearch.trigger("focus");
                 }
-            })
+            };
+            if (tabQueries && !tabQueries.listShown) {
+                tabQueries.listShown = true;
+                fillList(VIS.AEnv.userQueryDataSet(tabQueries.queries));
+            }
+            else {
+                executeDataSet(sqlUserSearch, param, function (data) {
+                    if (tabQueries && data && data.tables[0].rows) {
+                        tabQueries.queries = [];
+                        for (var r = 0; r < data.tables[0].rows.length; r++)
+                            tabQueries.queries.push(data.tables[0].rows[r].cells);
+                    }
+                    fillList(data);
+                });
+            }
         };
 
         this.findRecords = function (query) {
@@ -4127,7 +4147,10 @@
             param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
         }
 
-        var data = executeDataSet(sqlUserSearch, param);
+        // the tab's saved searches came with the window (same rows as VIS_117); a specific query (VIS_159) and
+        // windows opened without them still ask the server
+        var tabQueries = AD_UserQuery_ID > 0 ? null : VIS.AEnv.getTabUserQueries(this.curWindowNo, this.curTab.getAD_Tab_ID());
+        var data = tabQueries ? VIS.AEnv.userQueryDataSet(tabQueries.queries) : executeDataSet(sqlUserSearch, param);
 
         if (data && data.tables[0].rows && data.tables[0].rows.length > 0) {
             $selfpanel.curTab.hasSavedAdvancedSearch = true;
@@ -4607,7 +4630,9 @@
 
         if (!e.getIsInserting()) {
             //var trxInfo = VIS.GridTab.prototype.getTrxInfo(this.curTab.getTableName(), VIS.context, this.curTab.getWindowNo(), this.curTab.getTabNo());
-            this.setStatusInfo(e.getRecord_ID());
+            // an unsaved field edit does not change the saved totals the footer reads (a request per keystroke-change)
+            if (!(e.getChangedColumn() >= 0 && e.getIsChanged()))
+                this.setStatusInfo(e.getRecord_ID());
 
             //if (trxInfo != null)
             //    this.statusBar.setInfo(trxInfo);
@@ -4620,12 +4645,22 @@
             VIS.context.setContext(this.curWindowNo, "tb_Index", this.curTabIndex);
             this.curWinTab.evaluate(null);
             if (e.getChangedColumn() < 0 || !e.getIsInserting()) {
-                this.curWinTab.notifyDataChanged(e);
+                // composite view: the child grid is re-queried here, so only when the parent record changed or
+                // after save/refresh/undo (col < 0, nothing pending) - not on every edit of an existing record
+                var depKey = this.curTab.getAD_Tab_ID() + "_" + this.curTab.getRecord_ID();
+                if (depKey !== this._depKey || (e.getChangedColumn() < 0 && !e.getIsChanged())) {
+                    this._depKey = depKey;
+                    this.curWinTab.notifyDataChanged(e);
+                }
             }
         }
 
         if (this.curTab.getParentTab() && this.aSharedRecord) {
-            this.curTab.loadShared();
+            // A row move or a field edit does not change what is shared (the page's markers come with the page);
+            // reload (a blocking request) only after save, delete, refresh and the like.
+            var rowMoveOrEdit = e.getAD_Message() == "NavigateOrUpdate" || (e.getChangedColumn() >= 0 && e.getIsChanged());
+            if (!rowMoveOrEdit)
+                this.curTab.loadShared();
             this.aSharedRecord.setPressed(this.curTab.hasShared());
         }
 
@@ -5886,8 +5921,9 @@
             return;
         }
 
-        //assigned Records
-        var assignedRecords = this.curTab.assignedRecords;
+        //assigned Records (of the loaded page; the check makes sure the list is there)
+        this.curTab.hasAssignedRecord();
+        var assignedRecords = this.curTab.assignedRecords || [];
         for (var i = 0; i < gridSelectedRows.length; i++) {
 
             recID = gridSelectedRows[i][(this.curGC.gTab.getTableName() + '_id').toLower()];
@@ -5951,6 +5987,10 @@
         }
         this.vTabbedPane.dispose();
         this.vTabbedPane = null;
+        if (this.landingPage) {
+            this.landingPage.dispose();
+            this.landingPage = null;
+        }
         if (this.gridWindow) {
             this.gridWindow.dispose();
             this.gridWindow = null;

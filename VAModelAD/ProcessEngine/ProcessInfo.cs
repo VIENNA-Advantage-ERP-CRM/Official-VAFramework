@@ -554,6 +554,23 @@ namespace VAdvantage.ProcessEngine
             return recIDs;
         }
 
+        /** Report made by a workflow report node of this run (methods, not a property: never serialized) */
+        private VAdvantage.Print.IReportEngine _workflowReport = null;
+
+        /// <summary>
+        /// Report produced by a report node of the workflow started for this run; ProcessCtl reads it after the
+        /// workflow. Kept on the run's own ProcessInfo so concurrent workflows never see each other's reports.
+        /// </summary>
+        public VAdvantage.Print.IReportEngine GetWorkflowReport()
+        {
+            return _workflowReport;
+        }
+
+        public void SetWorkflowReport(VAdvantage.Print.IReportEngine report)
+        {
+            _workflowReport = report;
+        }
+
         /// <summary>
         /// get record id
         /// </summary>

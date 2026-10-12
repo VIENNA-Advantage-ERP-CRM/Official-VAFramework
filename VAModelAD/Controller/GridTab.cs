@@ -234,7 +234,9 @@ namespace VAdvantage.Model
             _gridTable.SetReadOnly(_vo.IsReadOnly || _vo.IsView);
             _gridTable.SetDeleteable(_vo.IsDeleteable);
             IniTab();
-            LoadData(_vo.GetCtx().GetAD_User_ID());
+            // LoadData read attachments, chats, locks, ... of the WHOLE table on every window open. The toolbar markers
+            // now come with each page of records (WindowHelper.GetRecordMarkers), so it is no longer called here.
+            //LoadData(_vo.GetCtx().GetAD_User_ID());
             InitIsAllowLetter();
 
         }
