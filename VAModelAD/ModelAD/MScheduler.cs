@@ -604,6 +604,12 @@ namespace VAdvantage.Model
                 //    re = null;
                 //}
             }
+            else if (m_process.GetIsCrystalReport() == "O")
+            {
+                // Onfinity Analytics (module VA149): PDF exported through the Analytics API (service account);
+                // null when StartReport fails, pi summary carries the reason (reported below)
+                re = VAdvanatge.Report.ReportEngine.GetReportEngine(p_ctx, pi, trx, "VA149Svc", "VA149Svc.Classes.AnalyticsReportEngine");
+            }
             else
             {
                 re = ReportEngine_N.Get(GetCtx(), pi);
@@ -614,7 +620,8 @@ namespace VAdvantage.Model
             if (re == null)
             {
                 string msg = "Cannot create Report AD_Process_ID=" + m_process.GetAD_Process_ID()
-                    + " - " + m_process.GetName();
+                    + " - " + m_process.GetName()
+                    + (pi.IsError() && !string.IsNullOrEmpty(pi.GetSummary()) ? " - " + pi.GetSummary() : "");
                 NotifySupervisor(false, msg, null);
                 return msg;
             }

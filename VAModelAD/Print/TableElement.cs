@@ -825,14 +825,10 @@ namespace VAdvantage.Print
                     else if (printItems[index] is Boolean)
                     {
                         int penX = curX + (int)((netWidth - LayoutEngine.IMAGE_SIZE.width) / 2);	//	center
-                        if (((Boolean)printItems[index]))
-                        {
-                            g2D.DrawImage(LayoutEngine.IMAGE_TRUE, penX, (int)penY);
-                        }
-                        else
-                        {
-                            g2D.DrawImage(LayoutEngine.IMAGE_FALSE, penX, (int)penY);
-                        }
+                        // shared GDI+ image: reports render in parallel, an image may only be drawn by one thread at a time
+                        System.Drawing.Image check = ((Boolean)printItems[index]) ? LayoutEngine.IMAGE_TRUE : LayoutEngine.IMAGE_FALSE;
+                        lock (check)
+                            g2D.DrawImage(check, penX, (int)penY);
                         penY += LayoutEngine.IMAGE_SIZE.height;
                     }
                     else

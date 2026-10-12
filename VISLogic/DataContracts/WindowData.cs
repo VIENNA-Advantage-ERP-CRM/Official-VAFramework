@@ -142,7 +142,53 @@ namespace VIS.DataContracts
         public Dictionary<string, Dictionary<object, string>> LookupDirect  { get;set; }
         public CardViewData CardViewTpl { get; set; }
 
+        /// <summary>
+        /// Shared-record access of every record on this page (Record_ID -> "IsReadOnly_AD_ShareRecordOrg_ID", as
+        /// RecordShared/GetSharedRecordAccess returns it); null when not computed, then the client asks per record
+        /// </summary>
+        public Dictionary<int, string> SharedAccess { get; set; }
+
+        /// <summary>
+        /// Toolbar markers (attachment, chat, lock, ...) of the records on this page; null when not computed
+        /// </summary>
+        public RecordMarkers Markers { get; set; }
+
         public int RecordCount = 0;
+    }
+
+    /// <summary>
+    /// Per-record markers for the window toolbar, for a set of records (a page). Same list shapes the client used to
+    /// load for the whole table: { ID = Record_ID, value = the feature's own ID }. A feature the window does not use
+    /// is null.
+    /// </summary>
+    public class RecordMarkers
+    {
+        public List<RecordMarker> Attachments { get; set; }
+        public List<RecordMarker> Chats { get; set; }
+        /** Records the current user has privately locked */
+        public List<int> Locks { get; set; }
+        /** Subscriptions of the current user */
+        public List<RecordMarker> Subscribe { get; set; }
+        public List<RecordMarker> Documents { get; set; }
+        /** Marked for export */
+        public List<RecordMarker> Marking { get; set; }
+        /** Records shared with any organization (value unused) */
+        public List<RecordMarker> Shared { get; set; }
+        public List<AssignedRecordMarker> Assigned { get; set; }
+    }
+
+    public class RecordMarker
+    {
+        public int ID;
+        public int value;
+    }
+
+    public class AssignedRecordMarker
+    {
+        public int ID;
+        public int value;
+        public int userId;
+        public int createdBy;
     }
 
     public class RecordInfoIn

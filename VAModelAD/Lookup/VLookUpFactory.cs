@@ -31,10 +31,30 @@ namespace VAdvantage.Classes
     /// </summary>
     public class VLookUpFactory
     {
-        /*Table IsTranslated Cache */
-        // private static CCache<string, bool> _sIsTranslated = new CCache<string, bool>("AD_Table_isTranslated", 10);
-        /** Table Reference Cache				*/
-        // private static CCache<string, VLookUpInfo> _sCacheRefTable = new CCache<string, VLookUpInfo>("AD_Ref_Table", 30, 60);	//	1h
+        // Dictionary caches. Only context-free dictionary data is cached: the lookup SQL itself depends on the window
+        // context (@Column@ in reference WHERE clauses), so it is still built per call. Names start with the source
+        // table so saving that table resets them (CacheMgt prefix match); entries also expire after an hour.
+        /** Table has translated identifier columns, by table name */
+        private static CCache<string, bool> _sIsTranslated = new CCache<string, bool>("AD_Column_IsTranslated", 30, 60);
+        /** AD_Ref_Table row (raw values) by AD_Reference_Value_ID */
+        private static CCache<int, RefTableRow> _sRefTable = new CCache<int, RefTableRow>("AD_Ref_Table", 30, 60);
+        /** Identifier display column SQL by language|table name; callers always get their own StringBuilder */
+        private static CCache<string, DisplayColumnSql> _sDisplayColumn = new CCache<string, DisplayColumnSql>("AD_Column_LookupDisplay", 50, 60);
+
+        /** AD_Ref_Table row as read from the dictionary (before context parsing) */
+        private sealed class RefTableRow
+        {
+            public string TableName, KeyColumn, DisplayColumn, WhereClause, OrderByClause;
+            public bool IsValueDisplayed, IsTranslated, IsDisplayIdentifiers;
+            public int ZoomWindow, ZoomWindowPO;
+        }
+
+        /** Built display column SQL of a table's identifiers */
+        private sealed class DisplayColumnSql
+        {
+            public string Sql;
+            public bool HasImage;
+        }
         /**	Logging								*/
         private static VLogger s_log = VLogger.GetVLogger(typeof(VLookUpInfo).FullName);
 
@@ -663,10 +683,8 @@ namespace VAdvantage.Classes
         {
             bool isTranslated = false;
 
-            //if (_sIsTranslated.ContainsKey(tableName))
-            //{
-            //    return _sIsTranslated[tableName];
-            //}
+            if (_sIsTranslated.TryGetValue(tableName, out isTranslated))
+                return isTranslated;
 
             string sql1 = "SELECT count(*) "
                 + "FROM AD_Table t"
@@ -683,15 +701,12 @@ namespace VAdvantage.Classes
                 int count = Utility.Util.GetValueOfInt(DataBase.DB.ExecuteScalar(sql1, param, null));
                 isTranslated = !(count == 0);
                 param = null;
+                _sIsTranslated[tableName] = isTranslated;   // only a successful read is cached
             }
             catch (System.Data.Common.DbException e)
             {
                 s_log.Log(Level.SEVERE, sql1, e);
             }
-            //if (!_sCacheRefTable.ContainsKey(tableName))
-            //{
-            //    _sIsTranslated.Add(tableName, isTranslated);
-            //}
             return isTranslated;
         }
 
@@ -859,6 +874,24 @@ namespace VAdvantage.Classes
         /// <param name="language">language object </param>
         /// <returns></returns>
         public static StringBuilder GetLookup_DisplayColumn(Language language, string tableName,out bool hasImagIdentifier)
+        {
+            string key = (language != null ? language.GetAD_Language() : "") + "|" + tableName;
+            DisplayColumnSql cached;
+            if (_sDisplayColumn.TryGetValue(key, out cached) && cached != null)
+            {
+                hasImagIdentifier = cached.HasImage;
+                return new StringBuilder(cached.Sql);  // callers may append to it
+            }
+            StringBuilder built = BuildLookup_DisplayColumn(language, tableName, out hasImagIdentifier);
+            if (built != null)  // errors and tables without identifiers are not cached
+                _sDisplayColumn[key] = new DisplayColumnSql { Sql = built.ToString(), HasImage = hasImagIdentifier };
+            return built;
+        }
+
+        /// <summary>
+        /// Build the display column SQL of a table's identifier columns (see GetLookup_DisplayColumn, which caches it)
+        /// </summary>
+        private static StringBuilder BuildLookup_DisplayColumn(Language language, string tableName, out bool hasImagIdentifier)
         {
             //	get display column names
             String sql0 = "SELECT c.ColumnName,c.IsTranslated,c.AD_Reference_ID,"
@@ -1040,37 +1073,66 @@ namespace VAdvantage.Classes
             //	int AD_Table_ID = 0;
             bool loaded = false;
 
-            IDataReader dr = null;
-            try
+            RefTableRow row;
+            if (_sRefTable.TryGetValue(AD_Reference_Value_ID, out row) && row != null)
             {
-                dr = DataBase.DB.ExecuteReader(sql0);
-                while (dr.Read())
-                {
-                    tableName = dr[0].ToString();
-                    keyColumn = dr[1].ToString();
-                    displayColumn = dr[2].ToString();
-                    isValueDisplayed = "Y".Equals(dr[3].ToString());
-                    isTranslated = "Y".Equals(dr[4].ToString());
-                    whereClause = dr[5].ToString();
-                    orderByClause = dr[6].ToString();
-                    zoomWindow = Utility.Util.GetValueOfInt(dr[7]);
-                    zoomWindowPO = Utility.Util.GetValueOfInt(dr[8]);
-                    isDisplayIdentifiers = "Y".Equals(dr[10].ToString());
-                    loaded = true;
-                }
-                dr.Close();
-                dr = null;
-
+                tableName = row.TableName;
+                keyColumn = row.KeyColumn;
+                displayColumn = row.DisplayColumn;
+                isValueDisplayed = row.IsValueDisplayed;
+                isTranslated = row.IsTranslated;
+                whereClause = row.WhereClause;
+                orderByClause = row.OrderByClause;
+                zoomWindow = row.ZoomWindow;
+                zoomWindowPO = row.ZoomWindowPO;
+                isDisplayIdentifiers = row.IsDisplayIdentifiers;
+                loaded = true;
             }
-            catch (Exception e)
+            else
             {
-                if (dr != null)
+                IDataReader dr = null;
+                try
                 {
+                    dr = DataBase.DB.ExecuteReader(sql0);
+                    while (dr.Read())
+                    {
+                        tableName = dr[0].ToString();
+                        keyColumn = dr[1].ToString();
+                        displayColumn = dr[2].ToString();
+                        isValueDisplayed = "Y".Equals(dr[3].ToString());
+                        isTranslated = "Y".Equals(dr[4].ToString());
+                        whereClause = dr[5].ToString();
+                        orderByClause = dr[6].ToString();
+                        zoomWindow = Utility.Util.GetValueOfInt(dr[7]);
+                        zoomWindowPO = Utility.Util.GetValueOfInt(dr[8]);
+                        isDisplayIdentifiers = "Y".Equals(dr[10].ToString());
+                        loaded = true;
+                    }
                     dr.Close();
                     dr = null;
+
                 }
-                s_log.Log(Level.SEVERE, sql0, e);
-                return null;
+                catch (Exception e)
+                {
+                    if (dr != null)
+                    {
+                        dr.Close();
+                        dr = null;
+                    }
+                    s_log.Log(Level.SEVERE, sql0, e);
+                    return null;
+                }
+
+                if (loaded)
+                {
+                    _sRefTable[AD_Reference_Value_ID] = new RefTableRow
+                    {
+                        TableName = tableName, KeyColumn = keyColumn, DisplayColumn = displayColumn,
+                        WhereClause = whereClause, OrderByClause = orderByClause, IsValueDisplayed = isValueDisplayed,
+                        IsTranslated = isTranslated, IsDisplayIdentifiers = isDisplayIdentifiers,
+                        ZoomWindow = zoomWindow, ZoomWindowPO = zoomWindowPO
+                    };
+                }
             }
 
             if (!loaded)

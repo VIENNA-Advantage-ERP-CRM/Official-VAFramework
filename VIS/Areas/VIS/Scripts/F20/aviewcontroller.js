@@ -1943,9 +1943,8 @@
             this.vCardView.navigate(recid, true);
         }
 
-        if (this.vHeaderPanel) {
-            this.vHeaderPanel.navigate();
-        }
+        // Header panel: gTab.navigate -> setCurrentRow always fires dataStatusChanged, which already updated it
+        // (it was redrawn twice per row move); if the row did not move (save failed) it does not need to change.
 
 
         if (recid == -1) {
@@ -2002,6 +2001,7 @@
     VIS.GridController.prototype.navigatePageExact = function (newPage) {
 
         this.gTab.getTableModel().setCurrentPage(newPage);
+        this.gTab.getTableModel().setPageNavigation();  // same query, other page: reuse the row count
         //MRole role = MRole.GetDefault();
         this.query(this.gTab.getOnlyCurrentDays(),
             //role.GetMaxQueryRecords(), false);	//	updated
@@ -2011,6 +2011,7 @@
     VIS.GridController.prototype.navigatePage = function (newPage) {
 
         this.gTab.getTableModel().setCurrentPageRelative(newPage);
+        this.gTab.getTableModel().setPageNavigation();  // same query, other page: reuse the row count
         //MRole role = MRole.GetDefault();
         this.query(this.gTab.getOnlyCurrentDays(),
             //role.GetMaxQueryRecords(), false);	//	updated

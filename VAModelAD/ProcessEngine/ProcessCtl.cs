@@ -34,6 +34,7 @@ namespace VAdvantage.ProcessEngine
         public const string ReportType_RTF = "R";
         public const string ReportType_HTML = "S";//HTML Report of Print Format
         public const string ReportType_BIHTML = "B";//HTML Scripts returned by BI
+        public const string ReportType_EMBED = "E";//Absolute URL opened in an iframe (Onfinity Analytics)
 
 
 
@@ -554,7 +555,7 @@ namespace VAdvantage.ProcessEngine
                 //Updated by raghu to open reports from work flow
 
                 byte[] repByt = null;
-                re = ReportCtl.Report;
+                re = _pi.GetWorkflowReport();   // the report of this run only (was the server-wide ReportCtl.Report)
                 if (re != null)
                 {
                     // int reportTable_ID = 0;
@@ -720,6 +721,7 @@ namespace VAdvantage.ProcessEngine
             bool IsTelerikReport = false;
             bool IsBIReport = false;
             bool IsJasperReport = false;
+            bool IsAnalyticsReport = false;
             int AD_ReportMaster_ID = 0;
 
             String sql = "SELECT p.Name, p.procedureName,p.Classname, p.AD_Process_ID,"		//	1..4  
@@ -763,6 +765,7 @@ namespace VAdvantage.ProcessEngine
                         //later
                         IsBIReport = "B".Equals(dr[10].ToString());
                         IsJasperReport = "J".Equals(dr[10].ToString());
+                        IsAnalyticsReport = "O".Equals(dr[10].ToString());
 
                         //New Column 
                         AD_ReportMaster_ID = Utility.Util.GetValueOfInt(dr[12].ToString());
@@ -799,7 +802,7 @@ namespace VAdvantage.ProcessEngine
                 //Updated by raghu to open reports from work flow
 
                 byte[] repByt = null;
-                re = ReportCtl.Report;
+                re = _pi.GetWorkflowReport();   // the report of this run only (was the server-wide ReportCtl.Report)
                 if (re != null)
                 {
                     // int reportTable_ID = 0;
@@ -948,6 +951,14 @@ namespace VAdvantage.ProcessEngine
 
                     re = VAdvanatge.Report.ReportEngine.GetReportEngine(_ctx, pi, _trx, "VA039", "VA039.Classes.JasperReportEngine");
                 }
+                else if (IsAnalyticsReport)
+                {
+                    // Onfinity Analytics (module VA149): interactive viewer gets a signed embed URL
+                    // (ReportType_EMBED), CSV requests export a file; the Print icon (IsFileOutput) always gets a file.
+                    // null when StartReport fails (summary set on pi)
+                    re = VAdvanatge.Report.ReportEngine.GetReportEngine(_ctx, pi, _trx, "VA149Svc",
+                        IsFileOutput ? "VA149Svc.Classes.AnalyticsReportEngine" : "VA149Svc.Classes.AnalyticsEmbedReportEngine");
+                }
                 else if (!IsCrystalReport)
                 {
                     //start report code
@@ -1050,6 +1061,10 @@ namespace VAdvantage.ProcessEngine
                         BiReportEngine com = new BiReportEngine();
                         reportFilePath = com.GetReportString(ctx, log, pi);
                         //reportFilePath = re.GetHTMLScript(reportFilePath);
+                    }
+                    else if (_pi.GetFileType() == ReportType_EMBED)
+                    {
+                        reportFilePath = re.GetReportString();
                     }
 
                 }
@@ -1359,6 +1374,16 @@ namespace VAdvantage.ProcessEngine
             set;
         }
 
+        /// <summary>
+        /// The caller needs a file (Print icon of a window): engines that can embed (Onfinity Analytics)
+        /// export PDF / CSV instead of returning an embed URL.
+        /// </summary>
+        public bool IsFileOutput
+        {
+            get;
+            set;
+        }
+
         ////public bool IsArabicReportFromOutside
         ////{
         ////    get;
@@ -1520,7 +1545,7 @@ namespace VAdvantage.ProcessEngine
             if (AD_Workflow_ID > 0)
             {
                 StartWorkflow(AD_Workflow_ID);
-                re = ReportCtl.Report;
+                re = _pi.GetWorkflowReport();   // the report of this run only (was the server-wide ReportCtl.Report)
 
                 Unlock();
                 return;
