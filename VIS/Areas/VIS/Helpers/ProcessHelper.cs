@@ -234,6 +234,8 @@ namespace VIS.Helpers
         public static ProcessReportInfo ExecuteProcess(Ctx ctx, Dictionary<string, string> processInfo, ProcessPara[] pList)
         {
             ProcessInfo pi = new ProcessInfo().FromList(processInfo);
+            // menu / button run: the report opens in the viewer, so engines that can embed return an embed URL
+            pi.SetIsEmbedView(true);
 
             //Saved Action Log
             if (pi.GetIsReport())
@@ -831,8 +833,6 @@ namespace VIS.Helpers
 
                 //report = null;
                 ProcessCtl ctl = new ProcessCtl();
-                // Print icon: the user picked a file type, so engines that can embed must export a file
-                ctl.IsFileOutput = true;
                 //ctl.SetIsPrintFormat(true);
                 //ctl.IsArabicReportFromOutside = false;
                 //ctl.SetIsPrintCsv(csv);
