@@ -96,6 +96,8 @@ namespace VAdvantage.ProcessEngine
         string recIDs = "";
         bool _isTelerikReport = false;
         bool _isJasperReport = false;
+        // false (default) = engines that can embed (Onfinity Analytics) produce a PDF / CSV file
+        bool _isEmbedView = false;
         bool _isSupportPaging = false;          //25
         Object _SerializableObject = null;
 
@@ -921,6 +923,20 @@ namespace VAdvantage.ProcessEngine
         public bool GetIsJasperReport()
         {
             return _isJasperReport;
+        }
+
+        /// <summary>
+        /// Report is shown in the interactive viewer (menu / button run): engines that can embed
+        /// (Onfinity Analytics) return an embed URL instead of a PDF / CSV file.
+        /// </summary>
+        /// <param name="isEmbedView"></param>
+        public void SetIsEmbedView(bool isEmbedView)
+        {
+            _isEmbedView = isEmbedView;
+        }
+        public bool GetIsEmbedView()
+        {
+            return _isEmbedView;
         }
 
         public bool GetIsSupportPaging()
