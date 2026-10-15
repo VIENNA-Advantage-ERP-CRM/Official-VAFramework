@@ -70,7 +70,8 @@ namespace VIS.Models
 
 
             //Row 0
-            obj.tableStucture = "<table style='width: 100%;'><tr>";
+            //Add div for apply scroll in table
+            obj.tableStucture = "<div class='vis-gen-attribute-popup'><table style='width: 100%;'><tr>";
             for (int i = 0; i < attributes.Length; i++)
             {
                 obj.tableStucture = AddAttributeLine(attributes[i], false, windowNo, obj, i);
@@ -96,15 +97,12 @@ namespace VIS.Models
 
             //Add Ok and Cancel button 
             //Last row
-            obj.tableStucture += "<tr>";
-
-            obj.tableStucture += "<td style='text-align:right'  colspan='2'>";
-            obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right' type='button' class='VIS_Pref_btn-2' style='float: right;'  id='btnCancel_" + windowNo + "' role='button' aria-disabled='false'>" +  Msg.GetMsg(ctx, "VIS_DialogCancel") + "</button>";
+            obj.tableStucture += "</table></div>";
+            //Fixed the "ok" and "Cancel" button div outside the scrollable content
+            obj.tableStucture += "<div style='text-align:right;width:100%'>";
+            obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right' type='button' class='VIS_Pref_btn-2' style='float: right;'  id='btnCancel_" + windowNo + "' role='button' aria-disabled='false'>" + Msg.GetMsg(ctx, "VIS_DialogCancel") + "</button>";
             obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right; margin-right: 10px;' type='button' class='VIS_Pref_btn-2' style='float: right; margin-right: 10px;'   id='btnOk_" + windowNo + "' role='button' aria-disabled='false'>" + Msg.GetMsg(ctx, "VIS_OK") + "</button>";
-            obj.tableStucture += "</td>";
-            obj.tableStucture += "</tr>";
-
-            obj.tableStucture += "</table>";
+            obj.tableStucture += "</div>";
             if (obj.ControlList != null)
             {
                 if (obj.ControlList.Length > 1)
@@ -505,7 +503,7 @@ namespace VIS.Models
                             else if (i > 0 && sql.Length > 0)
                             {
                                 sql.Append(" JOIN C_GenAttributeInstance cg" + i + " ON cg" + i + ".C_GenAttributeSetInstance_ID = cg.C_GenAttributeSetInstance_ID AND cg" + i + ".IsActive='Y'");
-                                sql.Append(" AND (cg" + i + ".VALUENUMBER=").Append(value).Append(" AND cg" + i + ".C_GenAttribute_ID=").Append(attributes[i].GetC_GenAttribute_ID() + ")");                                
+                                sql.Append(" AND (cg" + i + ".VALUENUMBER=").Append(value).Append(" AND cg" + i + ".C_GenAttribute_ID=").Append(attributes[i].GetC_GenAttribute_ID() + ")");
                             }
 
                             description.Append(value + "_");
