@@ -180,7 +180,7 @@
             $root.dialog({
                 modal: true,
                 title: VIS.Msg.translate(VIS.Env.getCtx(), "C_GenAttributeSetInstance_ID"),
-                width: 400,
+                width: 500,
                 close: function () {
                     $self.dispose();
                     $self = null;
