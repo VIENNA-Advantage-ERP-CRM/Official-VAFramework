@@ -4480,5 +4480,16 @@ table.fixed-header thead tr {
     padding-right: 4px;
     padding-top: 4px;
 }
- 
+
+/** General Attribute Set Instance Control */
+
+.vis-gen-attribute-popup {
+    max-height: 290px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding-right: 4px;
+    padding-top: 4px;
+}
+
 
