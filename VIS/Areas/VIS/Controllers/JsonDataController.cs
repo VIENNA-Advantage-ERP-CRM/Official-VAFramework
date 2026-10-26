@@ -19,6 +19,7 @@ using VIS.Models;
 using System.Web.Mvc;
 using VIS.Filters;
 using System.Web.SessionState;
+using VIS.Areas.VIS.Classes;
 using ViennaAdvantage.Model;
 using System.Web.Script.Serialization;
 using System.Text;
@@ -36,14 +37,13 @@ namespace VIS.Controllers
     [AjaxAuthorizeAttribute] // redirect to login page if reques`t is not Authorized
     [AjaxSessionFilterAttribute] // redirect to Login/Home page if session expire
     [AjaxValidateAntiForgeryToken] // validate antiforgery token 
-    //[SessionState(SessionStateBehavior.ReadOnly)]
+    [SessionState(SessionStateBehavior.ReadOnly)] // writing actions opt back in with [ActionSessionState]
     // [OutputCacheAttribute(VaryByParam = "*", Duration = 0, NoStore = true)]
 
     public class JsonDataController : Controller
     {
 
-        private static Dictionary<string, string> toastrMessage = new Dictionary<string, string>();
-        static readonly object _object = new object();
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult UpdateCtx(Dictionary<string, object> dCtx)
         {
 
@@ -77,7 +77,7 @@ namespace VIS.Controllers
         /// <param name="windowNo">window number</param>
         /// <param name="AD_Window_ID">window Id</param>
         /// <returns>grid window json result</returns>
-        public JsonResult GetGridWindow(int windowNo, int AD_Window_ID)
+        public ActionResult GetGridWindow(int windowNo, int AD_Window_ID)
         {
             GridWindow wVo = null;
             string retJSON = "";
@@ -127,7 +127,7 @@ namespace VIS.Controllers
             {
                 retError = "SessionExpired";
             }
-            return Json(new { result = retJSON, error = retError, wCtx = windowCtx, userQueries = userQueries }, JsonRequestBehavior.AllowGet);
+            return WindowJson(new { result = retJSON, error = retError, wCtx = windowCtx, userQueries = userQueries });
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace VIS.Controllers
         /// <param name="windowNo"></param>
         /// <param name="AD_Window_ID"></param>
         /// <returns></returns>
-        public JsonResult GetGridWindowSkipRole(int windowNo, int AD_Window_ID)
+        public ActionResult GetGridWindowSkipRole(int windowNo, int AD_Window_ID)
         {
             GridWindow wVo = null;
             string retJSON = "";
@@ -172,7 +172,17 @@ namespace VIS.Controllers
             {
                 retError = "SessionExpired";
             }
-            return Json(new { result = retJSON, error = retError, wCtx = windowCtx }, JsonRequestBehavior.AllowGet);
+            return WindowJson(new { result = retJSON, error = retError, wCtx = windowCtx });
+        }
+
+        /// <summary>
+        /// Window response written by Newtonsoft. Json() re-escaped the whole window JSON string with the slow
+        /// JavaScriptSerializer (and fails past its 2 MB maxJsonLength). Same shape: "result" stays a JSON string,
+        /// modules parse it themselves.
+        /// </summary>
+        private ContentResult WindowJson(object data)
+        {
+            return Content(JsonConvert.SerializeObject(data), "application/json", Encoding.UTF8);
         }
 
 
@@ -316,6 +326,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="gridTable">Data Contract </param>
         /// <returns>json result </returns>
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult InsertOrUpdateWRecords(SaveRecordIn gridTable)
         {
             try
@@ -355,6 +366,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="dInn">data contract</param>
         /// <returns>json result</returns>
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult DeleteWRecords(DeleteRecordIn dInn)
         {
             DeleteRecordOut gOut = null;
@@ -463,6 +475,7 @@ namespace VIS.Controllers
         /// - or list process fields
         /// </returns>
         /// vinay bhatt window id
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult Process(Dictionary<string, string> processInfo)
         {
             string retJSON = "";
@@ -497,11 +510,13 @@ namespace VIS.Controllers
         /// <param name="ParameterList">process parameter list</param>
         /// <returns>json result</returns>
         /// 
+        [ActionSessionState(SessionStateBehavior.Required)]
         public async Task<JsonResult> ExecuteProcess(Dictionary<string, string> processInfo, ProcessPara[] parameterList)
         {
             return await System.Threading.Tasks.Task.Run(() => ExecuteProcesAsync(processInfo, parameterList));
         }
 
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult ExecuteProcesAsync(Dictionary<string, string> processInfo, ProcessPara[] parameterList)
         {
             string retJSON = "";
@@ -845,12 +860,14 @@ namespace VIS.Controllers
         }
 
 
+        [ActionSessionState(SessionStateBehavior.Required)]
         public async System.Threading.Tasks.Task<JsonResult> GenerateReport(Dictionary<string, string> processInfo, string queryInfo, Object code, bool isCreateNew, int? treeID, int? node_ID, bool IsSummary)
         {
             return await System.Threading.Tasks.Task.Run(() => GenerateReportAsync(processInfo, queryInfo, code, isCreateNew, treeID, node_ID, IsSummary));
         }
 
         [HttpPost]
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult GenerateReportAsync(Dictionary<string, string> processInfo, string queryInfo, Object code, bool isCreateNew, int? treeID, int? node_ID, bool IsSummary)
         {
             if (Session["ctx"] != null)
@@ -871,10 +888,12 @@ namespace VIS.Controllers
             }
         }
 
+        [ActionSessionState(SessionStateBehavior.Required)]
         public async System.Threading.Tasks.Task<JsonResult> GeneratePrint(int AD_Process_ID, string Name, int AD_Table_ID, int Record_ID, int WindowNo, string filetype, string actionOrigin, string originName)
         {
             return await System.Threading.Tasks.Task.Run(() => GeneratePrintAsync(AD_Process_ID, Name, AD_Table_ID, Record_ID, WindowNo, filetype, actionOrigin, originName));
         }
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult GeneratePrintAsync(int AD_Process_ID, string Name, int AD_Table_ID, int Record_ID, int WindowNo, string filetype, string actionOrigin, string originName)
         {
             if (Session["ctx"] != null)
@@ -908,6 +927,7 @@ namespace VIS.Controllers
         /// <param name="WindowNo"></param>
         /// <param name="filetype"></param>
         /// <returns></returns>
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult GenerateMultiPrint(int AD_Process_ID, string Name, int AD_Table_ID, string RecIDs, int WindowNo, string filetype, string actionOrigin, string originName)
         {
             if (Session["ctx"] != null)
@@ -934,6 +954,7 @@ namespace VIS.Controllers
 
 
 
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult ArchiveDoc(int AD_Process_ID, string Name, int AD_Table_ID, int Record_ID, int C_BPartner_ID, bool isReport, byte[] binaryData, string reportPath)
         {
             if (Session["ctx"] != null)
@@ -1275,6 +1296,7 @@ namespace VIS.Controllers
         }
 
         [HttpPost]
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult CheckVersions(SaveRecordIn RowData)
         {
             bool hasRecords = false;

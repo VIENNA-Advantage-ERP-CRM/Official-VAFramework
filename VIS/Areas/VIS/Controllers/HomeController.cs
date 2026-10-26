@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.SessionState;
+using VIS.Areas.VIS.Classes;
 using System.Web.Security;
 using VAdvantage.Classes;
 using VAdvantage.Model;
@@ -42,6 +44,7 @@ namespace VIS.Controllers
     /// app controller
     /// </summary>
 
+    [SessionState(SessionStateBehavior.ReadOnly)] // writing actions opt back in with [ActionSessionState]
     public class HomeController : Controller
     {
         /// <summary>
@@ -57,6 +60,7 @@ namespace VIS.Controllers
         private static bool isBundleAdded = false;
         //private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
+        [ActionSessionState(SessionStateBehavior.Required)]
         public ActionResult SignIn(string provider)
         {
 
@@ -77,6 +81,7 @@ namespace VIS.Controllers
         /// <summary>
         /// Send an OpenID Connect sign-out request.
         /// </summary>
+        [ActionSessionState(SessionStateBehavior.Required)]
         public void SignOut()
         {
             HttpContext.GetOwinContext().Authentication.SignOut(
@@ -104,6 +109,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
+        [ActionSessionState(SessionStateBehavior.Required)]
         public ActionResult Index(FormCollection form)
         {
 
@@ -851,6 +857,7 @@ namespace VIS.Controllers
         #region "Favourite Node"
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
+        [ActionSessionState(SessionStateBehavior.Required)]
         public JsonResult GetFavouriteNode()
         {
             try
