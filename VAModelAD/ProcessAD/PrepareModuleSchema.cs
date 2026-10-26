@@ -196,7 +196,10 @@ namespace VAdvantage.Process
             {
                 prefix += "_";
             }
-            return prefix + Guid.NewGuid().ToString("N");
+            // Last 9 digits of current DateTime ticks
+            string ticks = DateTime.Now.Ticks.ToString();
+            ticks = ticks.Substring(ticks.Length - 9);
+            return prefix + Guid.NewGuid().ToString("N") + ticks;
         }
 
         private List<int> GetIDs(String TableName, String IdColumn, String WhereClause)
