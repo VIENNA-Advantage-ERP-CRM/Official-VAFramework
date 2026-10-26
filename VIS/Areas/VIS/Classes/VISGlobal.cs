@@ -24,6 +24,9 @@ namespace VIS.Areas.VIS.Classes
         {           
             AntiForgeryConfig.UniqueClaimTypeIdentifier = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
+            // lets actions override the controller [SessionState] (read-only AJAX calls skip the session lock)
+            ControllerBuilder.Current.SetControllerFactory(new ActionSessionControllerFactory());
+
             AppDomain.CurrentDomain.AssemblyResolve += (s, args) =>
             {
                 var requested = new AssemblyName(args.Name);

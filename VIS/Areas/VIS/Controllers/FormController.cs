@@ -6,6 +6,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
+using VIS.Areas.VIS.Classes;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.Classes;
@@ -19,7 +20,7 @@ namespace VIS.Controllers
     [AjaxAuthorizeAttribute] // redirect to login page if request is not Authorized
     [AjaxSessionFilterAttribute] // redirect to Login/Home page if session expire
     [AjaxValidateAntiForgeryToken] // validate antiforgery token 
-    //[SessionState(SessionStateBehavior.ReadOnly)]
+    [SessionState(SessionStateBehavior.ReadOnly)] // writing actions opt back in with [ActionSessionState]
 
     public class FormController : Controller
     {
@@ -194,6 +195,7 @@ namespace VIS.Controllers
 
 
 
+        [ActionSessionState(SessionStateBehavior.Required)] // FormModel resets M_Product/ASI/Locator in the session Ctx
         public ActionResult GetTextButtonQueryResult(string Text, int windowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string ColumnName,
              string ValidationCode)
         {

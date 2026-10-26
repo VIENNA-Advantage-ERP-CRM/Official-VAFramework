@@ -864,11 +864,17 @@
                     if (this.curTab.getRecord_ID() > -1) {
                         this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
                     }
+                    // after the refresh: panels skipped while hidden load once, with this 'R'
+                    if (this.curGC.vTabPanel)
+                        this.curGC.vTabPanel.setHidden(false);
                 }
 
 
             }
             else {
+                // panels skip record refreshes until shown again (survey panel excepted)
+                if (this.curGC && this.curGC.vTabPanel)
+                    this.curGC.vTabPanel.setHidden(true);
                 $tabPanel.css({ "display": "none" });
                 $tabPanel.parent().removeClass(clsName + 'b').removeClass(
                     clsName + 'r').addClass(clsName + 'r');

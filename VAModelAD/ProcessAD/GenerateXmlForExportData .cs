@@ -226,12 +226,16 @@ namespace VAdvantage.Process
 
                 //String exportid = module.GetPrefix() + PrimaryKey;    //export id to be picked from msequence table
 
-                int expID = MSequence.GetNextExportID(GetCtx().GetAD_Client_ID(), tableName, null);
-                if (expID == -1)
-                {
-                    throw new InvalidConstraintException("ExportID -1 for TableName: " + tableName);
-                }
-                String exportid = module.GetPrefix() + expID;
+                // Old logic: Export ID generated from AD_Sequence (ModulePrefix + SequenceNo)
+                //int expID = MSequence.GetNextExportID(GetCtx().GetAD_Client_ID(), tableName, null);
+                //if (expID == -1)
+                //{
+                //    throw new InvalidConstraintException("ExportID -1 for TableName: " + tableName);
+                //}
+                //String exportid = module.GetPrefix() + expID;
+
+                // New logic: Export ID generated in format ModulePrefix_GUID
+                String exportid = PrepareModuleSchema.GenerateExportID(module.GetPrefix());
 
                 String _updateSql = "Update " + refTable + " SET Export_ID = " + DB.TO_STRING(exportid) + " WHERE " + tableName + "_ID = " + PrimaryKey;
                 int result = DB.ExecuteQuery(_updateSql);
@@ -257,13 +261,17 @@ namespace VAdvantage.Process
 
                 //String exportid = module.GetPrefix() + PrimaryKey;    //export id to be picked from msequence table
 
-                int expID = MSequence.GetNextExportID(GetCtx().GetAD_Client_ID(), tableName, null);
-                if (expID == -1)
-                {
-                    throw new InvalidConstraintException("ExportID -1 for TableName: " + tableName);
-                }
+                // Old logic: Export ID generated from AD_Sequence (ModulePrefix + SequenceNo)
+                //int expID = MSequence.GetNextExportID(GetCtx().GetAD_Client_ID(), tableName, null);
+                //if (expID == -1)
+                //{
+                //    throw new InvalidConstraintException("ExportID -1 for TableName: " + tableName);
+                //}
 
-                String exportid = module.GetPrefix() + expID;
+                //String exportid = module.GetPrefix() + expID;
+
+                // New logic: Export ID generated in format ModulePrefix_GUID
+                String exportid = PrepareModuleSchema.GenerateExportID(module.GetPrefix());
 
                 string[] ds = GetParentColumns(_table_ID);
 

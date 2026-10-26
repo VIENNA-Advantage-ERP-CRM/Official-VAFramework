@@ -641,9 +641,26 @@
     };
 
     VIS.GridController.prototype.getSurveyCondition = function (record_ID) {
-        if (this.vTabPanel && this.vTabPanel.curTabPanel.getSurveyCondition) {//&& $(this.vTabPanel.getRoot()).is(':visible'))
+        if (this.vTabPanel && this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.getSurveyCondition) {//&& $(this.vTabPanel.getRoot()).is(':visible'))
             return this.vTabPanel.curTabPanel.getSurveyCondition();
         }
+    };
+
+    /**
+     * Open survey panel of this tab (selected, show-all or right-side panel), or null; vTabPanel is null
+     * for a view-wise tab whose current view has no panels
+     */
+    VIS.GridController.prototype.getSurveyPanel = function () {
+        var vtp = this.vTabPanel;
+        while (vtp && VIS.SurveyPanel) {
+            var panels = vtp.curTabPanel ? [vtp.curTabPanel] : (vtp.tabPanels || []);
+            for (var i = 0; i < panels.length; i++) {
+                if (panels[i] instanceof VIS.SurveyPanel)
+                    return panels[i];
+            }
+            vtp = vtp.specialObj;
+        }
+        return null;
     };
 
     /// Check Checklist required
@@ -672,21 +689,17 @@
         var windowID = this.gTab.getAD_Window_ID();
         var cIdx = this.gTab.currentRow;
         var rowData = this.gTab;//.gridTable.getRow(cIdx);
-        var isCheckListFill = false;
-        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
-            isCheckListFill = this.vTabPanel.curTabPanel.isCheckListFill;
-        }
+        // The server returns every checklist of the window/table and each condition is evaluated below against
+        // the current row, so the decision does not depend on the panel. The panel only adds unsaved answers
+        // (isCheckListFill). It used to return true while the panel had not loaded its checklist yet
+        // (selectdIdx -1, e.g. save right after a row change) - the mandatory check was skipped.
+        var surveyPanel = this.getSurveyPanel();
+        var isCheckListFill = !!(surveyPanel && surveyPanel.isCheckListFill);
 
         var Survey_ID = 0;
-        var IsMandatoryToFill = false;
-        if (this.vTabPanel.curTabPanel) {
-            if (this.vTabPanel.curTabPanel.selectdIdx > -1) {
-                Survey_ID = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].Survey_ID;
-                IsMandatoryToFill = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].IsMandatoryToFill;
-            } else {
-                return true;
-            }
-        } 
+        if (surveyPanel && surveyPanel.selectdIdx > -1 && surveyPanel.ChecklistRes && surveyPanel.ChecklistRes[surveyPanel.selectdIdx]) {
+            Survey_ID = surveyPanel.ChecklistRes[surveyPanel.selectdIdx].Survey_ID;
+        }
 
         //if (!IsMandatoryToFill) {
         //    return true;
@@ -753,7 +766,8 @@
     }
 
     VIS.GridController.prototype.SaveSurvey = function (recordID) {
-        return this.vTabPanel.curTabPanel.SaveData(recordID);
+        var surveyPanel = this.getSurveyPanel();
+        return surveyPanel ? surveyPanel.SaveData(recordID) : null;
     }
 
 

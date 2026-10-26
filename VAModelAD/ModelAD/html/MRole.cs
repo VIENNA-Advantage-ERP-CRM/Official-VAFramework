@@ -1624,9 +1624,34 @@ namespace VAdvantage.Model
         {
             if (_tableAccessLevel != null && _tableName != null && !reload)
                 return;
-            _tableAccessLevel = new Dictionary<int, string>(300);
-            _tableName = new Dictionary<string, int>(300);
+            // Same for every role and user, so one read-only copy is shared instead of reading AD_Table
+            // into every cached role_user instance; reset with AD_Table (CacheMgt prefix "AD_Table")
+            TableInfo info;
+            if (!s_tableInfo.TryGetValue(0, out info) || info == null)
+            {
+                info = new TableInfo();
+                if (ReadTableInfo(info))
+                    s_tableInfo[0] = info;
+            }
+            _tableAccessLevel = info.AccessLevel;
+            _tableName = info.Names;
+        }
 
+        /** AD_Table AccessLevel / TableName; shared, read-only */
+        private sealed class TableInfo
+        {
+            public Dictionary<int, string> AccessLevel = new Dictionary<int, string>(300);
+            public Dictionary<string, int> Names = new Dictionary<string, int>(300);
+        }
+
+        private static CCache<int, TableInfo> s_tableInfo = new CCache<int, TableInfo>("AD_Table_RoleInfo", 1, 10);   // 10 min: other servers of a farm see new tables soon
+
+        /// <summary>
+        /// Read the active tables into info
+        /// </summary>
+        /// <returns>false on a database error (info is partial and not cached)</returns>
+        private bool ReadTableInfo(TableInfo info)
+        {
             String sql = "SELECT AD_Table_ID, AccessLevel, TableName "
                 + "FROM AD_Table WHERE IsActive='Y'";
             IDataReader dr = null;
@@ -1636,8 +1661,8 @@ namespace VAdvantage.Model
                 while (dr.Read())
                 {
                     int ii = Utility.Util.GetValueOfInt(dr[0]);
-                    _tableAccessLevel.Add(ii, CommonFunctions.GetString(dr[1]));
-                    _tableName.Add(CommonFunctions.GetString(dr[2]), ii);
+                    info.AccessLevel.Add(ii, CommonFunctions.GetString(dr[1]));
+                    info.Names.Add(CommonFunctions.GetString(dr[2]), ii);
                 }
                 dr.Close();
                 dr = null;
@@ -1650,9 +1675,10 @@ namespace VAdvantage.Model
                     dr = null;
                 }
                 log.Log(Level.SEVERE, sql, e);
-
+                return false;
             }
-            log.Fine("#" + _tableAccessLevel.Count);
+            log.Fine("#" + info.AccessLevel.Count);
+            return true;
         }
 
         public Dictionary<int, string> GetTableAccessLevel()
