@@ -144,13 +144,18 @@ namespace VAdvantage.Process
                         object Export_ID = DB.ExecuteScalar("SELECT Export_ID FROM " + TableName + " WHERE " + whereClause);
                         if (Export_ID == null || Export_ID.ToString() == "")
                         {
-                            int expID = MSequence.GetNextExportID(GetCtx().GetAD_Client_ID(), TableName, null);
-                            if (expID == -1)
-                            {
-                                throw new InvalidConstraintException("ExportID -1 for TableName: " + TableName);
-                            }
+                            // Old logic: Export ID generated from AD_Sequence (ModulePrefix + SequenceNo)
+                            //int expID = MSequence.GetNextExportID(GetCtx().GetAD_Client_ID(), TableName, null);
+                            //if (expID == -1)
+                            //{
+                            //    throw new InvalidConstraintException("ExportID -1 for TableName: " + TableName);
+                            //}
 
-                            string sql = "UPDATE " + TableName + " SET Export_ID = '" + modulePrefix + expID + "' WHERE " +
+                            //string sql = "UPDATE " + TableName + " SET Export_ID = '" + modulePrefix + expID + "' WHERE " +
+                            //                        whereClause;
+
+                            // New logic: Export ID generated in format ModulePrefix_GUID
+                            string sql = "UPDATE " + TableName + " SET Export_ID = " + DB.TO_STRING(GenerateExportID(modulePrefix)) + " WHERE " +
                                                     whereClause;
                             // insert Export Id
                             if (DB.ExecuteQuery(sql, null, Get_TrxName()) != 1)
@@ -178,6 +183,24 @@ namespace VAdvantage.Process
             return true;
         }
 
+
+        /// <summary>
+        /// Generate Export ID in format ModulePrefix_GUID + last 9 digits of DateTime ticks
+        /// </summary>
+        /// <param name="prefix">Module Prefix</param>
+        /// <returns>Export ID</returns>
+        public static string GenerateExportID(string prefix)
+        {
+            // Module prefixes normally end with "_" (e.g. VIS_), avoid double underscore
+            if (!prefix.EndsWith("_"))
+            {
+                prefix += "_";
+            }
+            // Last 9 digits of current DateTime ticks
+            string ticks = DateTime.Now.Ticks.ToString();
+            ticks = ticks.Substring(ticks.Length - 9);
+            return prefix + Guid.NewGuid().ToString("N") + ticks;
+        }
 
         private List<int> GetIDs(String TableName, String IdColumn, String WhereClause)
         {
