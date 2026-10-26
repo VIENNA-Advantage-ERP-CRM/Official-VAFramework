@@ -4464,7 +4464,6 @@
                             count++;
                             //break;
                         }
-                        console.log(buffer.getTable(0).lookupDirect);
                     }
                     buffer.dispose();
                     buffer = null;
@@ -4473,7 +4472,9 @@
                     VIS.MLookupCache.addRecordLookup(that.gTable._windowNo, that.gTable._tabNo, lookupDirect);
 
                 that.cardTempalte = cardViewData;
-                if (dataIn.card_ID > 0 && cardViewData && cardViewData.DisableWindowPageSize) {
+                // card with "disable window page size": the server sent every row, so they are one page
+                // (was dataIn.card_ID - dataIn is local to the fetch, the ReferenceError was swallowed below)
+                if (that.card_ID > 0 && cardViewData && cardViewData.DisableWindowPageSize) {
                     that.pazeSize = that.rowCount;
                     that.currentPage = 1;
                 }

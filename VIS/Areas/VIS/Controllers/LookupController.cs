@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.SessionState;
 using VAdvantage.Classes;
 using VAdvantage.Controller;
 using VAdvantage.DataBase;
@@ -21,6 +22,7 @@ namespace VIS.Areas.VIS.Controllers
     [AjaxAuthorizeAttribute] // redirect to login page if reques`t is not Authorized
     [AjaxSessionFilterAttribute] // redirect to Login/Home page if session expire
     [AjaxValidateAntiForgeryToken] // validate antiforgery token    
+    [SessionState(SessionStateBehavior.ReadOnly)] // read-only: requests of one user run in parallel
     public class LookupController : Controller
     {
         // GET: VIS/Lookup

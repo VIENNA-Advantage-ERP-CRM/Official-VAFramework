@@ -26,7 +26,10 @@
         this.isShowAll = false;
         this.curTabPanel = null;
         this.windowNo = windowNo;
-      
+        this.isHidden = false; // container hidden by APanel.showTabPanel(false)
+        this.pendingRefresh = null; // {action} - record changed while hidden/collapsed, refreshed when shown
+        this.lastRefreshKey = null; // record|action refreshed in the current JS turn
+
 
         var clone = document.importNode(tmpTabPnl, true);
 
@@ -223,6 +226,9 @@
 
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged();
+
+            if (!this.isClosed)
+                this.flushPendingRefresh();
 
             if (this.specialObj) {
                 this.specialObj.refreshSize(evt);
@@ -527,6 +533,7 @@
             this.curTabPanel = null;
         }
         this.curTabPanel = tblPanel;
+        this.pendingRefresh = null; // a new panel loads the current record in initalizeTabPanel
     }
 
     /**
@@ -562,20 +569,79 @@
 
     VTabPanel.prototype.refreshPanelData = function (rec_Id,dataRow,action) {
 
+        // tab activation and save ask for the same record more than once in one go; the panel is already loading it
+        var key = rec_Id + '|' + (action || '');
+        if (this.lastRefreshKey !== key) {
+            if (this.lastRefreshKey === null) {
+                var self = this;
+                window.setTimeout(function () { self.lastRefreshKey = null; }, 0);
+            }
+            this.lastRefreshKey = key;
 
-        if (this.curTabPanel) {
-            this.curTabPanel.refreshPanelData(rec_Id, dataRow,action);
-        }
-        else {
-            for (var i = 0; i < this.tabPanels.length; i++) {
+            if (this.curTabPanel) {
+                this.refreshPanel(this.curTabPanel, rec_Id, dataRow, action);
+            }
+            else {
+                for (var i = 0; i < this.tabPanels.length; i++) {
 
-                this.tabPanels[i].refreshPanelData(rec_Id, dataRow,action);
+                    this.refreshPanel(this.tabPanels[i], rec_Id, dataRow, action);
 
+                }
             }
         }
         if (this.specialObj) {
             this.specialObj.refreshPanelData(rec_Id, dataRow, action);
         }
+    };
+
+    /**
+     * Survey panel: IsCheckListRequire (before save) reads the checklist state its refresh loads,
+     * so it must refresh even while hidden.
+     * @param {any} panel
+     */
+    function isAlwaysRefresh(panel) {
+        return VIS.SurveyPanel && panel instanceof VIS.SurveyPanel;
+    };
+
+    /**
+     * Refresh one panel, or only remember it while the panel is collapsed or its container is hidden
+     * (setSize / setHidden refresh it once it is shown again).
+     */
+    VTabPanel.prototype.refreshPanel = function (panel, rec_Id, dataRow, action) {
+        if ((this.isClosed || this.isHidden) && !isAlwaysRefresh(panel)) {
+            this.pendingRefresh = { action: action };
+            return;
+        }
+        panel.refreshPanelData(rec_Id, dataRow, action);
+    };
+
+    /**
+     * Load the current record into panels whose refresh was skipped while hidden
+     */
+    VTabPanel.prototype.flushPendingRefresh = function () {
+        var pending = this.pendingRefresh;
+        if (!pending || this.isClosed || this.isHidden || !this.gTab)
+            return;
+        this.pendingRefresh = null;
+        var rec_Id = this.gTab.getRecord_ID();
+        var dataRow = this.gTab.getTableModel().getRow(this.gTab.getCurrentRow());
+        var panels = this.curTabPanel ? [this.curTabPanel] : this.tabPanels;
+        for (var i = 0; i < panels.length; i++) {
+            if (!isAlwaysRefresh(panels[i]))
+                panels[i].refreshPanelData(rec_Id, dataRow, pending.action);
+        }
+    };
+
+    /**
+     * Container shown/hidden by APanel.showTabPanel
+     * @param {boolean} hidden
+     */
+    VTabPanel.prototype.setHidden = function (hidden) {
+        this.isHidden = hidden;
+        if (!hidden)
+            this.flushPendingRefresh();
+        if (this.specialObj)
+            this.specialObj.setHidden(hidden);
     };
 
     VTabPanel.prototype.setTabPanelSize = function (size) {
