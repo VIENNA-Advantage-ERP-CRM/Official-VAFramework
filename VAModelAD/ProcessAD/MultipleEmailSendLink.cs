@@ -64,7 +64,7 @@ namespace VAModelAD.ProcessAD
 
             // ---------- Step 2: get all users where IsLoginUser = 'N' ----------
             // Recommended: add  AND IsActive = 'Y' AND AD_Client_ID = <current client>
-            string userSql = "SELECT AD_User_ID FROM AD_User WHERE IsLoginUser = 'N' AND IsActive = 'Y'";
+            string userSql = "SELECT AD_User_ID,Name FROM AD_User WHERE IsLoginUser = 'N' AND IsActive = 'Y'";
             userSql = MRole.GetDefault(GetCtx()).AddAccessSQL(userSql, "AD_User", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
             // string userSql = "SELECT AD_User_ID FROM AD_User WHERE IsLoginUser = 'N' AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
 
@@ -73,19 +73,24 @@ namespace VAModelAD.ProcessAD
             {
                 return Msg.GetMsg(GetCtx(), "NoRecordFound");   // use a suitable message key
             }
-
-            List<int> userIDs = new List<int>();
+            Dictionary<int, string> users = new Dictionary<int, string>();
+           // List<int> userIDs = new List<int>();
             foreach (DataRow row in ds.Tables[0].Rows)
             {
-                userIDs.Add(Util.GetValueOfInt(row["AD_User_ID"]));
+                int userID = Util.GetValueOfInt(row["AD_User_ID"]);
+                string userName = Util.GetValueOfString(row["Name"]);
+                users.Add(userID, userName);
             }
 
             // ---------- Step 3: send mail to each user ----------
             int sent = 0;
             List<string> failed = new List<string>();
 
-            foreach (int userID in userIDs)
-            {
+            //foreach (int userID in userIDs)
+             foreach (KeyValuePair<int, string> user in users)
+             {
+                int userID = user.Key;
+                string userName = user.Value;
                 try
                 {
                     string result = SendMailToUser(userID, out warning);   // null = success, otherwise reason
@@ -94,24 +99,27 @@ namespace VAModelAD.ProcessAD
                     {
                         sent++;
                         if (!string.IsNullOrEmpty(warning))
-                            warnings.Add("UserID " + userID + ": " + warning);
+                          // warnings.Add("UserID " + userID + ": " + warning);
+                           warnings.Add("UserName " + userName + ": " + warning);
                     }
                     else
                     {
-                        failed.Add("UserID " + userID + " (" + result + ")");
-                        log.Fine("UserID " + userID + ": " + result);
+                       // failed.Add("UserID " + userID + " (" + result + ")");
+                       //log.Fine("UserID " + userID + ": " + result);
+                        failed.Add("UserName " + userName + " (" + result + ")");                        
+                        log.Fine("UserName " + userName + ": " + result);
                     }
                 }
                 catch (Exception ex)
                 {
                     // one user failing must not stop the others
                     VLogger.Get().SaveError("EmailSendLinkProcess ", ex.Message);
-                    failed.Add("UserID " + userID + " (" + ex.Message + ")");
+                    failed.Add("UserName " + userName + " (" + ex.Message + ")");
                 }
             }
 
             // ---------- Step 4: summary ----------
-            string msg = Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + userIDs.Count;
+            string msg = Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + users.Count;
             if (warnings.Count > 0)
                 msg += ". " + string.Join("; ", warnings);
             if (failed.Count > 0)
