@@ -119,16 +119,44 @@ namespace VAModelAD.ProcessAD
             }
 
             // ---------- Step 4: summary ----------
-            string msg = Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + users.Count;
+            /*string msg = Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + users.Count;
             if (warnings.Count > 0)
-                msg += ". " + string.Join("; ", warnings);
+                 msg += ". " + string.Join("; ", warnings);
             if (failed.Count > 0)
             {
-                msg += ". Failed: " + string.Join("; ", failed);
+                  msg += ". Failed: " + string.Join("; ", failed);
             }
-            return msg;
+            return msg;*/
+            // ---------- Step 4: summary ----------
+            StringBuilder msg = new StringBuilder();
+
+            msg.Append(Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully")
+                + ": " + sent + " / " + users.Count);
+
+            if (warnings.Count > 0)
+            {
+                msg.Append("<br/><br/>Warnings:<br/>");
+
+                foreach (string warningMessage in warnings)
+                {
+                    msg.Append(warningMessage + "<br/>");
+                }
+            }
+
+            if (failed.Count > 0)
+            {
+                msg.Append("<br/>Failed:<br/>");
+
+                foreach (string failedMessage in failed)
+                {
+                    msg.Append(failedMessage + "<br/>");
+                }
+            }
+
+            return msg.ToString();
+
         }
-       
+
         /// <summary>
         /// Send create-password mail to one user.
         /// </summary>
