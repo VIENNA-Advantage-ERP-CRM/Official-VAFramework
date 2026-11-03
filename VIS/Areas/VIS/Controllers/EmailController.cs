@@ -325,7 +325,20 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.GetRecordThread(ctx, recordId, tableID, windowID, tabID)), JsonRequestBehavior.AllowGet);
         }
 
+      //  public JsonResult SearchEmails(string term, int windowID = 0, string windowName = "")
+       public JsonResult SearchEmails(string term, string tableName, int tableID)
+        {
+            if (Session["ctx"] == null)
+            {
+                return Json(new { error = "SessionExpired" }, JsonRequestBehavior.AllowGet);
+            }
 
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            var result = model.SearchEmails(term, tableName, tableID, ctx);
+
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        }
 
 
         //public JsonResult SavedAttachmentForFormat(int textTemplate_ID)
