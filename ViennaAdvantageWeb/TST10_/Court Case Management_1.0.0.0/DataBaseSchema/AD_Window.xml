@@ -1,0 +1,249 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Window" msprop:SqlHash="1764582843" msprop:BaseTable.0="AD_WINDOW">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_COLOR_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_COLOR_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_CTXAREA_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CTXAREA_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_IMAGE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_IMAGE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_WINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISBETAFUNCTIONALITY" msprop:OraDbType="104" msprop:BaseColumn="ISBETAFUNCTIONALITY" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCUSTOMDEFAULT" msprop:OraDbType="104" msprop:BaseColumn="ISCUSTOMDEFAULT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDEFAULT" msprop:OraDbType="104" msprop:BaseColumn="ISDEFAULT" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PROCESSING" msprop:OraDbType="104" msprop:BaseColumn="PROCESSING" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="WINHEIGHT" msprop:OraDbType="113" msprop:BaseColumn="WINHEIGHT" type="xs:long" minOccurs="0" />
+                <xs:element name="WINWIDTH" msprop:OraDbType="113" msprop:BaseColumn="WINWIDTH" type="xs:long" minOccurs="0" />
+                <xs:element name="WINDOWTYPE" msprop:OraDbType="104" msprop:BaseColumn="WINDOWTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSOTRX" msprop:OraDbType="104" msprop:BaseColumn="ISSOTRX" type="xs:string" minOccurs="0" />
+                <xs:element name="DISPLAYNAME" msprop:OraDbType="119" msprop:BaseColumn="DISPLAYNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCOMPOSITEVIEW" msprop:OraDbType="104" msprop:BaseColumn="ISCOMPOSITEVIEW" type="xs:string" minOccurs="0" />
+                <xs:element name="ISHIDETOOLBAR" msprop:OraDbType="104" msprop:BaseColumn="ISHIDETOOLBAR" type="xs:string" minOccurs="0" />
+                <xs:element name="ISHIDEACTIONBAR" msprop:OraDbType="104" msprop:BaseColumn="ISHIDEACTIONBAR" type="xs:string" minOccurs="0" />
+                <xs:element name="ISHIDETABNAME" msprop:OraDbType="104" msprop:BaseColumn="ISHIDETABNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="ISLANDINGPAGE" msprop:OraDbType="104" msprop:BaseColumn="ISLANDINGPAGE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDEPENDENTINDETAILVIEW" msprop:OraDbType="104" msprop:BaseColumn="ISDEPENDENTINDETAILVIEW" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000744</AD_WINDOW_ID>
+    <CREATED>2026-10-21T06:08:31+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>TST10_Case</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-21T04:35:56+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINHEIGHT>0</WINHEIGHT>
+    <WINWIDTH>60</WINWIDTH>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>TST10 Case</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+tlGGAijzgZQIMKe0o3Q==</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000741</AD_WINDOW_ID>
+    <CREATED>2026-10-20T23:32:34+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>TST10_CaseType</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-21T04:35:54+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINHEIGHT>0</WINHEIGHT>
+    <WINWIDTH>60</WINWIDTH>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>TST10 Case Type</DISPLAYNAME>
+    <EXPORT_ID>TST10_XkpMWb8+dJngZQIMKe0o3Q==</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000743</AD_WINDOW_ID>
+    <CREATED>2026-10-21T05:58:09+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>TST10_Lawyer</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-21T04:35:55+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINHEIGHT>0</WINHEIGHT>
+    <WINWIDTH>60</WINWIDTH>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>TST10 Lawyer</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+ltsonidXgZQIMKe0o3Q==</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000740</AD_WINDOW_ID>
+    <CREATED>2026-10-20T23:26:56+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>TST10_FeeStructure</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-21T04:35:53+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINHEIGHT>0</WINHEIGHT>
+    <WINWIDTH>60</WINWIDTH>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>TST10 Fee Structure</DISPLAYNAME>
+    <EXPORT_ID>TST10_XkpEJxGddJXgZQIMKe0o3Q==</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000745</AD_WINDOW_ID>
+    <CREATED>2026-10-21T06:25:46+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>TST10_Hearing</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-21T04:35:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINHEIGHT>0</WINHEIGHT>
+    <WINWIDTH>60</WINWIDTH>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>TST10 Hearing</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+tlGaPijzgZQIMKe0o3Q==</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>108</AD_WINDOW_ID>
+    <CREATED>2012-12-01T00:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Maintain Users of the system.</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <HELP>The User Window allows you to maintain User of the system.  Users can log into the system and have access to functionality via one or more roles.  A user can also be a business aprtner contact.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>User</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-27T16:07:29+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>User Management</DISPLAYNAME>
+    <EXPORT_ID>VIS_108</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+  <AD_Window>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000742</AD_WINDOW_ID>
+    <CREATED>2026-10-20T23:45:09+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISCUSTOMDEFAULT>N</ISCUSTOMDEFAULT>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>TST10_Court</NAME>
+    <PROCESSING>N</PROCESSING>
+    <UPDATED>2026-10-21T04:35:55+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WINHEIGHT>0</WINHEIGHT>
+    <WINWIDTH>60</WINWIDTH>
+    <WINDOWTYPE>M</WINDOWTYPE>
+    <ISSOTRX>N</ISSOTRX>
+    <DISPLAYNAME>TST10 Court</DISPLAYNAME>
+    <EXPORT_ID>TST10_XkpERw1GdJvgZQIMKe0o3Q==</EXPORT_ID>
+    <ISCOMPOSITEVIEW>N</ISCOMPOSITEVIEW>
+    <ISHIDETOOLBAR>N</ISHIDETOOLBAR>
+    <ISHIDEACTIONBAR>N</ISHIDEACTIONBAR>
+    <ISHIDETABNAME>N</ISHIDETABNAME>
+    <ISLANDINGPAGE>N</ISLANDINGPAGE>
+    <ISDEPENDENTINDETAILVIEW>N</ISDEPENDENTINDETAILVIEW>
+  </AD_Window>
+</NewDataSet>

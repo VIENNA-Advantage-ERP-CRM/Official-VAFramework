@@ -353,6 +353,28 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
     opacity: 1;
 }
 
+.vis-its-module-notinstalled .vis-its-module-icon {
+    opacity: .5;
+}
+
+/* Error the run stopped with, under the module list */
+.vis-its-install-error {
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+    color: #e53935;
+    word-break: break-word;
+}
+
+    .vis-its-install-error > i {
+        flex: 0 0 20px;
+        margin-top: 3px;
+    }
+
+html[dir="rtl"] .vis-its-install-error > i {
+    margin-left: 4px;
+}
+
 html[dir="rtl"] .vis-its-dots {
     margin-left: 0;
     margin-right: 4px;

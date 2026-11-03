@@ -1,0 +1,1740 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Element" msprop:SqlHash="-113412255" msprop:BaseTable.0="AD_ELEMENT">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ELEMENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ELEMENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_VALUE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_VALUE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_VAL_RULE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_VAL_RULE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="COLUMNNAME" msprop:OraDbType="119" msprop:BaseColumn="COLUMNNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DBDATATYPE" msprop:OraDbType="104" msprop:BaseColumn="DBDATATYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="FIELDLENGTH" msprop:OraDbType="113" msprop:BaseColumn="FIELDLENGTH" type="xs:long" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PO_DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="PO_DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="PO_HELP" msprop:OraDbType="119" msprop:BaseColumn="PO_HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="PO_NAME" msprop:OraDbType="119" msprop:BaseColumn="PO_NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PO_PRINTNAME" msprop:OraDbType="119" msprop:BaseColumn="PO_PRINTNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PRINTNAME" msprop:OraDbType="119" msprop:BaseColumn="PRINTNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006730</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Lawyer_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T05:55:21+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Lawyer_GUID</NAME>
+    <PRINTNAME>TST10_Lawyer_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:22+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+04RdvijrgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006729</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Lawyer_ID</COLUMNNAME>
+    <CREATED>2026-10-21T05:55:14+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Lawyer</NAME>
+    <PRINTNAME>TST10 Lawyer</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:19+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vghijikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006732</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Specialization</COLUMNNAME>
+    <CREATED>2026-10-21T05:55:40+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Specialization</NAME>
+    <PRINTNAME>Specialization</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:24+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0hsmbij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006731</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_BarRegNo</COLUMNNAME>
+    <CREATED>2026-10-21T05:55:32+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Bar Registration No.</NAME>
+    <PRINTNAME>Bar Registration No.</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:23+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlFzFijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006733</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Experience</COLUMNNAME>
+    <CREATED>2026-10-21T05:55:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Experience (years)</NAME>
+    <PRINTNAME>Experience (years)</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:25+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+ltsk4idXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>187</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>C_BPartner_ID</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Identifies a Customer/Prospect</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>A Customer/Prospect is anyone with whom you transact.  This can include Vendor, Customer, Employee or Salesperson</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Business Partner</NAME>
+    <PRINTNAME>Customer/Prospect</PRINTNAME>
+    <UPDATED>2026-10-27T15:29:08+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_187</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006720</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Phone</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:59+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Phone</NAME>
+    <PRINTNAME>Phone</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:08+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEJxP0dJXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006721</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_EMail</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:02+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Email</NAME>
+    <PRINTNAME>Email</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:09+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEJxP1dJXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006744</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseParty_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:30+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseParty_GUID</NAME>
+    <PRINTNAME>TST10_CaseParty_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:36+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0hszCij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006743</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseParty_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:28+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Case Party</NAME>
+    <PRINTNAME>TST10 Case Party</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:35+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqeMikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006734</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Case_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:00:55+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Case</NAME>
+    <PRINTNAME>TST10 Case</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:26+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqdrikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006745</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_PartyRole</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:33+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Party Role</NAME>
+    <PRINTNAME>Party Role</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:37+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+ltsrdidXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006746</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Counsel</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:35+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Counsel</NAME>
+    <PRINTNAME>Counsel</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:38+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqehikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006748</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseLawyer_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:42+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseLawyer_GUID</NAME>
+    <PRINTNAME>TST10_CaseLawyer_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:40+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vghoeikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006747</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseLawyer_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:38+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Case Lawyer</NAME>
+    <PRINTNAME>TST10 Case Lawyer</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:39+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqeiikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006749</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_LawyerRole</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Role</NAME>
+    <PRINTNAME>Role</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:41+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPxmijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006750</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_StartDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:50+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Start Date</NAME>
+    <PRINTNAME>Start Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:42+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPxtijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006751</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_EndDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>End Date</NAME>
+    <PRINTNAME>End Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:43+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqe3ikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006753</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseDocument_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:58+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseDocument_GUID</NAME>
+    <PRINTNAME>TST10_CaseDocument_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:46+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPyAijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006752</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseDocument_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:55+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Case Document</NAME>
+    <PRINTNAME>TST10 Case Document</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:44+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vgho6ikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006710</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseType_GUID</COLUMNNAME>
+    <CREATED>2026-10-20T23:31:10+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseType_GUID</NAME>
+    <PRINTNAME>TST10_CaseType_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:58+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpERwdZdJvgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006709</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseType_ID</COLUMNNAME>
+    <CREATED>2026-10-20T23:31:06+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Case Type</NAME>
+    <PRINTNAME>TST10 Case Type</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrhHdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>348</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>IsActive</COLUMNNAME>
+    <CREATED>2000-01-02T19:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>The record is active in the system</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>There are two methods of making records unavailable in the system: One is to delete the record, the other is to de-activate the record. A de-activated record is not available for selection, but available for reports.
+There are two reasons for de-activating and not deleting records:
+(1) The system requires the record for audit purposes.
+(2) The record is referenced by other records. E.g., you cannot delete a Account, if there are invoices for this Account record existing. You de-activate the Account and prevent that this record is used for future entries.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Active</NAME>
+    <PRINTNAME>Active</PRINTNAME>
+    <UPDATED>2026-10-27T11:35:54+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_348</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1001381</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Export_ID</COLUMNNAME>
+    <CREATED>2012-08-17T12:47:08+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ENTITYTYPE>U</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Export</NAME>
+    <PRINTNAME>Export</PRINTNAME>
+    <UPDATED>2026-10-27T11:36:19+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_1001381</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>102</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>AD_Client_ID</COLUMNNAME>
+    <CREATED>2000-01-02T19:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Client/Tenant for this installation.</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>A Client is a company or a legal entity. You cannot share data between Clients. Tenant is a synonym for Client.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Tenant</NAME>
+    <PRINTNAME>Tenant</PRINTNAME>
+    <UPDATED>2026-10-27T11:36:23+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_102</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006699</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Label</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:15+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Label</NAME>
+    <PRINTNAME>Label</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:43+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrWodJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>113</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>AD_Org_ID</COLUMNNAME>
+    <CREATED>2000-01-02T19:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Organizational entity within Tenant</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>An organization is a unit of your Tenant or legal entity - examples are store, department. You can share data between organizations.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Organization</NAME>
+    <PRINTNAME>Organization</PRINTNAME>
+    <UPDATED>2026-10-27T11:36:48+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_113</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>620</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Value</COLUMNNAME>
+    <CREATED>2000-01-02T19:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Search key for the record in the format required - must be unique</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>A search key allows you a fast method of finding a particular record.
+If you leave the search key empty, the system automatically creates a numeric number.  The document sequence used for this fallback number is defined in the "Maintain Sequence" window with the name "DocumentNo_&lt;TableName&gt;", where TableName is the actual name of the table (e.g. C_Order).</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Search Key</NAME>
+    <PRINTNAME>Search Key</PRINTNAME>
+    <UPDATED>2026-10-06T21:28:35+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_620</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006711</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseCategory</COLUMNNAME>
+    <CREATED>2026-10-20T23:31:14+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Category</NAME>
+    <PRINTNAME>Category</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:59+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrhIdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>469</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Name</COLUMNNAME>
+    <CREATED>2000-01-02T19:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Alphanumeric identifier of the entity</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The name of an entity (record) is used as an default search option in addition to the search key. The name is up to 100 characters in length.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Name</NAME>
+    <PRINTNAME>Name</PRINTNAME>
+    <UPDATED>2026-10-27T11:35:59+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_469</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006697</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FeeStructure_ID</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:10+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Fee Structure</NAME>
+    <PRINTNAME>TST10 Fee Structure</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:40+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpERwO+dJvgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006712</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_TypicalDays</COLUMNNAME>
+    <CREATED>2026-10-20T23:31:17+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Typical Duration (days)</NAME>
+    <PRINTNAME>Typical Duration (days)</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:00+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpERwdhdJvgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>275</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Description</COLUMNNAME>
+    <CREATED>2000-01-02T19:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Optional short description of the record</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>A description is limited to 255 characters.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Description</NAME>
+    <PRINTNAME>Description</PRINTNAME>
+    <UPDATED>2026-10-27T11:36:00+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_275</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>192</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>C_Country_ID</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Country </DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The Country defines a Country.  Each Country must be defined before it can be used in any document.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Country</NAME>
+    <PRINTNAME>Country</PRINTNAME>
+    <UPDATED>2026-10-27T12:07:50+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_192</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006723</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CourtRoom_GUID</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:08+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CourtRoom_GUID</NAME>
+    <PRINTNAME>TST10_CourtRoom_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:12+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnbdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006722</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CourtRoom_ID</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:06+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Court Room</NAME>
+    <PRINTNAME>TST10 Court Room</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:10+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnadJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006724</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Floor</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:11+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Floor</NAME>
+    <PRINTNAME>Floor</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:13+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrncdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006725</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Capacity</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:13+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Capacity</NAME>
+    <PRINTNAME>Capacity</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:15+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnddJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006727</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Judge_GUID</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:20+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Judge_GUID</NAME>
+    <PRINTNAME>TST10_Judge_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:17+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnfdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006726</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Judge_ID</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:17+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Judge</NAME>
+    <PRINTNAME>TST10 Judge</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:16+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnedJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006728</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Designation</COLUMNNAME>
+    <CREATED>2026-10-20T23:35:23+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Designation</NAME>
+    <PRINTNAME>Designation</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:18+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrngdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006698</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FeeStructure_GUID</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:13+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_FeeStructure_GUID</NAME>
+    <PRINTNAME>TST10_FeeStructure_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:42+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrWndJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006700</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FeeType</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:20+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Fee Type</NAME>
+    <PRINTNAME>Fee Type</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:45+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrWpdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006701</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_BaseAmount</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:23+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Base Amount</NAME>
+    <PRINTNAME>Base Amount</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:46+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrWqdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006702</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_SuccessPercent</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:27+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Success Fee %</NAME>
+    <PRINTNAME>Success Fee %</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:47+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrWrdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006704</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FeeStructureLine_GUID</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:33+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_FeeStructureLine_GUID</NAME>
+    <PRINTNAME>TST10_FeeStructureLine_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:51+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpERwPOdJvgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006703</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FeeStructureLine_ID</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:31+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Fee Structure Line</NAME>
+    <PRINTNAME>TST10 Fee Structure Line</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:49+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpERwPNdJvgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>439</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Line</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Unique line for this document</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>Indicates the unique line for a document.  It will also control the display order of the lines within a document.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Line No</NAME>
+    <PRINTNAME>Line No</PRINTNAME>
+    <UPDATED>2026-10-06T21:42:43+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_439</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006705</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_ActivityType</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:37+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Activity Type</NAME>
+    <PRINTNAME>Activity Type</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:52+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpMWbq3dJngZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006706</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Rate</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:39+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Rate</NAME>
+    <PRINTNAME>Rate</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:53+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpMWbq4dJngZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006707</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_MinAmount</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:42+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Minimum Amount</NAME>
+    <PRINTNAME>Minimum Amount</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:54+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpMWbq5dJngZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006708</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_MaxAmount</COLUMNNAME>
+    <CREATED>2026-10-20T23:23:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Maximum Amount</NAME>
+    <PRINTNAME>Maximum Amount</PRINTNAME>
+    <UPDATED>2026-10-21T04:38:55+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpMWbq6dJngZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006771</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingReschedule_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:39+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_HearingReschedule_GUID</NAME>
+    <PRINTNAME>TST10_HearingReschedule_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:06+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlGPwijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006770</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingReschedule_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:37+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Hearing Reschedule</NAME>
+    <PRINTNAME>TST10 Hearing Reschedule</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:05+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+04R2iijrgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006756</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Hearing_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:16:36+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Hearing</NAME>
+    <PRINTNAME>TST10 Hearing</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:49+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqt0ikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006772</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_OldDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:42+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Previous Date</NAME>
+    <PRINTNAME>Previous Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:07+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0htJoij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006773</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_OldStartTime</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Previous Start Time</NAME>
+    <PRINTNAME>Previous Start Time</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:08+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+lts45idXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006774</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_NewDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:50+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>New Date</NAME>
+    <PRINTNAME>New Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:09+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzQGMijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006775</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_NewStartTime</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>New Start Time</NAME>
+    <PRINTNAME>New Start Time</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:10+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0htJ0ij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006776</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_NewEndTime</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:56+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>New End Time</NAME>
+    <PRINTNAME>New End Time</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:11+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlGP/ijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006777</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_ReschedReason</COLUMNNAME>
+    <CREATED>2026-10-21T06:18:01+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Reason</NAME>
+    <PRINTNAME>Reason</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:12+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0htKAij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006778</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_RequestedBy</COLUMNNAME>
+    <CREATED>2026-10-21T06:18:18+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Requested By</NAME>
+    <PRINTNAME>Requested By</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:13+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+lts5FidXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006757</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Hearing_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:16:38+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Hearing_GUID</NAME>
+    <PRINTNAME>TST10_Hearing_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:50+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vgh49ikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006762</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingStatus</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:06+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Hearing Status</NAME>
+    <PRINTNAME>Hearing Status</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlGPLijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006758</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:16:51+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Hearing Date</NAME>
+    <PRINTNAME>Hearing Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:51+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0htIwij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006759</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_StartTime</COLUMNNAME>
+    <CREATED>2026-10-21T06:16:55+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Start Time</NAME>
+    <PRINTNAME>Start Time</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:53+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+lts4YidXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006760</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_EndTime</COLUMNNAME>
+    <CREATED>2026-10-21T06:16:58+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>End Time</NAME>
+    <PRINTNAME>End Time</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:54+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlGPKijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006761</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingType</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:02+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Hearing Type</NAME>
+    <PRINTNAME>Hearing Type</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:56+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzQF4ijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006763</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_RescheduleCount</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:10+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Reschedule Count</NAME>
+    <PRINTNAME>Reschedule Count</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:58+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0htI/ij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006764</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Outcome</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:13+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Outcome</NAME>
+    <PRINTNAME>Outcome</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:59+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+04R2gijrgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006765</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Remarks</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:18+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Remarks</NAME>
+    <PRINTNAME>Remarks</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:00+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vgh4+ikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006767</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingActivity_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:25+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_HearingActivity_GUID</NAME>
+    <PRINTNAME>TST10_HearingActivity_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:02+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vgh5GikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006766</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingActivity_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:22+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Hearing Activity</NAME>
+    <PRINTNAME>TST10 Hearing Activity</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:01+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzQGAijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006768</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_ActivityTime</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:30+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Time</NAME>
+    <PRINTNAME>Time</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:03+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vgh5HikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006769</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Details</COLUMNNAME>
+    <CREATED>2026-10-21T06:17:33+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Details</NAME>
+    <PRINTNAME>Details</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:04+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+04R2hijrgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006780</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingFee_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:18:24+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_HearingFee_GUID</NAME>
+    <PRINTNAME>TST10_HearingFee_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:15+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqveikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006779</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_HearingFee_ID</COLUMNNAME>
+    <CREATED>2026-10-21T06:18:22+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Hearing Fee</NAME>
+    <PRINTNAME>TST10 Hearing Fee</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:14+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlGQSijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006781</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FeeAmount</COLUMNNAME>
+    <CREATED>2026-10-21T06:18:28+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Fee Amount</NAME>
+    <PRINTNAME>Fee Amount</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:16+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqvfikPgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006782</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_IsBilled</COLUMNNAME>
+    <CREATED>2026-10-21T06:18:33+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Billed</NAME>
+    <PRINTNAME>Billed</PRINTNAME>
+    <UPDATED>2026-10-21T04:40:17+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzQGUijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1000791</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>DAYS</COLUMNNAME>
+    <CREATED>2011-03-10T19:19:10+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ENTITYTYPE>U</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>DAYS</NAME>
+    <PRINTNAME>DAYS</PRINTNAME>
+    <UPDATED>2026-01-27T15:06:39+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_1000791</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>245</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Created</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Date this record was created</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The Created On field indicates the date that this record was created.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Created On</NAME>
+    <PRINTNAME>Created On</PRINTNAME>
+    <UPDATED>2026-10-27T12:14:33+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_245</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>246</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>CreatedBy</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>User who created this record</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The Created By field indicates the user who created this record.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Created By</NAME>
+    <PRINTNAME>Created By</PRINTNAME>
+    <UPDATED>2026-10-27T12:14:34+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_246</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>138</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>AD_User_ID</COLUMNNAME>
+    <CREATED>2012-12-01T00:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>User within the system - Internal or Customer/Prospect Contact.</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The User identifies a unique user in the system. This could be an internal user or a Customer/Prospect contact</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>User/Contact</NAME>
+    <PRINTNAME>User</PRINTNAME>
+    <UPDATED>2026-10-27T11:35:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_138</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>607</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>Updated</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Date this record was updated</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The Updated field indicates the date that this record was updated.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Updated</NAME>
+    <PRINTNAME>Updated</PRINTNAME>
+    <UPDATED>2026-10-23T15:09:59+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_607</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>608</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>UpdatedBy</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>User who updated this records</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The Updated By field indicates the user who updated this record.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Updated By</NAME>
+    <PRINTNAME>Updated By</PRINTNAME>
+    <UPDATED>2026-10-23T15:09:59+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_608</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006754</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_DocType</COLUMNNAME>
+    <CREATED>2026-10-21T06:02:01+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Document Type</NAME>
+    <PRINTNAME>Document Type</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:47+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+0hsz2ij/gZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006755</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_DocDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:02:03+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Document Date</NAME>
+    <PRINTNAME>Document Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:48+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+ltssRidXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006735</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Case_GUID</COLUMNNAME>
+    <CREATED>2026-10-21T06:00:58+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Case_GUID</NAME>
+    <PRINTNAME>TST10_Case_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:27+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vghnWikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>290</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>DocumentNo</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Document sequence number of the document</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>The Document number is usually automatically generated by the system and determined by the document type of the document. If the document is not saved, the preliminary number is displayed between greater than and less than symbols
+
+If the document type of your document has no automatic document sequence defined, the field is empty if you create a new document. This is for documents which usually have an external number (like vendor invoice).  If you leave the field empty, the system will generate a document number for you. The document sequence used for this fallback number is defined in the "Maintain Sequence" window with the name "DocumentNo_&lt;TableName&gt;", where TableName is the actual name of the table (e.g. C_Order).</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Document No.</NAME>
+    <PRINTNAME>Document No.</PRINTNAME>
+    <UPDATED>2026-10-27T11:36:05+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_290</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006738</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseStatus</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:11+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Case Status</NAME>
+    <PRINTNAME>Case Status</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:30+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPxGijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006713</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Court_ID</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:35+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Court</NAME>
+    <PRINTNAME>TST10 Court</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:01+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnGdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006736</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CourtCaseNo</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:06+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Court Case No.</NAME>
+    <PRINTNAME>Court Case No.</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:28+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+vghnaikHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006737</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_FilingDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:09+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Filing Date</NAME>
+    <PRINTNAME>Filing Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:29+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPxFijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006739</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Priority</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:14+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Priority</NAME>
+    <PRINTNAME>Priority</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:31+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+ltsqiidXgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006740</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_NextHearingDate</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:16+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Next Hearing Date</NAME>
+    <PRINTNAME>Next Hearing Date</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:32+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPxOijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>193</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>C_Currency_ID</COLUMNNAME>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>The Currency for this record</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <HELP>Indicates the Currency to be used when processing or reporting on this record</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Currency</NAME>
+    <PRINTNAME>Currency</PRINTNAME>
+    <UPDATED>2026-10-06T21:29:08+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_193</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006741</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_ClaimAmount</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:20+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Claim Amount</NAME>
+    <PRINTNAME>Claim Amount</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:33+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+wzPxSijjgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006742</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CaseSummary</COLUMNNAME>
+    <CREATED>2026-10-21T06:01:24+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Case Summary</NAME>
+    <PRINTNAME>Case Summary</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:34+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_Xk+tlF6KijzgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006714</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Court_GUID</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:38+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Court_GUID</NAME>
+    <PRINTNAME>TST10_Court_GUID</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:02+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpMWb+8dJngZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006715</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_CourtLevel</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:43+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Court Level</NAME>
+    <PRINTNAME>Court Level</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:03+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnHdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006716</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Jurisdiction</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Jurisdiction</NAME>
+    <PRINTNAME>Jurisdiction</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:04+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnIdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006718</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_City</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:51+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>City</NAME>
+    <PRINTNAME>City</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:06+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnKdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006717</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_Address1</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:48+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Address</NAME>
+    <PRINTNAME>Address</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:05+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnJdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+  <AD_Element>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1006719</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <COLUMNNAME>TST10_PostalCode</COLUMNNAME>
+    <CREATED>2026-10-20T23:34:54+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>Postal Code</NAME>
+    <PRINTNAME>Postal Code</PRINTNAME>
+    <UPDATED>2026-10-21T04:39:07+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XkpEIrnLdJHgZQIMKe0o3Q==</EXPORT_ID>
+  </AD_Element>
+</NewDataSet>

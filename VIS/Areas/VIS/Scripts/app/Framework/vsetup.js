@@ -101,11 +101,9 @@
         /* Kept so the details can be handed to the module log page on the way out. */
         var tenantInfo = null;
         var installPollTimer = null;
-        var installPollCount = 0;
-        /* 5s is short enough to see each module change state, and the cap keeps a stuck
-           installation from polling for the rest of the session - together ~10 minutes. */
+        /* 5s is short enough to see each module change state. There is no cap - the right
+           panel follows the installation until it finishes or fails, however long it takes. */
         var INSTALL_POLL_INTERVAL = 5000;
-        var MAX_INSTALL_POLLS = 120;
 
         /* Message lookup that falls back to plain text when the key is not
            translated - VIS.Msg.getMsg returns "[key]" for a missing key. */
@@ -833,7 +831,6 @@
             moduleRows = {};
             setStatusLine(divModules, msgOr("Starting", "Starting"), true);
 
-            installPollCount = 0;
             var poll = function () {
                 $.ajax({
                     url: VIS.Application.contextUrl + "VSetup/GetInstallLog",
@@ -856,12 +853,20 @@
                             return;
                         }
                         /* Anything else is the restart, or a blip - the installation is
-                           still going, so keep asking until the cap runs out. */
+                           still going, so keep asking. */
                         scheduleNextPoll(poll);
                     },
                     success: function (data) {
                         var rows = data == null ? null : data.result;
                         showInstallLog(rows);
+                        /* Market turned the whole request down - its log never says so, the
+                           rows would stay "InProgress" for good. Nothing more is coming. */
+                        var failure = data == null ? null : data.failure;
+                        if (failure != null && failure.length > 0) {
+                            showInstallFailure(failure);
+                            stopInstallPolling();
+                            return;
+                        }
                         if (rows != null && rows.length > 0 && isInstallFinished(rows)) {
                             /* Say it is over - a list that simply stops changing does not
                                tell the user whether it finished or stalled. Note that this
@@ -902,18 +907,9 @@
             poll();
         };
 
-        /* Stops after MAX_INSTALL_POLLS so a stuck installation does not leave the
-           screen polling for the rest of the session. */
+        /* No limit - polling ends only when the installation finishes, fails, or the user
+           is signed out. */
         var scheduleNextPoll = function (poll) {
-            installPollCount++;
-            if (installPollCount >= MAX_INSTALL_POLLS) {
-                showInstallMessage(msgOr("ModuleInstallStillRunning",
-                    "Still running - check the module log for the rest."));
-                /* Giving up on the log also releases the form - leaving it busy for a
-                   run we have stopped watching would strand the user. */
-                stopInstallPolling();
-                return;
-            }
             installPollTimer = window.setTimeout(poll, INSTALL_POLL_INTERVAL);
         };
 
@@ -1014,6 +1010,30 @@
             divModuleList.append($('<div style="margin-top:10px;margin-bottom:10px">').append(text));
         };
 
+        /* The run stopped with an error Market did not put in its log. The module it was
+           on failed with it, the ones it never reached are not installed - none of them
+           is still going, whatever the log last said. */
+        var showInstallFailure = function (failure) {
+            if (divModuleList == null) {
+                return;
+            }
+            /* Failed before Market wrote any log line - "Starting" is over all the same. */
+            clearStatusLine();
+            for (var name in moduleRows) {
+                var $row = moduleRows[name];
+                if ($row.hasClass('vis-its-module-installing')) {
+                    setModuleState($row, "failed", failure);
+                }
+                else if ($row.hasClass('vis-its-module-pending')) {
+                    setModuleState($row, "notinstalled", null);
+                }
+            }
+            /* .text - the message comes from Market, it is not markup */
+            divModuleList.append($('<div class="vis-its-install-error">')
+                .append($('<i class="fa fa-times-circle">'))
+                .append($('<span>').text(msgOr("ModuleInstallFailed", "Installation failed") + ": " + failure)));
+        };
+
         var hasInstallError = function (rows) {
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].IsSuccess) {
@@ -1061,7 +1081,8 @@
         };
 
         /* States: pending (clock), installing (spinner - only the one Market is on),
-           installed (green tick), failed (red cross, with Market's message as title). */
+           installed (green tick), failed (red cross, with Market's message as title),
+           notinstalled (dash - the run stopped before reaching it). */
         var setModuleState = function ($row, state, message) {
             var text, icon;
             if (state === "installed") {
@@ -1075,6 +1096,10 @@
             else if (state === "failed") {
                 text = msgOr("Failed", "Failed");
                 icon = "fa fa-times-circle";
+            }
+            else if (state === "notinstalled") {
+                text = msgOr("NotInstalled", "Not installed");
+                icon = "fa fa-minus-circle";
             }
             else {
                 text = msgOr("Pending", "Pending");

@@ -1,0 +1,79 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Process_Para" msprop:SqlHash="1303593273" msprop:BaseTable.0="AD_PROCESS_PARA">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ELEMENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ELEMENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_PROCESS_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_PROCESS_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_PROCESS_PARA_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_PROCESS_PARA_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_VALUE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_VALUE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_VAL_RULE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_VAL_RULE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="COLUMNNAME" msprop:OraDbType="119" msprop:BaseColumn="COLUMNNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DEFAULTVALUE" msprop:OraDbType="119" msprop:BaseColumn="DEFAULTVALUE" type="xs:string" minOccurs="0" />
+                <xs:element name="DEFAULTVALUE2" msprop:OraDbType="119" msprop:BaseColumn="DEFAULTVALUE2" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="FIELDLENGTH" msprop:OraDbType="113" msprop:BaseColumn="FIELDLENGTH" type="xs:long" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCENTRALLYMAINTAINED" msprop:OraDbType="104" msprop:BaseColumn="ISCENTRALLYMAINTAINED" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDISPLAYED" msprop:OraDbType="104" msprop:BaseColumn="ISDISPLAYED" type="xs:string" minOccurs="0" />
+                <xs:element name="ISMANDATORY" msprop:OraDbType="104" msprop:BaseColumn="ISMANDATORY" type="xs:string" minOccurs="0" />
+                <xs:element name="ISRANGE" msprop:OraDbType="104" msprop:BaseColumn="ISRANGE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="SEQNO" msprop:OraDbType="113" msprop:BaseColumn="SEQNO" type="xs:long" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="VFORMAT" msprop:OraDbType="119" msprop:BaseColumn="VFORMAT" type="xs:string" minOccurs="0" />
+                <xs:element name="VALUEMAX" msprop:OraDbType="119" msprop:BaseColumn="VALUEMAX" type="xs:string" minOccurs="0" />
+                <xs:element name="VALUEMIN" msprop:OraDbType="119" msprop:BaseColumn="VALUEMIN" type="xs:string" minOccurs="0" />
+                <xs:element name="ISENCRYPTED" msprop:OraDbType="104" msprop:BaseColumn="ISENCRYPTED" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_BVIEW_FIELD_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_BVIEW_FIELD_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_INFOWINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_INFOWINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="SHOWCHILDOFSELECTED" msprop:OraDbType="104" msprop:BaseColumn="SHOWCHILDOFSELECTED" type="xs:string" minOccurs="0" />
+                <xs:element name="LOADRECURSIVEDATA" msprop:OraDbType="104" msprop:BaseColumn="LOADRECURSIVEDATA" type="xs:string" minOccurs="0" />
+                <xs:element name="ZOOMWINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="ZOOMWINDOW_ID" type="xs:long" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Process_Para>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ELEMENT_ID>1000791</AD_ELEMENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_PROCESS_ID>1000710</AD_PROCESS_ID>
+    <AD_PROCESS_PARA_ID>1001574</AD_PROCESS_PARA_ID>
+    <AD_REFERENCE_ID>11</AD_REFERENCE_ID>
+    <COLUMNNAME>Days</COLUMNNAME>
+    <CREATED>2026-10-21T06:00:39+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>How many days ahead to look (3 when empty)</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <FIELDLENGTH>0</FIELDLENGTH>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCENTRALLYMAINTAINED>Y</ISCENTRALLYMAINTAINED>
+    <ISDISPLAYED>Y</ISDISPLAYED>
+    <ISMANDATORY>N</ISMANDATORY>
+    <ISRANGE>N</ISRANGE>
+    <NAME>Days Ahead</NAME>
+    <SEQNO>10</SEQNO>
+    <UPDATED>2026-10-21T00:30:19+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISENCRYPTED>N</ISENCRYPTED>
+    <EXPORT_ID>TST10_Xk+vXqc9ikPgZQIMKe0o3Q==</EXPORT_ID>
+    <SHOWCHILDOFSELECTED>N</SHOWCHILDOFSELECTED>
+    <LOADRECURSIVEDATA>N</LOADRECURSIVEDATA>
+  </AD_Process_Para>
+</NewDataSet>

@@ -1,0 +1,184 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Image" msprop:SqlHash="-1372804384" msprop:BaseTable.0="AD_IMAGE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_IMAGE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_IMAGE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="BINARYDATA" msprop:OraDbType="102" msprop:BaseColumn="BINARYDATA" type="xs:base64Binary" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGEURL" msprop:OraDbType="119" msprop:BaseColumn="IMAGEURL" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="FONTNAME" msprop:OraDbType="119" msprop:BaseColumn="FONTNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="FONTNAMEHELP" msprop:OraDbType="119" msprop:BaseColumn="FONTNAMEHELP" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGEEXTENSION" msprop:OraDbType="119" msprop:BaseColumn="IMAGEEXTENSION" type="xs:string" minOccurs="0" />
+                <xs:element name="FONTSTYLE" msprop:OraDbType="119" msprop:BaseColumn="FONTSTYLE" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000730</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:13+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 User</NAME>
+    <UPDATED>2026-10-21T07:30:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW6Z/MUovTgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>vis vis-user</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000734</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:32+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Building</NAME>
+    <UPDATED>2026-10-21T07:31:10+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW7H6KDovzgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-building-o</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000729</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:09+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 List</NAME>
+    <UPDATED>2026-10-21T07:30:48+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW7H6KCovzgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-bars</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000725</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:00:49+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Calendar</NAME>
+    <UPDATED>2026-10-21T07:30:27+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW55O7kovbgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-calendar</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000726</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:00:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Court</NAME>
+    <UPDATED>2026-10-21T07:30:31+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW55O7lovbgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-university</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000728</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:03+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Number</NAME>
+    <UPDATED>2026-10-21T07:30:41+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW55O7movbgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-sort-numeric-asc</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000727</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:00:57+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Document</NAME>
+    <UPDATED>2026-10-21T07:30:36+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW6Z/MTovTgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-file-text</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000732</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:25+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Amount</NAME>
+    <UPDATED>2026-10-21T07:31:03+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW8DNi8n87gZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-usd</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000733</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:29+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Time</NAME>
+    <UPDATED>2026-10-21T07:31:07+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW6Z/MVovTgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-clock-o</FONTNAME>
+  </AD_Image>
+  <AD_Image>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_IMAGE_ID>1000731</AD_IMAGE_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T13:01:21+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court Case Management icon</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10 Location</NAME>
+    <UPDATED>2026-10-21T07:31:00+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>TST10_XlW55O7novbgZQIMKe0o3Q==</EXPORT_ID>
+    <FONTNAME>fa fa-map-marker</FONTNAME>
+  </AD_Image>
+</NewDataSet>

@@ -1,0 +1,566 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Table" msprop:SqlHash="-370088787" msprop:BaseTable.0="AD_TABLE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_TABLE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_TABLE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_VAL_RULE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_VAL_RULE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_WINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="ACCESSLEVEL" msprop:OraDbType="104" msprop:BaseColumn="ACCESSLEVEL" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="IMPORTTABLE" msprop:OraDbType="104" msprop:BaseColumn="IMPORTTABLE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCHANGELOG" msprop:OraDbType="104" msprop:BaseColumn="ISCHANGELOG" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDELETEABLE" msprop:OraDbType="104" msprop:BaseColumn="ISDELETEABLE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISHIGHVOLUME" msprop:OraDbType="104" msprop:BaseColumn="ISHIGHVOLUME" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSECURITYENABLED" msprop:OraDbType="104" msprop:BaseColumn="ISSECURITYENABLED" type="xs:string" minOccurs="0" />
+                <xs:element name="ISVIEW" msprop:OraDbType="104" msprop:BaseColumn="ISVIEW" type="xs:string" minOccurs="0" />
+                <xs:element name="LOADSEQ" msprop:OraDbType="113" msprop:BaseColumn="LOADSEQ" type="xs:long" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PO_WINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="PO_WINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="REFERENCED_TABLE_ID" msprop:OraDbType="113" msprop:BaseColumn="REFERENCED_TABLE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="REPLICATIONTYPE" msprop:OraDbType="104" msprop:BaseColumn="REPLICATIONTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="TABLENAME" msprop:OraDbType="119" msprop:BaseColumn="TABLENAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="BASE_TABLE_ID" msprop:OraDbType="113" msprop:BaseColumn="BASE_TABLE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CHANGELOGLEVEL" msprop:OraDbType="104" msprop:BaseColumn="CHANGELOGLEVEL" type="xs:string" minOccurs="0" />
+                <xs:element name="DATECOLUMN_ID" msprop:OraDbType="113" msprop:BaseColumn="DATECOLUMN_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORTVIEW" msprop:OraDbType="104" msprop:BaseColumn="EXPORTVIEW" type="xs:string" minOccurs="0" />
+                <xs:element name="IMPORTVIEW" msprop:OraDbType="104" msprop:BaseColumn="IMPORTVIEW" type="xs:string" minOccurs="0" />
+                <xs:element name="SUBTABLETYPE" msprop:OraDbType="104" msprop:BaseColumn="SUBTABLETYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="TABLETRXTYPE" msprop:OraDbType="104" msprop:BaseColumn="TABLETRXTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISREPORTINGTABLE" msprop:OraDbType="104" msprop:BaseColumn="ISREPORTINGTABLE" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="VALIDATETABLE" msprop:OraDbType="104" msprop:BaseColumn="VALIDATETABLE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISMAINTAINVERSIONS" msprop:OraDbType="104" msprop:BaseColumn="ISMAINTAINVERSIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="TABLETYPE" msprop:OraDbType="104" msprop:BaseColumn="TABLETYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISTIMELINETRACKED" msprop:OraDbType="104" msprop:BaseColumn="ISTIMELINETRACKED" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001549</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:02:09+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Case Party</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_CaseParty</TABLENAME>
+    <UPDATED>2026-10-21T04:30:35+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+tlF7nijzgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001550</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:02:13+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Case Lawyer</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_CaseLawyer</TABLENAME>
+    <UPDATED>2026-10-21T04:30:35+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+wzPylijjgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001551</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:02:19+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Case Document</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_CaseDocument</TABLENAME>
+    <UPDATED>2026-10-21T04:30:36+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+wzPyqijjgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001543</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-20T23:31:21+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Case Type</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_CaseType</TABLENAME>
+    <UPDATED>2026-10-21T04:30:28+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_XkpMWb6FdJngZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001547</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T05:55:59+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Lawyer</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_Lawyer</TABLENAME>
+    <UPDATED>2026-10-21T04:30:33+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+04ReEijrgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001545</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-20T23:35:31+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Court Room</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_CourtRoom</TABLENAME>
+    <UPDATED>2026-10-21T04:30:31+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_XkpEIrnidJHgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001546</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-20T23:35:35+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Judge</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_Judge</TABLENAME>
+    <UPDATED>2026-10-21T04:30:32+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_XkpMWcAFdJngZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001541</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-20T23:23:49+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Fee Structure</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_FeeStructure</TABLENAME>
+    <UPDATED>2026-10-21T04:30:26+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_XkpERwPrdJvgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001542</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-20T23:23:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Fee Structure Line</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_FeeStructureLine</TABLENAME>
+    <UPDATED>2026-10-21T04:30:27+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_XkpEIrXfdJHgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001554</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:18:44+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Hearing Reschedule</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_HearingReschedule</TABLENAME>
+    <UPDATED>2026-10-21T04:30:39+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+wzQG3ijjgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001552</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:18:37+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Hearing</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_Hearing</TABLENAME>
+    <UPDATED>2026-10-21T04:30:37+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+04R28ijrgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001553</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:18:40+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Hearing Activity</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_HearingActivity</TABLENAME>
+    <UPDATED>2026-10-21T04:30:38+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+04R29ijrgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001555</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:18:48+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Hearing Fee</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_HearingFee</TABLENAME>
+    <UPDATED>2026-10-21T04:30:40+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+vXqvwikPgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>114</AD_TABLE_ID>
+    <AD_WINDOW_ID>108</AD_WINDOW_ID>
+    <ACCESSLEVEL>7</ACCESSLEVEL>
+    <CREATED>2000-01-01T21:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>**The most overloaded table in the system.** One row can be any or all of: a login account, a business contact, an employee, a reporting-tool user and a correspondence actor.</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <HELP>**The most overloaded table in the system.** One row can be any or all of: a login account, a business contact, an employee, a reporting-tool user and a correspondence actor. Ten windows are built on it - User Management, Employee Master, Representative Info, Prospect, Business Partner, Channel Partner, Customer Master, Vendor Master, User Substitute and SSO Data Mapping - and most fields are only meaningful on some of them. The login side carries the password, the two-factor settings, the authentication tokens, the failed login count and the PIN and card used at a till. The employee side carries joining and relieving dates, qualifications with percentages and years, blood group and statutory identifiers. The contact side carries the address, greeting, telephone numbers and opt-out. **A query about people has to establish which population it means**, because `AD_User` holds employees and customers' staff in the same table. Note also that HR identity is conventionally taken from `C_BPartner` rather than from here; this table is the account and contact record.</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>N</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>Y</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>65</LOADSEQ>
+    <NAME>User/Contact</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>AD_User</TABLENAME>
+    <UPDATED>2026-10-27T11:35:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>VIS_114</EXPORT_ID>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <TABLETYPE>M</TABLETYPE>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001548</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-21T06:02:06+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Case</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_Case</TABLENAME>
+    <UPDATED>2026-10-21T04:30:34+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_Xk+vghpLikHgZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+  <AD_Table>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_TABLE_ID>1001544</AD_TABLE_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CREATED>2026-10-20T23:35:26+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <IMPORTTABLE>N</IMPORTTABLE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISCHANGELOG>Y</ISCHANGELOG>
+    <ISDELETEABLE>Y</ISDELETEABLE>
+    <ISHIGHVOLUME>N</ISHIGHVOLUME>
+    <ISSECURITYENABLED>N</ISSECURITYENABLED>
+    <ISVIEW>N</ISVIEW>
+    <LOADSEQ>0</LOADSEQ>
+    <NAME>TST10 Court</NAME>
+    <REPLICATIONTYPE>L</REPLICATIONTYPE>
+    <TABLENAME>TST10_Court</TABLENAME>
+    <UPDATED>2026-10-21T04:30:30+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <CHANGELOGLEVEL>N</CHANGELOGLEVEL>
+    <EXPORTVIEW>N</EXPORTVIEW>
+    <IMPORTVIEW>N</IMPORTVIEW>
+    <TABLETRXTYPE>O</TABLETRXTYPE>
+    <ISREPORTINGTABLE>N</ISREPORTINGTABLE>
+    <EXPORT_ID>TST10_XkpMWb/9dJngZQIMKe0o3Q==</EXPORT_ID>
+    <VALIDATETABLE>N</VALIDATETABLE>
+    <ISMAINTAINVERSIONS>N</ISMAINTAINVERSIONS>
+    <ISTIMELINETRACKED>N</ISTIMELINETRACKED>
+  </AD_Table>
+</NewDataSet>

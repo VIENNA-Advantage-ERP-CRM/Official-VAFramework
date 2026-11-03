@@ -1,0 +1,90 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Form" msprop:SqlHash="-315484319" msprop:BaseTable.0="AD_FORM">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_CTXAREA_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CTXAREA_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_FORM_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_FORM_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="ACCESSLEVEL" msprop:OraDbType="104" msprop:BaseColumn="ACCESSLEVEL" type="xs:string" minOccurs="0" />
+                <xs:element name="CLASSNAME" msprop:OraDbType="119" msprop:BaseColumn="CLASSNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISBETAFUNCTIONALITY" msprop:OraDbType="104" msprop:BaseColumn="ISBETAFUNCTIONALITY" type="xs:string" minOccurs="0" />
+                <xs:element name="JSPURL" msprop:OraDbType="119" msprop:BaseColumn="JSPURL" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="ISREPORT" msprop:OraDbType="104" msprop:BaseColumn="ISREPORT" type="xs:string" minOccurs="0" />
+                <xs:element name="REPORTPATH" msprop:OraDbType="119" msprop:BaseColumn="REPORTPATH" type="xs:string" minOccurs="0" />
+                <xs:element name="SQLQUERY" msprop:OraDbType="119" msprop:BaseColumn="SQLQUERY" type="xs:string" minOccurs="0" />
+                <xs:element name="INCLUDEPROCEDURE" msprop:OraDbType="104" msprop:BaseColumn="INCLUDEPROCEDURE" type="xs:string" minOccurs="0" />
+                <xs:element name="INCLUDEIMAGE" msprop:OraDbType="104" msprop:BaseColumn="INCLUDEIMAGE" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGEFIELD" msprop:OraDbType="119" msprop:BaseColumn="IMAGEFIELD" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGEPATHFIELD" msprop:OraDbType="119" msprop:BaseColumn="IMAGEPATHFIELD" type="xs:string" minOccurs="0" />
+                <xs:element name="PROCEDURENAME" msprop:OraDbType="119" msprop:BaseColumn="PROCEDURENAME" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDIRECTPRINT" msprop:OraDbType="104" msprop:BaseColumn="ISDIRECTPRINT" type="xs:string" minOccurs="0" />
+                <xs:element name="FORMGROUP" msprop:OraDbType="104" msprop:BaseColumn="FORMGROUP" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="GROUPTYPE" msprop:OraDbType="104" msprop:BaseColumn="GROUPTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="DISPLAYNAME" msprop:OraDbType="119" msprop:BaseColumn="DISPLAYNAME" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Form>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_FORM_ID>1000203</AD_FORM_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CLASSNAME>TST10.TST10_HearingEntry</CLASSNAME>
+    <CREATED>2026-10-21T05:59:50+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Create, reschedule, adjourn and close a hearing.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <NAME>TST10_HearingEntry</NAME>
+    <UPDATED>2026-10-21T00:29:29+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISREPORT>N</ISREPORT>
+    <INCLUDEPROCEDURE>N</INCLUDEPROCEDURE>
+    <INCLUDEIMAGE>N</INCLUDEIMAGE>
+    <ISDIRECTPRINT>N</ISDIRECTPRINT>
+    <EXPORT_ID>TST10_Xk+ltspUidXgZQIMKe0o3Q==</EXPORT_ID>
+    <DISPLAYNAME>TST10 Hearing Entry</DISPLAYNAME>
+  </AD_Form>
+  <AD_Form>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_FORM_ID>1000204</AD_FORM_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CLASSNAME>TST10.TST10_CourtReports</CLASSNAME>
+    <CREATED>2026-10-21T06:22:15+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Cause list, case history and lawyer fee statement.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <NAME>TST10_CourtReports</NAME>
+    <UPDATED>2026-10-21T00:51:55+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISREPORT>N</ISREPORT>
+    <INCLUDEPROCEDURE>N</INCLUDEPROCEDURE>
+    <INCLUDEIMAGE>N</INCLUDEIMAGE>
+    <ISDIRECTPRINT>N</ISDIRECTPRINT>
+    <EXPORT_ID>TST10_Xk+wzQMGijjgZQIMKe0o3Q==</EXPORT_ID>
+    <DISPLAYNAME>TST10 Court Reports</DISPLAYNAME>
+  </AD_Form>
+</NewDataSet>

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Hosting;
 using VAdvantage.Classes;
@@ -145,7 +146,10 @@ namespace VIS.Models
                 MSetup ms = new MSetup(context, 0);
                 //  Step 1
                 //bool ok = ms.CreateClient(fClientName.Text, fOrgName.Text, fUserClient.Text, fUserOrg.Text);
+
                 bool ok = false;
+                VLogger.Get().SaveError("CCient", "Creating tenant - Name=" + clientName + ", Org=" + orgName
+                    + ", UserClient=" + userClient + ", UserOrg=" + userOrg);
                 VLogger.Get().SaveInfo("CCient", "Creating tenant - Name=" + clientName + ", Org=" + orgName
                     + ", UserClient=" + userClient + ", UserOrg=" + userOrg);
                 /* The package is deliberately NOT handed to CreateClient. MSetup installs
@@ -154,6 +158,7 @@ namespace VIS.Models
                    reach the screen until then. Left null, that step is skipped and the
                    install is queued below instead, once the response is on its way. */
                 TenantInfoM clientInfo = ms.CreateClient(clientName, orgName, userClient, userOrg);
+                VLogger.Get().SaveError("Not Reached", "");
                 VLogger.Get().SaveInfo("Tenant Creation", "Tenant Created - Name=" + clientName + ", Org=" + orgName
                     + ", UserClient=" + userClient + ", UserOrg=" + userOrg);
                 if (string.IsNullOrEmpty(clientInfo.Log))
@@ -295,6 +300,7 @@ namespace VIS.Models
                 {
                     //  the tenant is already created, a failed install must not be thrown away silently
                     VLogger.Get().Log(Level.SEVERE, "Queued module install failed - LogKey=" + logKey, ex);
+                    SaveInstallFailure(logKey, ex.Message);
                     return;
                 }
 
@@ -453,13 +459,132 @@ namespace VIS.Models
             /* Market answers only when the last module is through - long enough for a few
                modules, short enough that a dead endpoint fails instead of hanging. Market
                keeps installing after a timeout here; the log says how it went. */
-            string raw = CallMarketModuleApi(ctx, json, TimeSpan.FromMinutes(5));
+            string error;
+            string raw = CallMarketModuleApi(ctx, json, TimeSpan.FromMinutes(5), out error);
             if (raw == null)
             {
+                /* A timeout is not a failure - Market carries on installing and its log
+                   says how it went. Anything else means the request never got through. */
+                if (error != null)
+                {
+                    SaveInstallFailure(logKey, error);
+                }
                 return false;
             }
             VLogger.Get().Info("Modules installed - " + raw);
+
+            /* Market can turn the whole request down (a bad version string, say) without
+               touching its log - the module rows then stay "InProgress" for good, and the
+               screen would wait on them forever. Kept so GetInstallFailure can report it. */
+            string failure = GetRequestFailure(raw);
+            if (failure != null)
+            {
+                SaveInstallFailure(logKey, failure);
+            }
             return true;
+        }
+
+        /// <summary>
+        /// The error Market answered an install request (MD) with - the same array GL
+        /// answers with. Null when every entry went through, is still running, or the
+        /// answer is not in that form.
+        /// </summary>
+        private static string GetRequestFailure(string raw)
+        {
+            List<InstallLogInfo> result = null;
+            try
+            {
+                result = JsonConvert.DeserializeObject<List<InstallLogInfo>>(raw);
+            }
+            catch
+            {
+                return null;
+            }
+            if (result == null)
+            {
+                return null;
+            }
+
+            List<string> errors = new List<string>();
+            foreach (InstallLogInfo entry in result)
+            {
+                if (entry == null || entry.IsSuccess || String.IsNullOrEmpty(entry.Message)
+                    || entry.Message == "InProgress" || entry.Message == "NotStarted")
+                {
+                    continue;
+                }
+                errors.Add(String.IsNullOrEmpty(entry.Name) ? entry.Message : entry.Name + ": " + entry.Message);
+            }
+            return errors.Count == 0 ? null : String.Join(Environment.NewLine, errors.ToArray());
+        }
+
+        /// <summary>
+        /// File the failure of one install run is kept in. On disk rather than in memory:
+        /// installing modules restarts the AppDomain, and the screen keeps polling across
+        /// it. App_Data, because changes there do not restart the application.
+        /// </summary>
+        /// <returns>null for a log key that is not a plain name - it comes from the browser</returns>
+        private static string GetInstallFailureFile(string logKey)
+        {
+            if (String.IsNullOrEmpty(logKey) || !Regex.IsMatch(logKey, "^[0-9A-Za-z_-]+$"))
+            {
+                return null;
+            }
+            string dir = HostingEnvironment.MapPath("~/App_Data/ModuleInstall");
+            return dir == null ? null : Path.Combine(dir, logKey + ".txt");
+        }
+
+        /// <summary>
+        /// Keeps the error an install run stopped with, for the screen following it.
+        /// Files older than 30 days are cleared on the way, nobody polls for those.
+        /// </summary>
+        private static void SaveInstallFailure(string logKey, string message)
+        {
+            try
+            {
+                string file = GetInstallFailureFile(logKey);
+                if (file == null)
+                {
+                    return;
+                }
+                string dir = Path.GetDirectoryName(file);
+                Directory.CreateDirectory(dir);
+                foreach (string old in Directory.GetFiles(dir, "*.txt"))
+                {
+                    if (File.GetLastWriteTime(old) < DateTime.Now.AddDays(-30))
+                    {
+                        File.Delete(old);
+                    }
+                }
+                File.WriteAllText(file, String.IsNullOrEmpty(message) ? "Installation failed" : message, Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                VLogger.Get().Log(Level.SEVERE, "Install failure not saved - LogKey=" + logKey, ex);
+            }
+        }
+
+        /// <summary>
+        /// The error the install run stopped with, null while it is running or when it
+        /// went through. Read along with GetInstallLog: when Market turns the whole
+        /// request down, its log never says so.
+        /// </summary>
+        public string GetInstallFailure(string logKey)
+        {
+            try
+            {
+                string file = GetInstallFailureFile(logKey);
+                if (file == null || !File.Exists(file))
+                {
+                    return null;
+                }
+                return File.ReadAllText(file, Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                VLogger.Get().Log(Level.SEVERE, "Install failure not readable - LogKey=" + logKey, ex);
+                return null;
+            }
         }
 
         /// <summary>
@@ -597,6 +722,15 @@ namespace VIS.Models
         /// <returns>response returned by the Market API, null on failure</returns>
         private string CallMarketModuleApi(Ctx m_ctx, string jsonRequest, TimeSpan? timeout = null)
         {
+            string error;
+            return CallMarketModuleApi(m_ctx, jsonRequest, timeout, out error);
+        }
+
+        /// <param name="error">why the call failed - null when it went through, and null
+        /// on a timeout too: Market keeps working on the request after we stop waiting</param>
+        private string CallMarketModuleApi(Ctx m_ctx, string jsonRequest, TimeSpan? timeout, out string error)
+        {
+            error = null;
             try
             {
                 string url = GetMarketApiUrl(m_ctx);
@@ -616,6 +750,7 @@ namespace VIS.Models
                     if (!response.IsSuccessStatusCode)
                     {
                         VLogger.Get().Log(Level.SEVERE, "Market API failed: " + response.StatusCode + " - " + raw);
+                        error = "Market API failed: " + response.StatusCode;
                         return null;
                     }
 
@@ -623,9 +758,16 @@ namespace VIS.Models
                     return raw.StartsWith("\"") ? JsonConvert.DeserializeObject<string>(raw) : raw;
                 }
             }
+            catch (System.Threading.Tasks.TaskCanceledException ex)
+            {
+                //  HttpClient reports its timeout this way - the request is still with Market
+                VLogger.Get().Log(Level.WARNING, "Market API timed out", ex);
+                return null;
+            }
             catch (Exception ex)
             {
                 VLogger.Get().Log(Level.SEVERE, "Market API error", ex);
+                error = ex.Message;
                 return null;
             }
         }

@@ -1,0 +1,149 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Process" msprop:SqlHash="-1255745844" msprop:BaseTable.0="AD_PROCESS">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_CTXAREA_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CTXAREA_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_PRINTFORMAT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_PRINTFORMAT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_PROCESS_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_PROCESS_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REPORTVIEW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REPORTVIEW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WORKFLOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_WORKFLOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="ACCESSLEVEL" msprop:OraDbType="104" msprop:BaseColumn="ACCESSLEVEL" type="xs:string" minOccurs="0" />
+                <xs:element name="CLASSNAME" msprop:OraDbType="119" msprop:BaseColumn="CLASSNAME" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISBETAFUNCTIONALITY" msprop:OraDbType="104" msprop:BaseColumn="ISBETAFUNCTIONALITY" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDIRECTPRINT" msprop:OraDbType="104" msprop:BaseColumn="ISDIRECTPRINT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISREPORT" msprop:OraDbType="104" msprop:BaseColumn="ISREPORT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSERVERPROCESS" msprop:OraDbType="104" msprop:BaseColumn="ISSERVERPROCESS" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PROCEDURENAME" msprop:OraDbType="119" msprop:BaseColumn="PROCEDURENAME" type="xs:string" minOccurs="0" />
+                <xs:element name="STATISTIC_COUNT" msprop:OraDbType="113" msprop:BaseColumn="STATISTIC_COUNT" type="xs:long" minOccurs="0" />
+                <xs:element name="STATISTIC_SECONDS" msprop:OraDbType="107" msprop:BaseColumn="STATISTIC_SECONDS" type="xs:decimal" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="VALUE" msprop:OraDbType="119" msprop:BaseColumn="VALUE" type="xs:string" minOccurs="0" />
+                <xs:element name="WORKFLOWVALUE" msprop:OraDbType="119" msprop:BaseColumn="WORKFLOWVALUE" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_IMAGE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_IMAGE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="ISEXTERNAL" msprop:OraDbType="104" msprop:BaseColumn="ISEXTERNAL" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDASHBOARD" msprop:OraDbType="104" msprop:BaseColumn="ISDASHBOARD" type="xs:string" minOccurs="0" />
+                <xs:element name="ADDMENU" msprop:OraDbType="104" msprop:BaseColumn="ADDMENU" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_BVIEW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_BVIEW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REPORTTEMPLATE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REPORTTEMPLATE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCRYSTALREPORT" msprop:OraDbType="104" msprop:BaseColumn="ISCRYSTALREPORT" type="xs:string" minOccurs="0" />
+                <xs:element name="INCLUDEIMAGE" msprop:OraDbType="104" msprop:BaseColumn="INCLUDEIMAGE" type="xs:string" minOccurs="0" />
+                <xs:element name="SQLQUERY" msprop:OraDbType="119" msprop:BaseColumn="SQLQUERY" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGEFIELD" msprop:OraDbType="119" msprop:BaseColumn="IMAGEFIELD" type="xs:string" minOccurs="0" />
+                <xs:element name="IMAGEPATHFIELD" msprop:OraDbType="119" msprop:BaseColumn="IMAGEPATHFIELD" type="xs:string" minOccurs="0" />
+                <xs:element name="REPORTPATH" msprop:OraDbType="119" msprop:BaseColumn="REPORTPATH" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_REPORTFORMAT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REPORTFORMAT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REPORTMASTER_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REPORTMASTER_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="ISBACKGROUNDPROCESS" msprop:OraDbType="104" msprop:BaseColumn="ISBACKGROUNDPROCESS" type="xs:string" minOccurs="0" />
+                <xs:element name="ASKUSERBGPROCESS" msprop:OraDbType="104" msprop:BaseColumn="ASKUSERBGPROCESS" type="xs:string" minOccurs="0" />
+                <xs:element name="VA039_BIREPORTID" msprop:OraDbType="119" msprop:BaseColumn="VA039_BIREPORTID" type="xs:string" minOccurs="0" />
+                <xs:element name="VA039_JASPERREPORTPATH" msprop:OraDbType="119" msprop:BaseColumn="VA039_JASPERREPORTPATH" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Process>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_PROCESS_ID>1000712</AD_PROCESS_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CLASSNAME>TST10.Process.TST10_UpdateCaseDates</CLASSNAME>
+    <CREATED>2026-10-21T06:01:15+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Recalculates the next hearing date and status of the running cases.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISDIRECTPRINT>N</ISDIRECTPRINT>
+    <ISREPORT>N</ISREPORT>
+    <ISSERVERPROCESS>N</ISSERVERPROCESS>
+    <NAME>TST10 Update Case Dates</NAME>
+    <STATISTIC_COUNT>0</STATISTIC_COUNT>
+    <STATISTIC_SECONDS>0</STATISTIC_SECONDS>
+    <UPDATED>2026-10-21T00:31:11+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALUE>TST10_UpdateCaseDates</VALUE>
+    <ISEXTERNAL>N</ISEXTERNAL>
+    <ISDASHBOARD>N</ISDASHBOARD>
+    <ADDMENU>N</ADDMENU>
+    <EXPORT_ID>TST10_Xk+vXqd4ikPgZQIMKe0o3Q==</EXPORT_ID>
+    <INCLUDEIMAGE>N</INCLUDEIMAGE>
+    <ISBACKGROUNDPROCESS>N</ISBACKGROUNDPROCESS>
+    <ASKUSERBGPROCESS>N</ASKUSERBGPROCESS>
+  </AD_Process>
+  <AD_Process>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_PROCESS_ID>1000710</AD_PROCESS_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CLASSNAME>TST10.Process.TST10_HearingReminder</CLASSNAME>
+    <CREATED>2026-10-21T06:00:11+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Lists the hearings of the next days and leaves a notice for the user.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISDIRECTPRINT>N</ISDIRECTPRINT>
+    <ISREPORT>N</ISREPORT>
+    <ISSERVERPROCESS>N</ISSERVERPROCESS>
+    <NAME>TST10 Hearing Reminder</NAME>
+    <STATISTIC_COUNT>0</STATISTIC_COUNT>
+    <STATISTIC_SECONDS>0</STATISTIC_SECONDS>
+    <UPDATED>2026-10-21T00:30:02+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALUE>TST10_HearingReminder</VALUE>
+    <ISEXTERNAL>N</ISEXTERNAL>
+    <ISDASHBOARD>N</ISDASHBOARD>
+    <ADDMENU>N</ADDMENU>
+    <EXPORT_ID>TST10_Xk+ltspVidXgZQIMKe0o3Q==</EXPORT_ID>
+    <INCLUDEIMAGE>N</INCLUDEIMAGE>
+    <ISBACKGROUNDPROCESS>N</ISBACKGROUNDPROCESS>
+    <ASKUSERBGPROCESS>N</ASKUSERBGPROCESS>
+  </AD_Process>
+  <AD_Process>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_PROCESS_ID>1000711</AD_PROCESS_ID>
+    <ACCESSLEVEL>3</ACCESSLEVEL>
+    <CLASSNAME>TST10.Process.TST10_MarkMissedHearings</CLASSNAME>
+    <CREATED>2026-10-21T06:00:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Marks open hearings of past dates as Missed.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISBETAFUNCTIONALITY>N</ISBETAFUNCTIONALITY>
+    <ISDIRECTPRINT>N</ISDIRECTPRINT>
+    <ISREPORT>N</ISREPORT>
+    <ISSERVERPROCESS>N</ISSERVERPROCESS>
+    <NAME>TST10 Mark Missed Hearings</NAME>
+    <STATISTIC_COUNT>0</STATISTIC_COUNT>
+    <STATISTIC_SECONDS>0</STATISTIC_SECONDS>
+    <UPDATED>2026-10-21T00:30:39+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALUE>TST10_MarkMissedHearings</VALUE>
+    <ISEXTERNAL>N</ISEXTERNAL>
+    <ISDASHBOARD>N</ISDASHBOARD>
+    <ADDMENU>N</ADDMENU>
+    <EXPORT_ID>TST10_Xk+ltsp5idXgZQIMKe0o3Q==</EXPORT_ID>
+    <INCLUDEIMAGE>N</INCLUDEIMAGE>
+    <ISBACKGROUNDPROCESS>N</ISBACKGROUNDPROCESS>
+    <ASKUSERBGPROCESS>N</ASKUSERBGPROCESS>
+  </AD_Process>
+</NewDataSet>

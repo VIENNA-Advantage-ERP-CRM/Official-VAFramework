@@ -1,0 +1,250 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_HeaderLayout" msprop:SqlHash="-508096720" msprop:BaseTable.0="AD_HEADERLAYOUT">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_HEADERLAYOUT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_HEADERLAYOUT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="ALIGNMENT" msprop:OraDbType="104" msprop:BaseColumn="ALIGNMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="BACKGROUNDCOLOR" msprop:OraDbType="119" msprop:BaseColumn="BACKGROUNDCOLOR" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="HEIGHT" msprop:OraDbType="113" msprop:BaseColumn="HEIGHT" type="xs:long" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="PADDING" msprop:OraDbType="119" msprop:BaseColumn="PADDING" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="WIDTH" msprop:OraDbType="113" msprop:BaseColumn="WIDTH" type="xs:long" minOccurs="0" />
+                <xs:element name="ISHEADERVIEW" msprop:OraDbType="104" msprop:BaseColumn="ISHEADERVIEW" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSYSTEMTEMPLATE" msprop:OraDbType="104" msprop:BaseColumn="ISSYSTEMTEMPLATE" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_TEMPLATECATEGORY_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_TEMPLATECATEGORY_ID" type="xs:long" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000323</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>H</ALIGNMENT>
+    <BACKGROUNDCOLOR>color:black;font-family:Roboto,Arial,sans-serif;background: linear-gradient(   180deg,   rgba(255, 255, 255, 0.92) 0%,   rgba(246, 251, 255, 0.92) 100% );</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T05:59:24+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+04RhzijrgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>70</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Lawyer Header</NAME>
+    <UPDATED>2026-10-21T04:36:24+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>Y</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000324</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>V</ALIGNMENT>
+    <BACKGROUNDCOLOR>position:relative;display:flex;width:380px !important;min-width:380px !important;max-width:380px !important;height:auto !important;box-sizing:border-box;border:0;border-bottom:1px solid #ebebeb;background:#fcfcfc;text-align:left;cursor:pointer;font-family:Roboto,Arial,sans-serif;overflow:hidden;</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T05:59:29+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+0hswiij/gZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>200</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Lawyer - Card</NAME>
+    <UPDATED>2026-10-21T04:36:25+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>N</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000319</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>H</ALIGNMENT>
+    <BACKGROUNDCOLOR>color:black;font-family:Roboto,Arial,sans-serif;background: linear-gradient(   180deg,   rgba(255, 255, 255, 0.92) 0%,   rgba(246, 251, 255, 0.92) 100% );</BACKGROUNDCOLOR>
+    <CREATED>2026-10-20T23:33:31+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XkpEIrmudJHgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>70</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseType Header</NAME>
+    <UPDATED>2026-10-21T04:36:21+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>Y</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000320</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>V</ALIGNMENT>
+    <BACKGROUNDCOLOR>position:relative;display:flex;width:380px !important;min-width:380px !important;max-width:380px !important;height:auto !important;box-sizing:border-box;border:0;border-bottom:1px solid #ebebeb;background:#fcfcfc;text-align:left;cursor:pointer;font-family:Roboto,Arial,sans-serif;overflow:hidden;</BACKGROUNDCOLOR>
+    <CREATED>2026-10-20T23:33:37+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XkpMWb+fdJngZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>200</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseType - Card</NAME>
+    <UPDATED>2026-10-21T04:36:22+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>N</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000322</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>V</ALIGNMENT>
+    <BACKGROUNDCOLOR>position:relative;display:flex;width:380px !important;min-width:380px !important;max-width:380px !important;height:auto !important;box-sizing:border-box;border:0;border-bottom:1px solid #ebebeb;background:#fcfcfc;text-align:left;cursor:pointer;font-family:Roboto,Arial,sans-serif;overflow:hidden;</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T05:54:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+tlFycijzgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>200</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Court - Card</NAME>
+    <UPDATED>2026-10-21T04:36:23+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>N</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000317</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>H</ALIGNMENT>
+    <BACKGROUNDCOLOR>color:black;font-family:Roboto,Arial,sans-serif;background: linear-gradient(   180deg,   rgba(255, 255, 255, 0.92) 0%,   rgba(246, 251, 255, 0.92) 100% );</BACKGROUNDCOLOR>
+    <CREATED>2026-10-20T23:28:42+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XkpMWb4sdJngZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>70</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_FeeStructure Header</NAME>
+    <UPDATED>2026-10-21T04:36:19+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>Y</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000318</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>V</ALIGNMENT>
+    <BACKGROUNDCOLOR>position:relative;display:flex;width:380px !important;min-width:380px !important;max-width:380px !important;height:auto !important;box-sizing:border-box;border:0;border-bottom:1px solid #ebebeb;background:#fcfcfc;text-align:left;cursor:pointer;font-family:Roboto,Arial,sans-serif;overflow:hidden;</BACKGROUNDCOLOR>
+    <CREATED>2026-10-20T23:28:47+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XkpEIrgzdJHgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>200</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_FeeStructure - Card</NAME>
+    <UPDATED>2026-10-21T04:36:20+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>N</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000327</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>H</ALIGNMENT>
+    <BACKGROUNDCOLOR>color:black;font-family:Roboto,Arial,sans-serif;background: linear-gradient(   180deg,   rgba(255, 255, 255, 0.92) 0%,   rgba(246, 251, 255, 0.92) 100% );</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T09:53:32+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XlMXlgMrl67gZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>70</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Hearing Header</NAME>
+    <UPDATED>2026-10-21T04:36:27+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>Y</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000328</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>V</ALIGNMENT>
+    <BACKGROUNDCOLOR>position:relative;display:flex;width:380px !important;min-width:380px !important;max-width:380px !important;height:auto !important;box-sizing:border-box;border:0;border-bottom:1px solid #ebebeb;background:#fcfcfc;text-align:left;cursor:pointer;font-family:Roboto,Arial,sans-serif;overflow:hidden;</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T09:53:39+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XlMYbMxol7LgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>200</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Hearing - Card</NAME>
+    <UPDATED>2026-10-21T04:36:28+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>N</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000325</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>H</ALIGNMENT>
+    <BACKGROUNDCOLOR>color:black;font-family:Roboto,Arial,sans-serif;background: linear-gradient(   180deg,   rgba(255, 255, 255, 0.92) 0%,   rgba(246, 251, 255, 0.92) 100% );</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T06:14:42+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+0htICij/gZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>70</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Case Header</NAME>
+    <UPDATED>2026-10-21T04:36:26+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>Y</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000326</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>V</ALIGNMENT>
+    <BACKGROUNDCOLOR>position:relative;display:flex;width:380px !important;min-width:380px !important;max-width:380px !important;height:auto !important;box-sizing:border-box;border:0;border-bottom:1px solid #ebebeb;background:#fcfcfc;text-align:left;cursor:pointer;font-family:Roboto,Arial,sans-serif;overflow:hidden;</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T06:14:48+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+lts3didXgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>200</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Case - Card</NAME>
+    <UPDATED>2026-10-21T04:36:26+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>N</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+  <AD_HeaderLayout>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_HEADERLAYOUT_ID>1000321</AD_HEADERLAYOUT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <ALIGNMENT>H</ALIGNMENT>
+    <BACKGROUNDCOLOR>color:black;font-family:Roboto,Arial,sans-serif;background: linear-gradient(   180deg,   rgba(255, 255, 255, 0.92) 0%,   rgba(246, 251, 255, 0.92) 100% );</BACKGROUNDCOLOR>
+    <CREATED>2026-10-21T05:53:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+ltskdidXgZQIMKe0o3Q==</EXPORT_ID>
+    <HEIGHT>70</HEIGHT>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Court Header</NAME>
+    <UPDATED>2026-10-21T04:36:22+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDTH>250</WIDTH>
+    <ISHEADERVIEW>Y</ISHEADERVIEW>
+    <ISSYSTEMTEMPLATE>Y</ISSYSTEMTEMPLATE>
+  </AD_HeaderLayout>
+</NewDataSet>

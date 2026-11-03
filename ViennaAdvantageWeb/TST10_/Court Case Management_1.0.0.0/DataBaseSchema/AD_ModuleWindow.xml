@@ -1,0 +1,165 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_ModuleWindow" msprop:SqlHash="881460553" msprop:BaseTable.0="AD_MODULEWINDOW">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_MODULEWINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_MODULEWINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_WINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_MODULEINFO_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_MODULEINFO_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="ISMENUITEM" msprop:OraDbType="104" msprop:BaseColumn="ISMENUITEM" type="xs:string" minOccurs="0" />
+                <xs:element name="PARENTFOLDER" msprop:OraDbType="119" msprop:BaseColumn="PARENTFOLDER" type="xs:string" minOccurs="0" />
+                <xs:element name="MENUITEM" msprop:OraDbType="119" msprop:BaseColumn="MENUITEM" type="xs:string" minOccurs="0" />
+                <xs:element name="MENUITEMEXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="MENUITEMEXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_MODULEMENU_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_MODULEMENU_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_MODULEMENUFOLDER_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_MODULEMENUFOLDER_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="SEQNO" msprop:OraDbType="113" msprop:BaseColumn="SEQNO" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATETABSANDFIELDS" msprop:OraDbType="104" msprop:BaseColumn="CREATETABSANDFIELDS" type="xs:string" minOccurs="0" />
+                <xs:element name="SHOWINSIDEMENU" msprop:OraDbType="104" msprop:BaseColumn="SHOWINSIDEMENU" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_IMAGE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_IMAGE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="SEQINSIDEMENU" msprop:OraDbType="113" msprop:BaseColumn="SEQINSIDEMENU" type="xs:long" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_ModuleWindow>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEWINDOW_ID>1001864</AD_MODULEWINDOW_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000744</AD_WINDOW_ID>
+    <CREATED>2026-10-21T10:19:18+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Case</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <UPDATED>2026-10-21T05:38:56+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <EXPORT_ID>TST10_XlMXY58gl7DgZQIMKe0o3Q==</EXPORT_ID>
+    <ISMENUITEM>Y</ISMENUITEM>
+    <MENUITEM>TST10 Case</MENUITEM>
+    <MENUITEMEXPORT_ID>TST10_Xk+0htIJij/gZQIMKe0o3Q==</MENUITEMEXPORT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <SEQNO>10</SEQNO>
+    <CREATETABSANDFIELDS>N         </CREATETABSANDFIELDS>
+    <SHOWINSIDEMENU>N</SHOWINSIDEMENU>
+  </AD_ModuleWindow>
+  <AD_ModuleWindow>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEWINDOW_ID>1001865</AD_MODULEWINDOW_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000741</AD_WINDOW_ID>
+    <CREATED>2026-10-21T10:24:43+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Case Type</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <UPDATED>2026-10-21T05:38:53+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <EXPORT_ID>TST10_XlMYLjyEl7jgZQIMKe0o3Q==</EXPORT_ID>
+    <ISMENUITEM>Y</ISMENUITEM>
+    <MENUITEM>TST10 Case Type</MENUITEM>
+    <MENUITEMEXPORT_ID>TST10_XkpEJxPcdJXgZQIMKe0o3Q==</MENUITEMEXPORT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <SEQNO>20</SEQNO>
+    <CREATETABSANDFIELDS>N         </CREATETABSANDFIELDS>
+    <SHOWINSIDEMENU>N</SHOWINSIDEMENU>
+  </AD_ModuleWindow>
+  <AD_ModuleWindow>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEWINDOW_ID>1001869</AD_MODULEWINDOW_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000743</AD_WINDOW_ID>
+    <CREATED>2026-10-21T10:37:12+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Lawyer</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <UPDATED>2026-10-21T05:38:54+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <EXPORT_ID>TST10_XlMXQwL6l7TgZQIMKe0o3Q==</EXPORT_ID>
+    <ISMENUITEM>Y</ISMENUITEM>
+    <MENUITEM>TST10 Lawyer</MENUITEM>
+    <MENUITEMEXPORT_ID>TST10_Xk+0hswmij/gZQIMKe0o3Q==</MENUITEMEXPORT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <SEQNO>60</SEQNO>
+    <CREATETABSANDFIELDS>N         </CREATETABSANDFIELDS>
+    <SHOWINSIDEMENU>N</SHOWINSIDEMENU>
+  </AD_ModuleWindow>
+  <AD_ModuleWindow>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEWINDOW_ID>1001867</AD_MODULEWINDOW_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000740</AD_WINDOW_ID>
+    <CREATED>2026-10-21T10:29:22+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Fee Structure</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <UPDATED>2026-10-21T05:38:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <EXPORT_ID>TST10_XlMYbMy0l7LgZQIMKe0o3Q==</EXPORT_ID>
+    <ISMENUITEM>Y</ISMENUITEM>
+    <MENUITEM>TST10 Fee Structure</MENUITEM>
+    <MENUITEMEXPORT_ID>TST10_XkpMWb46dJngZQIMKe0o3Q==</MENUITEMEXPORT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <SEQNO>40</SEQNO>
+    <CREATETABSANDFIELDS>N         </CREATETABSANDFIELDS>
+    <SHOWINSIDEMENU>N</SHOWINSIDEMENU>
+  </AD_ModuleWindow>
+  <AD_ModuleWindow>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEWINDOW_ID>1001868</AD_MODULEWINDOW_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000745</AD_WINDOW_ID>
+    <CREATED>2026-10-21T10:31:48+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Hearing</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <UPDATED>2026-10-21T05:38:58+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <EXPORT_ID>TST10_XlMYbMy5l7LgZQIMKe0o3Q==</EXPORT_ID>
+    <ISMENUITEM>Y</ISMENUITEM>
+    <MENUITEM>TST10 Hearing</MENUITEM>
+    <MENUITEMEXPORT_ID>TST10_XlMXlgMvl67gZQIMKe0o3Q==</MENUITEMEXPORT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <SEQNO>50</SEQNO>
+    <CREATETABSANDFIELDS>N         </CREATETABSANDFIELDS>
+    <SHOWINSIDEMENU>N</SHOWINSIDEMENU>
+  </AD_ModuleWindow>
+  <AD_ModuleWindow>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEWINDOW_ID>1001866</AD_MODULEWINDOW_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOW_ID>1000742</AD_WINDOW_ID>
+    <CREATED>2026-10-21T10:25:52+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>TST10 Court</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <UPDATED>2026-10-21T05:38:56+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <EXPORT_ID>TST10_XlMW4ISPl7bgZQIMKe0o3Q==</EXPORT_ID>
+    <ISMENUITEM>Y</ISMENUITEM>
+    <MENUITEM>TST10 Court</MENUITEM>
+    <MENUITEMEXPORT_ID>TST10_Xk+0hsmEij/gZQIMKe0o3Q==</MENUITEMEXPORT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <SEQNO>30</SEQNO>
+    <CREATETABSANDFIELDS>N         </CREATETABSANDFIELDS>
+    <SHOWINSIDEMENU>N</SHOWINSIDEMENU>
+  </AD_ModuleWindow>
+</NewDataSet>

@@ -1,0 +1,119 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="AD_Reference" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Reference" msprop:SqlHash="980018861" msprop:BaseTable.0="AD_REFERENCE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="VFORMAT" msprop:OraDbType="119" msprop:BaseColumn="VFORMAT" type="xs:string" minOccurs="0" />
+                <xs:element name="VALIDATIONTYPE" msprop:OraDbType="104" msprop:BaseColumn="VALIDATIONTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="LISTDISPLAYOPTION" msprop:OraDbType="104" msprop:BaseColumn="LISTDISPLAYOPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_GUID" msprop:OraDbType="120" msprop:BaseColumn="AD_REFERENCE_GUID" type="xs:base64Binary" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>389</AD_REFERENCE_ID>
+    <CREATED>2012-12-21T00:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>_EntityTypeNew</NAME>
+    <UPDATED>2026-10-27T15:21:48+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>T</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_389</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+    <AD_REFERENCE_GUID>QMgW6fuf5gTgZQIMKe0o3Q==</AD_REFERENCE_GUID>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>103</AD_REFERENCE_ID>
+    <CREATED>2000-01-02T13:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Message Type list</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>AD_Message Type</NAME>
+    <UPDATED>2026-10-27T15:21:47+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VFORMAT>L</VFORMAT>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_103</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+    <AD_REFERENCE_GUID>QMgW6fvS5gTgZQIMKe0o3Q==</AD_REFERENCE_GUID>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000497</AD_REFERENCE_ID>
+    <CREATED>2024-08-12T03:22:09+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ENTITYTYPE>U</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>WidgetTypeRef</NAME>
+    <UPDATED>2026-10-27T15:22:02+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_1000296</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+    <AD_REFERENCE_GUID>QMgW6f7b5gTgZQIMKe0o3Q==</AD_REFERENCE_GUID>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>108</AD_REFERENCE_ID>
+    <CREATED>2012-12-01T00:00:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Window Type list</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <HELP>e.g. M = Multi/Single (one uppercase character)</HELP>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>AD_Window Types</NAME>
+    <UPDATED>2026-10-27T15:22:02+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VFORMAT>L</VFORMAT>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_108</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+    <AD_REFERENCE_GUID>QMgW6fvW5gTgZQIMKe0o3Q==</AD_REFERENCE_GUID>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000496</AD_REFERENCE_ID>
+    <CREATED>2024-08-11T12:27:14+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ENTITYTYPE>U</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>WidgetRowCols</NAME>
+    <UPDATED>2026-10-27T15:22:01+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_1000295</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+    <AD_REFERENCE_GUID>QMgW6f5n5gTgZQIMKe0o3Q==</AD_REFERENCE_GUID>
+  </AD_Reference>
+</NewDataSet>

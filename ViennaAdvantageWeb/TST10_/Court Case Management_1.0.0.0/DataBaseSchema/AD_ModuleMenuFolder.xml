@@ -1,0 +1,47 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_ModuleMenuFolder" msprop:SqlHash="-1187641760" msprop:BaseTable.0="AD_MODULEMENUFOLDER">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_MODULEMENUFOLDER_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_MODULEMENUFOLDER_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISPARENTFOLDER" msprop:OraDbType="104" msprop:BaseColumn="ISPARENTFOLDER" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_MODULEINFO_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_MODULEINFO_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="LABEL" msprop:OraDbType="119" msprop:BaseColumn="LABEL" type="xs:string" minOccurs="0" />
+                <xs:element name="SEQNO" msprop:OraDbType="113" msprop:BaseColumn="SEQNO" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REF_MODULEMENUFOLDER_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REF_MODULEMENUFOLDER_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_IMAGE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_IMAGE_ID" type="xs:long" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_ModuleMenuFolder>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEMENUFOLDER_ID>1000205</AD_MODULEMENUFOLDER_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <CREATED>2026-10-21T10:18:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XlMW4ISDl7bgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISPARENTFOLDER>N</ISPARENTFOLDER>
+    <NAME>Court Case Management</NAME>
+    <UPDATED>2026-10-21T05:38:51+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <SEQNO>10</SEQNO>
+  </AD_ModuleMenuFolder>
+</NewDataSet>

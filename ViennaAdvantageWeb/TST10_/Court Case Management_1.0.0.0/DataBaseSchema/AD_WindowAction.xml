@@ -1,0 +1,294 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_WindowAction" msprop:SqlHash="-707477275" msprop:BaseTable.0="AD_WINDOWACTION">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WINDOWACTION_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_WINDOWACTION_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WINDOW_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_WINDOW_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISAPPOINTMENT" msprop:OraDbType="104" msprop:BaseColumn="ISAPPOINTMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISEMAIL" msprop:OraDbType="104" msprop:BaseColumn="ISEMAIL" type="xs:string" minOccurs="0" />
+                <xs:element name="ISLETTER" msprop:OraDbType="104" msprop:BaseColumn="ISLETTER" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSMS" msprop:OraDbType="104" msprop:BaseColumn="ISSMS" type="xs:string" minOccurs="0" />
+                <xs:element name="ISTASK" msprop:OraDbType="104" msprop:BaseColumn="ISTASK" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="ISFAXEMAIL" msprop:OraDbType="104" msprop:BaseColumn="ISFAXEMAIL" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="ISARCHIVE" msprop:OraDbType="104" msprop:BaseColumn="ISARCHIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISATTACHDOCUMENTFROM" msprop:OraDbType="104" msprop:BaseColumn="ISATTACHDOCUMENTFROM" type="xs:string" minOccurs="0" />
+                <xs:element name="ISATTACHEMAIL" msprop:OraDbType="104" msprop:BaseColumn="ISATTACHEMAIL" type="xs:string" minOccurs="0" />
+                <xs:element name="ISATTACHMENT" msprop:OraDbType="104" msprop:BaseColumn="ISATTACHMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCHAT" msprop:OraDbType="104" msprop:BaseColumn="ISCHAT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCHECKREQUEST" msprop:OraDbType="104" msprop:BaseColumn="ISCHECKREQUEST" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCOPYRECORD" msprop:OraDbType="104" msprop:BaseColumn="ISCOPYRECORD" type="xs:string" minOccurs="0" />
+                <xs:element name="ISCREATEDOCUMENT" msprop:OraDbType="104" msprop:BaseColumn="ISCREATEDOCUMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISHISTORY" msprop:OraDbType="104" msprop:BaseColumn="ISHISTORY" type="xs:string" minOccurs="0" />
+                <xs:element name="ACTION1" msprop:OraDbType="104" msprop:BaseColumn="ACTION1" type="xs:string" minOccurs="0" />
+                <xs:element name="ACTION2" msprop:OraDbType="104" msprop:BaseColumn="ACTION2" type="xs:string" minOccurs="0" />
+                <xs:element name="ISIMPORTMAP" msprop:OraDbType="104" msprop:BaseColumn="ISIMPORTMAP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISMARKTOEXPORT" msprop:OraDbType="104" msprop:BaseColumn="ISMARKTOEXPORT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISROLECENTERVIEW" msprop:OraDbType="104" msprop:BaseColumn="ISROLECENTERVIEW" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSUBSCRIBERECORD" msprop:OraDbType="104" msprop:BaseColumn="ISSUBSCRIBERECORD" type="xs:string" minOccurs="0" />
+                <xs:element name="ISUPLOADDOCUMENT" msprop:OraDbType="104" msprop:BaseColumn="ISUPLOADDOCUMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISVIEWDOCUMENT" msprop:OraDbType="104" msprop:BaseColumn="ISVIEWDOCUMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="ISZOOMACROSS" msprop:OraDbType="104" msprop:BaseColumn="ISZOOMACROSS" type="xs:string" minOccurs="0" />
+                <xs:element name="ISGENERATEATTACHMENTCODE" msprop:OraDbType="104" msprop:BaseColumn="ISGENERATEATTACHMENTCODE" type="xs:string" minOccurs="0" />
+                <xs:element name="ISASSIGNRECORD" msprop:OraDbType="104" msprop:BaseColumn="ISASSIGNRECORD" type="xs:string" minOccurs="0" />
+                <xs:element name="ISADVANCETASK" msprop:OraDbType="104" msprop:BaseColumn="ISADVANCETASK" type="xs:string" minOccurs="0" />
+                <xs:element name="ISRISKREGISTER" msprop:OraDbType="104" msprop:BaseColumn="ISRISKREGISTER" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_WindowAction>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOWACTION_ID>1000320</AD_WINDOWACTION_ID>
+    <AD_WINDOW_ID>1000744</AD_WINDOW_ID>
+    <CREATED>2026-10-21T06:15:10+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISAPPOINTMENT>Y</ISAPPOINTMENT>
+    <ISEMAIL>Y</ISEMAIL>
+    <ISLETTER>Y</ISLETTER>
+    <ISSMS>Y</ISSMS>
+    <ISTASK>Y</ISTASK>
+    <UPDATED>2026-10-21T04:38:30+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISFAXEMAIL>N</ISFAXEMAIL>
+    <EXPORT_ID>TST10_Xk+vXqtSikPgZQIMKe0o3Q==</EXPORT_ID>
+    <ISARCHIVE>Y</ISARCHIVE>
+    <ISATTACHDOCUMENTFROM>Y</ISATTACHDOCUMENTFROM>
+    <ISATTACHEMAIL>Y</ISATTACHEMAIL>
+    <ISATTACHMENT>Y</ISATTACHMENT>
+    <ISCHAT>Y</ISCHAT>
+    <ISCHECKREQUEST>Y</ISCHECKREQUEST>
+    <ISCOPYRECORD>Y</ISCOPYRECORD>
+    <ISCREATEDOCUMENT>Y</ISCREATEDOCUMENT>
+    <ISHISTORY>Y</ISHISTORY>
+    <ACTION1>Y</ACTION1>
+    <ACTION2>Y</ACTION2>
+    <ISIMPORTMAP>Y</ISIMPORTMAP>
+    <ISMARKTOEXPORT>N</ISMARKTOEXPORT>
+    <ISROLECENTERVIEW>Y</ISROLECENTERVIEW>
+    <ISSUBSCRIBERECORD>Y</ISSUBSCRIBERECORD>
+    <ISUPLOADDOCUMENT>Y</ISUPLOADDOCUMENT>
+    <ISVIEWDOCUMENT>Y</ISVIEWDOCUMENT>
+    <ISZOOMACROSS>Y</ISZOOMACROSS>
+    <ISGENERATEATTACHMENTCODE>N</ISGENERATEATTACHMENTCODE>
+    <ISASSIGNRECORD>N</ISASSIGNRECORD>
+    <ISADVANCETASK>N</ISADVANCETASK>
+    <ISRISKREGISTER>N</ISRISKREGISTER>
+  </AD_WindowAction>
+  <AD_WindowAction>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOWACTION_ID>1000317</AD_WINDOWACTION_ID>
+    <AD_WINDOW_ID>1000741</AD_WINDOW_ID>
+    <CREATED>2026-10-20T23:33:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISAPPOINTMENT>Y</ISAPPOINTMENT>
+    <ISEMAIL>Y</ISEMAIL>
+    <ISLETTER>Y</ISLETTER>
+    <ISSMS>Y</ISSMS>
+    <ISTASK>Y</ISTASK>
+    <UPDATED>2026-10-21T04:38:26+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISFAXEMAIL>N</ISFAXEMAIL>
+    <EXPORT_ID>TST10_XkpEJxPbdJXgZQIMKe0o3Q==</EXPORT_ID>
+    <ISARCHIVE>Y</ISARCHIVE>
+    <ISATTACHDOCUMENTFROM>Y</ISATTACHDOCUMENTFROM>
+    <ISATTACHEMAIL>Y</ISATTACHEMAIL>
+    <ISATTACHMENT>Y</ISATTACHMENT>
+    <ISCHAT>Y</ISCHAT>
+    <ISCHECKREQUEST>Y</ISCHECKREQUEST>
+    <ISCOPYRECORD>Y</ISCOPYRECORD>
+    <ISCREATEDOCUMENT>Y</ISCREATEDOCUMENT>
+    <ISHISTORY>Y</ISHISTORY>
+    <ACTION1>Y</ACTION1>
+    <ACTION2>Y</ACTION2>
+    <ISIMPORTMAP>Y</ISIMPORTMAP>
+    <ISMARKTOEXPORT>N</ISMARKTOEXPORT>
+    <ISROLECENTERVIEW>Y</ISROLECENTERVIEW>
+    <ISSUBSCRIBERECORD>Y</ISSUBSCRIBERECORD>
+    <ISUPLOADDOCUMENT>Y</ISUPLOADDOCUMENT>
+    <ISVIEWDOCUMENT>Y</ISVIEWDOCUMENT>
+    <ISZOOMACROSS>Y</ISZOOMACROSS>
+    <ISGENERATEATTACHMENTCODE>N</ISGENERATEATTACHMENTCODE>
+    <ISASSIGNRECORD>N</ISASSIGNRECORD>
+    <ISADVANCETASK>N</ISADVANCETASK>
+    <ISRISKREGISTER>N</ISRISKREGISTER>
+  </AD_WindowAction>
+  <AD_WindowAction>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOWACTION_ID>1000319</AD_WINDOWACTION_ID>
+    <AD_WINDOW_ID>1000743</AD_WINDOW_ID>
+    <CREATED>2026-10-21T05:59:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISAPPOINTMENT>Y</ISAPPOINTMENT>
+    <ISEMAIL>Y</ISEMAIL>
+    <ISLETTER>Y</ISLETTER>
+    <ISSMS>Y</ISSMS>
+    <ISTASK>Y</ISTASK>
+    <UPDATED>2026-10-21T04:38:29+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISFAXEMAIL>N</ISFAXEMAIL>
+    <EXPORT_ID>TST10_Xk+ltspTidXgZQIMKe0o3Q==</EXPORT_ID>
+    <ISARCHIVE>Y</ISARCHIVE>
+    <ISATTACHDOCUMENTFROM>Y</ISATTACHDOCUMENTFROM>
+    <ISATTACHEMAIL>Y</ISATTACHEMAIL>
+    <ISATTACHMENT>Y</ISATTACHMENT>
+    <ISCHAT>Y</ISCHAT>
+    <ISCHECKREQUEST>Y</ISCHECKREQUEST>
+    <ISCOPYRECORD>Y</ISCOPYRECORD>
+    <ISCREATEDOCUMENT>Y</ISCREATEDOCUMENT>
+    <ISHISTORY>Y</ISHISTORY>
+    <ACTION1>Y</ACTION1>
+    <ACTION2>Y</ACTION2>
+    <ISIMPORTMAP>Y</ISIMPORTMAP>
+    <ISMARKTOEXPORT>N</ISMARKTOEXPORT>
+    <ISROLECENTERVIEW>Y</ISROLECENTERVIEW>
+    <ISSUBSCRIBERECORD>Y</ISSUBSCRIBERECORD>
+    <ISUPLOADDOCUMENT>Y</ISUPLOADDOCUMENT>
+    <ISVIEWDOCUMENT>Y</ISVIEWDOCUMENT>
+    <ISZOOMACROSS>Y</ISZOOMACROSS>
+    <ISGENERATEATTACHMENTCODE>N</ISGENERATEATTACHMENTCODE>
+    <ISASSIGNRECORD>N</ISASSIGNRECORD>
+    <ISADVANCETASK>N</ISADVANCETASK>
+    <ISRISKREGISTER>N</ISRISKREGISTER>
+  </AD_WindowAction>
+  <AD_WindowAction>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOWACTION_ID>1000316</AD_WINDOWACTION_ID>
+    <AD_WINDOW_ID>1000740</AD_WINDOW_ID>
+    <CREATED>2026-10-20T23:29:04+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISAPPOINTMENT>Y</ISAPPOINTMENT>
+    <ISEMAIL>Y</ISEMAIL>
+    <ISLETTER>Y</ISLETTER>
+    <ISSMS>Y</ISSMS>
+    <ISTASK>Y</ISTASK>
+    <UPDATED>2026-10-21T04:38:26+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISFAXEMAIL>N</ISFAXEMAIL>
+    <EXPORT_ID>TST10_XkpMWb45dJngZQIMKe0o3Q==</EXPORT_ID>
+    <ISARCHIVE>Y</ISARCHIVE>
+    <ISATTACHDOCUMENTFROM>Y</ISATTACHDOCUMENTFROM>
+    <ISATTACHEMAIL>Y</ISATTACHEMAIL>
+    <ISATTACHMENT>Y</ISATTACHMENT>
+    <ISCHAT>Y</ISCHAT>
+    <ISCHECKREQUEST>Y</ISCHECKREQUEST>
+    <ISCOPYRECORD>Y</ISCOPYRECORD>
+    <ISCREATEDOCUMENT>Y</ISCREATEDOCUMENT>
+    <ISHISTORY>Y</ISHISTORY>
+    <ACTION1>Y</ACTION1>
+    <ACTION2>Y</ACTION2>
+    <ISIMPORTMAP>Y</ISIMPORTMAP>
+    <ISMARKTOEXPORT>N</ISMARKTOEXPORT>
+    <ISROLECENTERVIEW>Y</ISROLECENTERVIEW>
+    <ISSUBSCRIBERECORD>Y</ISSUBSCRIBERECORD>
+    <ISUPLOADDOCUMENT>Y</ISUPLOADDOCUMENT>
+    <ISVIEWDOCUMENT>Y</ISVIEWDOCUMENT>
+    <ISZOOMACROSS>Y</ISZOOMACROSS>
+    <ISGENERATEATTACHMENTCODE>N</ISGENERATEATTACHMENTCODE>
+    <ISASSIGNRECORD>N</ISASSIGNRECORD>
+    <ISADVANCETASK>N</ISADVANCETASK>
+    <ISRISKREGISTER>N</ISRISKREGISTER>
+  </AD_WindowAction>
+  <AD_WindowAction>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOWACTION_ID>1000321</AD_WINDOWACTION_ID>
+    <AD_WINDOW_ID>1000745</AD_WINDOW_ID>
+    <CREATED>2026-10-21T09:53:55+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISAPPOINTMENT>Y</ISAPPOINTMENT>
+    <ISEMAIL>Y</ISEMAIL>
+    <ISLETTER>Y</ISLETTER>
+    <ISSMS>Y</ISSMS>
+    <ISTASK>Y</ISTASK>
+    <UPDATED>2026-10-21T04:38:31+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISFAXEMAIL>N</ISFAXEMAIL>
+    <EXPORT_ID>TST10_XlMW4IRDl7bgZQIMKe0o3Q==</EXPORT_ID>
+    <ISARCHIVE>Y</ISARCHIVE>
+    <ISATTACHDOCUMENTFROM>Y</ISATTACHDOCUMENTFROM>
+    <ISATTACHEMAIL>Y</ISATTACHEMAIL>
+    <ISATTACHMENT>Y</ISATTACHMENT>
+    <ISCHAT>Y</ISCHAT>
+    <ISCHECKREQUEST>Y</ISCHECKREQUEST>
+    <ISCOPYRECORD>Y</ISCOPYRECORD>
+    <ISCREATEDOCUMENT>Y</ISCREATEDOCUMENT>
+    <ISHISTORY>Y</ISHISTORY>
+    <ACTION1>Y</ACTION1>
+    <ACTION2>Y</ACTION2>
+    <ISIMPORTMAP>Y</ISIMPORTMAP>
+    <ISMARKTOEXPORT>N</ISMARKTOEXPORT>
+    <ISROLECENTERVIEW>Y</ISROLECENTERVIEW>
+    <ISSUBSCRIBERECORD>Y</ISSUBSCRIBERECORD>
+    <ISUPLOADDOCUMENT>Y</ISUPLOADDOCUMENT>
+    <ISVIEWDOCUMENT>Y</ISVIEWDOCUMENT>
+    <ISZOOMACROSS>Y</ISZOOMACROSS>
+    <ISGENERATEATTACHMENTCODE>N</ISGENERATEATTACHMENTCODE>
+    <ISASSIGNRECORD>N</ISASSIGNRECORD>
+    <ISADVANCETASK>N</ISADVANCETASK>
+    <ISRISKREGISTER>N</ISRISKREGISTER>
+  </AD_WindowAction>
+  <AD_WindowAction>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WINDOWACTION_ID>1000318</AD_WINDOWACTION_ID>
+    <AD_WINDOW_ID>1000742</AD_WINDOW_ID>
+    <CREATED>2026-10-21T05:54:16+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISAPPOINTMENT>Y</ISAPPOINTMENT>
+    <ISEMAIL>Y</ISEMAIL>
+    <ISLETTER>Y</ISLETTER>
+    <ISSMS>Y</ISSMS>
+    <ISTASK>Y</ISTASK>
+    <UPDATED>2026-10-21T04:38:28+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <ISFAXEMAIL>N</ISFAXEMAIL>
+    <EXPORT_ID>TST10_Xk+wzPqeijjgZQIMKe0o3Q==</EXPORT_ID>
+    <ISARCHIVE>Y</ISARCHIVE>
+    <ISATTACHDOCUMENTFROM>Y</ISATTACHDOCUMENTFROM>
+    <ISATTACHEMAIL>Y</ISATTACHEMAIL>
+    <ISATTACHMENT>Y</ISATTACHMENT>
+    <ISCHAT>Y</ISCHAT>
+    <ISCHECKREQUEST>Y</ISCHECKREQUEST>
+    <ISCOPYRECORD>Y</ISCOPYRECORD>
+    <ISCREATEDOCUMENT>Y</ISCREATEDOCUMENT>
+    <ISHISTORY>Y</ISHISTORY>
+    <ACTION1>Y</ACTION1>
+    <ACTION2>Y</ACTION2>
+    <ISIMPORTMAP>Y</ISIMPORTMAP>
+    <ISMARKTOEXPORT>N</ISMARKTOEXPORT>
+    <ISROLECENTERVIEW>Y</ISROLECENTERVIEW>
+    <ISSUBSCRIBERECORD>Y</ISSUBSCRIBERECORD>
+    <ISUPLOADDOCUMENT>Y</ISUPLOADDOCUMENT>
+    <ISVIEWDOCUMENT>Y</ISVIEWDOCUMENT>
+    <ISZOOMACROSS>Y</ISZOOMACROSS>
+    <ISGENERATEATTACHMENTCODE>N</ISGENERATEATTACHMENTCODE>
+    <ISASSIGNRECORD>N</ISASSIGNRECORD>
+    <ISADVANCETASK>N</ISADVANCETASK>
+    <ISRISKREGISTER>N</ISRISKREGISTER>
+  </AD_WindowAction>
+</NewDataSet>

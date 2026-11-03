@@ -1,0 +1,240 @@
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Reference" msprop:SqlHash="733230556" msprop:BaseTable.0="AD_REFERENCE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="VFORMAT" msprop:OraDbType="119" msprop:BaseColumn="VFORMAT" type="xs:string" minOccurs="0" />
+                <xs:element name="VALIDATIONTYPE" msprop:OraDbType="104" msprop:BaseColumn="VALIDATIONTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="LISTDISPLAYOPTION" msprop:OraDbType="104" msprop:BaseColumn="LISTDISPLAYOPTION" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>110</AD_REFERENCE_ID>
+    <CREATED>1999-12-25T18:30:00+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>User selection</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>AD_User</NAME>
+    <UPDATED>2026-10-27T11:37:56+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>T</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_110</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000691</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:00:17+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseStatus</NAME>
+    <UPDATED>2026-10-21T04:35:45+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+wzPvoijjgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000692</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:00:25+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_Priority</NAME>
+    <UPDATED>2026-10-21T04:35:46+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+vXqclikPgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000693</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:00:31+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_PartyRole</NAME>
+    <UPDATED>2026-10-21T04:35:47+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+vXqcuikPgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000696</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:16:02+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_HearingStatus</NAME>
+    <UPDATED>2026-10-21T04:35:49+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+wzQFTijjgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000697</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:16:12+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_HearingType</NAME>
+    <UPDATED>2026-10-21T04:35:50+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+vXqtVikPgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000687</AD_REFERENCE_ID>
+    <CREATED>2026-10-20T23:22:46+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_FeeType</NAME>
+    <UPDATED>2026-10-21T04:35:42+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_XkpMWbpXdJngZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000688</AD_REFERENCE_ID>
+    <CREATED>2026-10-20T23:22:54+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_ActivityType</NAME>
+    <UPDATED>2026-10-21T04:35:43+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_XkpMWbp0dJngZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000689</AD_REFERENCE_ID>
+    <CREATED>2026-10-20T23:30:55+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CaseCategory</NAME>
+    <UPDATED>2026-10-21T04:35:44+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_XkpEJxKhdJXgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000690</AD_REFERENCE_ID>
+    <CREATED>2026-10-20T23:34:24+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_CourtLevel</NAME>
+    <UPDATED>2026-10-21T04:35:45+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_XkpEJxPddJXgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000694</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:00:38+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_LawyerRole</NAME>
+    <UPDATED>2026-10-21T04:35:48+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+ltsppidXgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000698</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:16:23+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_ReschedReason</NAME>
+    <UPDATED>2026-10-21T04:35:51+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+lts35idXgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>1000695</AD_REFERENCE_ID>
+    <CREATED>2026-10-21T06:00:45+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Pilot customization, not standard Onfinity. Build Factory pilot by AI through VAAPI, 8 Oct 2026.</DESCRIPTION>
+    <ENTITYTYPE>CUST</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>TST10_DocType</NAME>
+    <UPDATED>2026-10-21T04:35:49+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>TST10_Xk+vghnDikHgZQIMKe0o3Q==</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+</NewDataSet>

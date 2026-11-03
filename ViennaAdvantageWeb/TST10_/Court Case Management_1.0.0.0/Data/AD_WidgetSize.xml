@@ -1,0 +1,235 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="AD_WidgetSize" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_WidgetSize" msprop:SqlHash="-427939342" msprop:BaseTable.0="AD_WIDGETSIZE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:BaseColumn="AD_CLIENT_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_IMAGE_ID" msprop:BaseColumn="AD_IMAGE_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:BaseColumn="AD_ORG_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WIDGETSIZE_ID" msprop:BaseColumn="AD_WIDGETSIZE_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WIDGET_ID" msprop:BaseColumn="AD_WIDGET_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="CLASSNAME" msprop:BaseColumn="CLASSNAME" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="COLSPAN" msprop:BaseColumn="COLSPAN" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:BaseColumn="CREATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:BaseColumn="CREATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:BaseColumn="EXPORT_ID" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:BaseColumn="ISACTIVE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDEFAULT" msprop:BaseColumn="ISDEFAULT" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ROWSPAN" msprop:BaseColumn="ROWSPAN" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="SEQUENCE" msprop:BaseColumn="SEQUENCE" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:BaseColumn="UPDATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:BaseColumn="UPDATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="D_CHART_ID" msprop:BaseColumn="D_CHART_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="RC_KPI_ID" msprop:BaseColumn="RC_KPI_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="RC_VIEW_ID" msprop:BaseColumn="RC_VIEW_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WIDGETSIZE_GUID" msprop:BaseColumn="AD_WIDGETSIZE_GUID" msprop:OraDbType="120" type="xs:base64Binary" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000975</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000700</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_HearingsToday</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:02:07+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+tlF7mijzgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:31:46+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+tlF7mijzgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000976</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000701</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_UpcomingHearings</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:02:46+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+ltstVidXgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:32:25+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+ltstVidXgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000977</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000702</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_CasesByStatus</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:03:19+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+tlF9cijzgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:32:58+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+tlF9cijzgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000978</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000703</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_CasesByType</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:03:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+ltswIidXgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:33:32+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+ltswIidXgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000979</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000704</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_LawyerWorkload</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:04:26+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+04RpWijrgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:34:06+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+04RpWijrgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000980</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000705</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_RescheduleStats</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:05:04+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+vXqnvikPgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:34:43+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+vXqnvikPgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000981</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000706</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_FeesPending</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:05:38+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+04RraijrgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:35:17+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+04RraijrgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000982</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000707</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_HearingsToday</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:07:32+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+vghzrikHgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:37:11+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+vghzrikHgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000983</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000708</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_LawyerWorkload</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:08:18+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+vgh0xikHgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:37:57+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+vgh0xikHgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000984</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000709</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_CasesByStatus</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T06:26:01+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_Xk+tlGawijzgZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T00:55:41+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>Xk+tlGawijzgZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+  <AD_WidgetSize>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGETSIZE_ID>1000985</AD_WIDGETSIZE_ID>
+    <AD_WIDGET_ID>1000710</AD_WIDGET_ID>
+    <CLASSNAME>TST10.TST10_UpcomingHearings</CLASSNAME>
+    <COLSPAN>3</COLSPAN>
+    <CREATED>2026-10-21T09:56:14+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <EXPORT_ID>TST10_XlMXlgNVl67gZQIMKe0o3Q==</EXPORT_ID>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>Y</ISDEFAULT>
+    <ROWSPAN>2</ROWSPAN>
+    <SEQUENCE>0</SEQUENCE>
+    <UPDATED>2026-10-21T04:25:52+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <AD_WIDGETSIZE_GUID>XlMXlgNVl67gZQIMKe0o3Q==</AD_WIDGETSIZE_GUID>
+  </AD_WidgetSize>
+</NewDataSet>

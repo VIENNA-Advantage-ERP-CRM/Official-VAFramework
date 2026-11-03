@@ -1,0 +1,264 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="AD_Widget" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Widget" msprop:SqlHash="-1348989199" msprop:BaseTable.0="AD_WIDGET">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:BaseColumn="AD_CLIENT_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_MODULEINFO_ID" msprop:BaseColumn="AD_MODULEINFO_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:BaseColumn="AD_ORG_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WIDGET_ID" msprop:BaseColumn="AD_WIDGET_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_WINDOW_ID" msprop:BaseColumn="AD_WINDOW_ID" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:BaseColumn="CREATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:BaseColumn="CREATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="DISPLAYNAME" msprop:BaseColumn="DISPLAYNAME" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:BaseColumn="EXPORT_ID" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="HTMLSTYLE" msprop:BaseColumn="HTMLSTYLE" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="HOMEPAGE" msprop:BaseColumn="HOMEPAGE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:BaseColumn="ISACTIVE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSHOWADVANCED" msprop:BaseColumn="ISSHOWADVANCED" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSHOWRANDOMCOLOR" msprop:BaseColumn="ISSHOWRANDOMCOLOR" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISWINDOW" msprop:BaseColumn="ISWINDOW" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:BaseColumn="NAME" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:BaseColumn="UPDATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:BaseColumn="UPDATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="WIDGETTYPE" msprop:BaseColumn="WIDGETTYPE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_WIDGET_GUID" msprop:BaseColumn="AD_WIDGET_GUID" msprop:OraDbType="120" type="xs:base64Binary" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:BaseColumn="DESCRIPTION" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="COMMENTS" msprop:BaseColumn="COMMENTS" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:BaseColumn="HELP" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000705</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:04:34+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Reschedule Overview</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+vXqmXikPgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_RescheduleStatsWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:34:38+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+vXqmXikPgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000700</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:01:46+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Hearings Today</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+ltsrsidXgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_HearingsTodayWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:31:41+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+ltsrsidXgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000701</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:02:14+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Upcoming Hearings</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+04RkiijrgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_UpcomingHearingsWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:32:20+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+04RkiijrgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000702</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:02:54+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Cases by Status</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+ltsuFidXgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_CasesByStatusWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:32:53+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+ltsuFidXgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000703</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:03:27+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Running Cases by Type</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+tlF9lijzgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_CasesByTypeWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:33:28+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+tlF9lijzgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000704</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:04:01+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Lawyer Workload</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+tlF/NijzgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_LawyerWorkloadWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:34:01+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+tlF/NijzgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000706</AD_WIDGET_ID>
+    <CREATED>2026-10-21T06:05:12+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Fees Pending Billing</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+ltsyDidXgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>Y</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>N</ISWINDOW>
+    <NAME>TST10_FeesPendingWidget_Home</NAME>
+    <UPDATED>2026-10-21T00:35:12+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+ltsyDidXgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000709</AD_WIDGET_ID>
+    <AD_WINDOW_ID>TST10_Xk+tlGGAijzgZQIMKe0o3Q==</AD_WINDOW_ID>
+    <CREATED>2026-10-21T06:25:36+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Cases by Status</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+lttC8idXgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>N</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>Y</ISWINDOW>
+    <NAME>TST10_CasesByStatusWidget</NAME>
+    <UPDATED>2026-10-21T00:55:36+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+lttC8idXgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000707</AD_WIDGET_ID>
+    <AD_WINDOW_ID>TST10_XkpERw1GdJvgZQIMKe0o3Q==</AD_WINDOW_ID>
+    <CREATED>2026-10-21T06:07:01+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Hearings Today</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+0hs+Aij/gZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>N</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>Y</ISWINDOW>
+    <NAME>TST10_HearingsTodayWidget</NAME>
+    <UPDATED>2026-10-21T00:37:06+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+0hs+Aij/gZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000708</AD_WIDGET_ID>
+    <AD_WINDOW_ID>TST10_Xk+ltsonidXgZQIMKe0o3Q==</AD_WINDOW_ID>
+    <CREATED>2026-10-21T06:07:53+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Lawyer Workload</DISPLAYNAME>
+    <EXPORT_ID>TST10_Xk+0htAIij/gZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>N</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>Y</ISWINDOW>
+    <NAME>TST10_LawyerWorkloadWidget</NAME>
+    <UPDATED>2026-10-21T00:37:53+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>Xk+0htAIij/gZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+  <AD_Widget>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_MODULEINFO_ID>1000092</AD_MODULEINFO_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_WIDGET_ID>1000710</AD_WIDGET_ID>
+    <AD_WINDOW_ID>TST10_Xk+tlGaPijzgZQIMKe0o3Q==</AD_WINDOW_ID>
+    <CREATED>2026-10-21T09:55:58+05:30</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DISPLAYNAME>TST10 Upcoming Hearings</DISPLAYNAME>
+    <EXPORT_ID>TST10_XlMW4IRLl7bgZQIMKe0o3Q==</EXPORT_ID>
+    <HOMEPAGE>N</HOMEPAGE>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISSHOWADVANCED>N</ISSHOWADVANCED>
+    <ISSHOWRANDOMCOLOR>N</ISSHOWRANDOMCOLOR>
+    <ISWINDOW>Y</ISWINDOW>
+    <NAME>TST10_UpcomingHearingsWidget</NAME>
+    <UPDATED>2026-10-21T04:25:48+05:30</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <WIDGETTYPE>C</WIDGETTYPE>
+    <AD_WIDGET_GUID>XlMW4IRLl7bgZQIMKe0o3Q==</AD_WIDGET_GUID>
+  </AD_Widget>
+</NewDataSet>
