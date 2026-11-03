@@ -7,34 +7,33 @@
   ******************************************************/
 
 
+using iTextSharp.text;
+using iTextSharp.text.html;
+using iTextSharp.text.html.simpleparser;
+using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.UI;
-
-using iTextSharp.text;
-using iTextSharp.text.html;
-using iTextSharp.text.pdf;
+using VAdvantage.Classes;
+using VAdvantage.Common;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.MailBox;
 using VAdvantage.Model;
+using VAdvantage.ProcessEngine;
 using VAdvantage.Utility;
-
-using iTextSharp.text.html.simpleparser;
-using VAdvantage.Classes;
+using VAModelAD.AIHelper;
 using VIS.DataContracts;
 using VIS.Helpers;
-using VAdvantage.Logging;
 using static VAModelAD.AIHelper.AIHelperDataContracts;
-using VAModelAD.AIHelper;
-using VAdvantage.Common;
-using System.Dynamic;
-using VAdvantage.ProcessEngine;
 
 namespace VIS.Models
 {
@@ -1205,6 +1204,77 @@ namespace VIS.Models
                 }
                 return threadID;
             }
+        }
+
+        // Returns the validated table name, or "" if it does not exist
+        private string ResolveTableName(string tableName, int tableID)
+        {
+            string sql;
+            SqlParameter[] param;
+
+            if (tableID > 0)
+            {
+                sql = "SELECT TableName FROM AD_Table WHERE IsActive = 'Y' AND AD_Table_ID = @id";
+                param = new SqlParameter[] { new SqlParameter("@id", tableID) };
+            }
+            else
+            {
+                return "";
+            }
+
+            object res = DB.ExecuteScalar(sql, param,null);
+            return Util.GetValueOfString(res);
+        }
+
+        public List<string> SearchEmails(string term, string tableName, int tableID, Ctx ctx)
+        {
+            var list = new List<string>();
+            // an empty term (To box right after "; ") returns the first addresses of the table
+            if (term == null)
+                term = "";
+            // the table is always read from AD_Table by id, the name sent by the client is never used in the query
+            string validTable = ResolveTableName(tableName, tableID);
+            if (validTable.Length == 0)
+                return list;
+
+            // not every table has an Email column (e.g. document tables), so check before querying
+            DataSet dsCols = DB.ExecuteDataset("SELECT UPPER(ColumnName) FROM AD_Column WHERE AD_Table_ID = @tableID AND IsActive = 'Y' AND UPPER(ColumnName) IN ('EMAIL', 'ISACTIVE', 'AD_CLIENT_ID')",
+                new SqlParameter[] { new SqlParameter("@tableID", tableID) });
+            var columns = new HashSet<string>();
+            if (dsCols != null && dsCols.Tables.Count > 0)
+            {
+                foreach (DataRow dr in dsCols.Tables[0].Rows)
+                    columns.Add(Util.GetValueOfString(dr[0]).ToUpper());
+            }
+            if (!columns.Contains("EMAIL"))
+                return list;
+
+            string sql = "SELECT DISTINCT Email FROM " + validTable + " WHERE Email IS NOT NULL AND UPPER(Email) LIKE UPPER(@term)";
+            var param = new List<SqlParameter>();
+            param.Add(new SqlParameter("@term", "%" + term.Trim() + "%"));
+            if (columns.Contains("ISACTIVE"))
+                sql += " AND IsActive = 'Y'";
+            if (columns.Contains("AD_CLIENT_ID"))
+            {
+                sql += " AND AD_Client_ID = @clientId";
+                param.Add(new SqlParameter("@clientId", ctx.GetAD_Client_ID()));
+            }
+            sql += " ORDER BY Email";
+
+            DataSet ds = DB.ExecuteDataset(sql, param.ToArray());
+            if (ds == null || ds.Tables.Count == 0)
+                return list;
+
+            // the box only needs a handful of suggestions
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                string email = Util.GetValueOfString(dr["Email"]).Trim();
+                if (email.Length > 0)
+                    list.Add(email);
+                if (list.Count >= 20)
+                    break;
+            }
+            return list;
         }
     }
 

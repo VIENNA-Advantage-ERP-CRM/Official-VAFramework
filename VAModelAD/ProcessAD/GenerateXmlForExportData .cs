@@ -26,7 +26,7 @@ namespace VAdvantage.Process
         //Replace Space with Underscore
         string Module_Name = "";
         string prefix = "";
-       // string versionId = "1.0.0.0";
+        // string versionId = "1.0.0.0";
         string versionNo = "1000";
         //string Database_Schema = "DataBaseSchema";
 
@@ -116,6 +116,15 @@ namespace VAdvantage.Process
                 SeqTable.Columns.Add("AD_ColOne_ID");
                 ds.Tables.Add(SeqTable);
 
+                // Stores the main records marked with the module (TableName + Export_ID),
+                // used to mark the same data with the module on the instance where module is installed
+                DataTable markTable = new DataTable();
+                markTable.TableName = "ExportDataMarking";
+                markTable.Columns.Add("TableName");
+                markTable.Columns.Add("Export_ID");
+                markTable.Columns.Add("ModulePrefix");
+                ds.Tables.Add(markTable);
+
                 //Parse through the marked record one by one
                 foreach (ExportDataRecords exportdata in _ExportRecordList)
                 {
@@ -139,6 +148,8 @@ namespace VAdvantage.Process
                         return msg;
                     }
 
+                    // Add marked record in ExportDataMarking
+                    AddMarkedRecord(currentTable, exportdata, markTable);
                 }
 
                 if (module == null)
@@ -203,6 +214,57 @@ namespace VAdvantage.Process
             return ds.ToXml(_FilePath);
         }
 
+        /// <summary>
+        /// Add the main record marked with the module in ExportDataMarking table.
+        /// Record is identified by TableName and Export_ID, as record IDs differ on other instances
+        /// </summary>
+        /// <param name="currentTable">Table of the marked record</param>
+        /// <param name="exportdata">Marked record info</param>
+        /// <param name="markTable">ExportDataMarking table</param>
+        private void AddMarkedRecord(MTable currentTable, ExportDataRecords exportdata, DataTable markTable)
+        {
+            try
+            {
+                String tableName = currentTable.GetTableName();
+
+                // These tables are not exported
+                if (_ExceptionTables.Contains(tableName))
+                    return;
+
+                string[] keyColumns = GetParentColumns(currentTable.GetAD_Table_ID());
+                if (keyColumns == null || keyColumns.Length == 0)
+                    return;
+
+                String sql = "SELECT Export_ID FROM " + tableName + " WHERE " + keyColumns[0] + " = " + exportdata.Record_ID;
+                if (keyColumns.Length > 1)
+                {
+                    sql += " AND " + keyColumns[1] + " = " + exportdata.AD_ColOne_ID;
+                }
+
+                // Record not found (marking will be deleted) or Export ID not generated
+                String exportID = Util.GetValueOfString(DB.ExecuteScalar(sql));
+                if (String.IsNullOrEmpty(exportID))
+                    return;
+
+                // Check for duplicate
+                if (markTable.Select("TableName = '" + tableName + "' AND Export_ID = '" + exportID + "'").Length > 0)
+                    return;
+
+                if (module == null)
+                    module = new X_AD_ModuleInfo(GetCtx(), _AD_ModuleInfo_ID, null);
+
+                DataRow row = markTable.NewRow();
+                row["TableName"] = tableName;
+                row["Export_ID"] = exportID;
+                row["ModulePrefix"] = module.GetPrefix();
+                markTable.Rows.Add(row);
+            }
+            catch (Exception ex)
+            {
+                log.Log(Level.SEVERE, "ExportDataMarking => " + currentTable.GetTableName() + " : " + exportdata.Record_ID + " - " + ex.Message);
+            }
+        }
+
         private void DeleteRecordsMarked()
         {
             for (int i = 0; i < deleteSqlExp.Count; i++)
@@ -241,7 +303,7 @@ namespace VAdvantage.Process
                 int result = DB.ExecuteQuery(_updateSql);
                 return exportid;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
                 return "";
@@ -291,7 +353,7 @@ namespace VAdvantage.Process
                 int result = DB.ExecuteQuery(_updateSql);
                 return exportid;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
                 return "";
@@ -389,7 +451,7 @@ namespace VAdvantage.Process
                     if (ValidationType.Equals("T"))
                         if (tmpDS != null && tmpDS.Tables[0].Rows.Count > 0)
                         {
-                           // ds.AddOrCopy(tmpDS, refTableName, refVID, 0, null, rowNum++);
+                            // ds.AddOrCopy(tmpDS, refTableName, refVID, 0, null, rowNum++);
 
                         }
                 }
@@ -712,7 +774,7 @@ namespace VAdvantage.Process
             {
                 string[] ds = GetParentColumns(_TableID);
                 // Code Commented by Lokesh Chauhan to get All Records for Marking those which are inactive too
-               // _Sql = "SELECT * FROM " + _tableName + " WHERE IsActive = 'Y' AND ";
+                // _Sql = "SELECT * FROM " + _tableName + " WHERE IsActive = 'Y' AND ";
                 _Sql = "SELECT * FROM " + _tableName + " WHERE ";
 
                 //_Sql += ds.Tables[0].Rows[0]["ColumnName"].ToString() + " =" + export.Record_ID;

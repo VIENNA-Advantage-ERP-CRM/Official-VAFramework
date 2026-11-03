@@ -101,14 +101,14 @@
                         <a class="vis-Email-CcBcc">@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc") &amp; @VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")</a>
 
                         <div class="vis-form-data">
-                            <input type="text" id="@(ViewBag.windowNo + "_emailToTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "To")>
+                            <textarea rows="1" class="vis-email-addrbox" id="@(ViewBag.windowNo + "_emailToTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "To")></textarea>
                         </div>
 
                         <div class="vis-form-data">
-                            <input type="text" id="@(ViewBag.windowNo + "_eamilCcTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc")>
+                            <textarea rows="1" class="vis-email-addrbox" id="@(ViewBag.windowNo + "_eamilCcTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc")></textarea>
                         </div>
                         <div class="vis-form-data">
-                            <input type="text" id="@(ViewBag.windowNo + "_emailBccTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")>
+                            <textarea rows="1" class="vis-email-addrbox" id="@(ViewBag.windowNo + "_emailBccTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")></textarea>
                         </div>
                     </div>
                     <!-- end of Email-topinputWrap -->
@@ -177,7 +177,7 @@
                         <div class="vis-form-rytData">
                             <div class="input-group vis-input-wrap">
                                 <div class="vis-control-wrap">
-                                    <input id="@(ViewBag.windowNo + "_emailTo")" type="text" name="to" data-placeholder="" placeholder=" ">
+                                    <textarea rows="1" class="vis-email-addrbox" id="@(ViewBag.windowNo + "_emailTo")" name="to" data-placeholder="" placeholder=" "></textarea>
                                     <label for="to">@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "To")</label>
                                 </div>
                             </div>
@@ -186,7 +186,7 @@
                         <div class="vis-form-rytData">
                             <div class="input-group vis-input-wrap">
                                 <div class="vis-control-wrap">
-                                    <input id="@(ViewBag.windowNo + "_eamilCc")" type="text" name="cc" data-placeholder="" placeholder=" ">
+                                    <textarea rows="1" class="vis-email-addrbox" id="@(ViewBag.windowNo + "_eamilCc")" name="cc" data-placeholder="" placeholder=" "></textarea>
                                     <label for="cc">@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc")</label>
                                 </div>
                             </div>
@@ -195,7 +195,7 @@
                         <div class="vis-form-rytData">
                             <div class="input-group vis-input-wrap">
                                 <div class="vis-control-wrap">
-                                    <input id="@(ViewBag.windowNo + "_emailBcc")" type="text" name="bcc" data-placeholder="" placeholder=" ">
+                                    <textarea rows="1" class="vis-email-addrbox" id="@(ViewBag.windowNo + "_emailBcc")" name="bcc" data-placeholder="" placeholder=" "></textarea>
                                     <label for="bcc">@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")</label>
                                 </div>
                             </div>

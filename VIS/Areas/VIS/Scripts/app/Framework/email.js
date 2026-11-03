@@ -246,11 +246,14 @@
             if (!callingFromOutsideofWindow) {
                 loadFields(false);
                 addPrintOption();
+             //   initEmailAutoComplete();  
             }
             //  loadTextArea();
             //createDesign();
 
             eventhandlers();
+            initAddressAutoComplete();
+            initAddressBoxes();
         };
 
         this.getRoot = function () {
@@ -682,9 +685,65 @@
             }
 
         };
-
-
         function loadEmails(refersh) {
+
+            if (refersh == true) {
+                rowsSource = _curGC.getSelectedRows();
+                rowsSingleView = _curtab.getRecords()[_curtab.getCurrentRow()];
+
+                // if To still holds the address we auto-filled earlier, clear it so it can be recalculated
+                
+                autoToEmail = "";
+            }
+            if (_curGC.singleRow && rowsSource.length == 0) {
+                loademailforSingleView();
+            }
+            else {
+                if (rowsSource.length > 0) {
+                    if (isEmail) {
+
+                        // 1) collect rows that have an email
+                        var withEmail = [];
+                        for (var i = 0; i < rowsSource.length; i++) {
+                            var em = rowsSource[i]["email"];
+                            if (em != null && $.trim(em) != "") {
+                                withEmail.push(rowsSource[i]);
+                            }
+                        }
+
+                        if (withEmail.length == 1) {
+                            // 2) only one email -> To field, not the checklist
+                            var onlyEmail = $.trim(withEmail[0]["email"]);
+                            if ($to && $to.length > 0 && $.trim($to.val()) == "") {
+                                $to.val(onlyEmail);
+                                autoToEmail = onlyEmail;
+                                resizeAddressBox($to);
+                            }
+                        }
+                        else if (withEmail.length > 1) {
+                            // 3) several emails -> checklist (Bcc), as before
+                            var htm = '';
+                            for (var j = 0; j < withEmail.length; j++) {
+                                var email = withEmail[j]["email"];
+                                var ID = withEmail[j][_curtab.getKeyColumnName().toLower()];
+
+                                htm += '<li class="vis-list-li-bcc" data-email="' + email + '"><input data-currentrec="Y" data-recID="' + ID + '" id="' + self.windowNo + '_' + email + '_CheckBoxList1" type="checkbox" value="' + email + '" checked/><label class="vis-chcklist-label" for="' + self.windowNo + '_' + email + '_CheckBoxList1">' + email + '(' + ID + ')</label></li>';
+                            }
+                            $bccChkList.append(htm);
+                            htm = null;
+                        }
+                    }
+                }
+                else {
+                    loademailforSingleView();
+                }
+            }
+            if (!refersh) {
+                $rightDiv.append($bccChkList);
+            }
+        };
+
+       /* function loadEmails(refersh) {
 
             if (refersh == true) {
                 //$bccChkList.empty();
@@ -724,16 +783,20 @@
             if (!refersh) {
                 $rightDiv.append($bccChkList);
             }
-        };
+        };*/
 
         function loademailforSingleView() {
             if (isEmail) {
+              //  var singleEmail = rowsSingleView ? rowsSingleView["email"] : null;
                 if (rowsSingleView["email"] != null) {
                     isEmail = true;
                     var ID = rowsSingleView[_curtab.getKeyColumnName().toLower()];
 
                     $bccChkList.append('<li class="vis-list-li-bcc" data-email="' + rowsSingleView["email"] + '"><input id="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSingleView["email"]
                         + '" checked /><label class="vis-chcklist-label" for="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1">' + rowsSingleView["email"] + '(' + ID + ')</label></li>');
+                   /* if ($to && $to.length > 0 && $.trim($to.val()) == "") {
+                        $to.val(singleEmail);
+                    }*/
                 }
             }
         };
@@ -797,6 +860,10 @@
 
                 if (_curtab.gridTable.getFields(0)[i].getColumnName().toUpper().equals(bpColumnName)) {
                     for (var q = 0; q < rowsSource.length; q++) {
+                        // record already has its own email -> it is shown from loadEmails, don't add its BP contacts
+                        if (rowsSource[q]["email"] != null && $.trim(rowsSource[q]["email"]) != "") {
+                            continue;
+                        }
                         if (VIS.DisplayType.IsLookup(_curtab.getField(bpColumnName).getDisplayType())) {
                             if (rowsSource[q][bpColumnName.toLower()] != null) {
                                 bpList.push(rowsSource[q][bpColumnName.toLower()]);
@@ -876,6 +943,8 @@
 
 
             var pvID = 0;
+            // emails added in this call but not yet appended to $bccChkList
+            var addedEmails = [];
             for (var i = 0; i < bpID.length; i++) {
                 //var sql = "Select AD_User_ID,email from ad_user where isEmail='Y' AND c_bpartner_ID=" + bpID[i];
                 //var ds = VIS.DB.executeDataSet(sql);
@@ -908,9 +977,19 @@
                                 continue;
                             }
 
-                            if ($($bccChkList.children('li').data(ds[j]["Email"] + prID[i])).length > 0) {
+                            // skip if this email is already in the Bcc list (or pending in htm)
+                            var bccEmail = $.trim(ds[j]["Email"]).toLowerCase();
+                            var isAdded = false;
+                            $bccChkList.find('input[type="checkbox"]').each(function () {
+                                if ($.trim($(this).val()).toLowerCase() == bccEmail) {
+                                    isAdded = true;
+                                    return false;
+                                }
+                            });
+                            if (isAdded || addedEmails.indexOf(bccEmail) > -1) {
                                 continue;
                             }
+                            addedEmails.push(bccEmail);
 
                             htm += '<li  class="vis-list-li-bcc"><input data-currentrec="N" data-recid="' + prID[i] + '" id="' + self.windowNo + '_' + ds[j]["Email"] + '_CheckBoxList1" type="checkbox"  value="' + ds[j]["Email"]
                                 + '" checked/><label class="vis-chcklist-label"  for="' + self.windowNo + '_' + ds[j]["Email"] + '_CheckBoxList1">' + ds[j]["Email"] + '(' + prID[i] + ')</label></li>';
@@ -1891,7 +1970,7 @@
                         }
 
                         if (currentchunk <= totalChunks) {
-                            setProgressValue(parseInt((currentchunk / totalChunks) * 100));
+                            setProgressValue(parseInt((currentchunk / totalChunks) * 100)); 
                         }
                         window.setTimeout(function () {
                             TransferFile();
@@ -1928,6 +2007,7 @@
                     $cc.prop('disabled', true);
                     $bcc.val('');
                     $bcc.prop('disabled', true);
+                    [$to, $cc, $bcc].forEach(function ($box) { resizeAddressBox($box); });
                 }
                 flagImg = true;
             }
@@ -1964,6 +2044,7 @@
                     $cc.prop('disabled', true);
                     $bcc.val('');
                     $bcc.prop('disabled', true);
+                    [$to, $cc, $bcc].forEach(function ($box) { resizeAddressBox($box); });
                 }
             }
             else {
@@ -3033,7 +3114,7 @@
             loadEmails(true); // Load emails
 
             loadFields(true); // Load Feilds and their bpartner's email IDS....
-
+          //  initEmailAutoComplete();  
         };
 
         function cancel(e) {
@@ -3149,7 +3230,7 @@
                         return;
                     }, 2);
                 }
-                mailInfo.Bcc.push(email);
+               mailInfo.Bcc.push(email);
                 hasMail = true;
             }
             else if ($bccChkList != null && $bccChkList != undefined) {
@@ -3166,7 +3247,7 @@
                             return;
                         }, 2);
                     }
-                    mailInfo.Bcc.push(source['email']);
+                     mailInfo.Bcc.push(source['email']);
                     hasMail = true;
                 }
                 else if (!_curGC.singleRow == false && rowsSource.length == 1) {
@@ -3209,7 +3290,13 @@
             }
             return mailInfo;
         };
-
+       /* function addRecipient(mailInfo, email) {
+            if (mailInfo.To == null || mailInfo.To.trim().length === 0) {
+                mailInfo.To = email;
+            } else {
+                mailInfo.Bcc.push(email);
+            }
+        }*/
         ///For Multi Row Selection
         function listofSelectedItems1(html, i) {
             var copyhtml = html;
@@ -3503,7 +3590,234 @@
 
         };
 
+       /* function initEmailAutoComplete() {
+            if (callingFromOutsideofWindow || !isEmail) return;
 
+            [$to, $cc, $bcc].forEach(function ($inp) {
+                if (!$inp || $inp.length === 0) return;
+
+                // already attached -> nothing to refresh, the source is remote
+                if ($inp.data("kendoAutoComplete")) return;
+
+                try {
+                    $inp.kendoAutoComplete({
+                        filter: "contains",
+                        minLength: 2,
+                        delay: 300,
+                        separator: "; ",
+                        clearButton: false,
+                        dataSource: {
+                            serverFiltering: true,
+                            transport: {
+                                read: function (options) {
+                                    var f = options.data.filter;
+                                    var term = (f && f.filters && f.filters.length > 0) ? f.filters[0].value : "";
+
+                                    // 1) reference emails from the checklist (instant)
+                                    var local = getReferenceEmails().filter(function (e) {
+                                        return e.toLowerCase().indexOf(String(term).toLowerCase()) > -1;
+                                    });
+                                    var t = getTableInfo();
+                                    // 2) all other emails from the server
+                                    $.ajax({
+                                        url: VIS.Application.contextUrl + "Email/SearchEmails",
+                                        type: "POST",
+                                        datatype: "json",
+                                        cache: false,
+                                        *//*data: { term: term },*//*
+                                        data: { term: term, tableName: t.tableName, tableID: t.tableID },
+                                        success: function (data) {
+                                            var remote = [];
+                                            try {
+                                                remote = (typeof data === "string") ? JSON.parse(data) : data;
+                                            } catch (ex) { remote = []; }
+                                            if (!$.isArray(remote)) remote = [];
+
+                                            // merge, reference emails first, no duplicates
+                                            var seen = {};
+                                            var merged = [];
+                                            local.concat(remote).forEach(function (e) {
+                                                var key = String(e).toLowerCase();
+                                                if (!seen[key]) {
+                                                    seen[key] = true;
+                                                    merged.push(e);
+                                                }
+                                            });
+                                            options.success(merged);
+                                        },
+                                        error: function () {
+                                            options.success(local);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                } catch (ex) {
+                    console.log("AutoComplete not available", ex);
+                }
+            });
+        }*/
+        // suggests addresses from the table this form was opened from in the To / Cc / Bcc boxes; ';' separates several addresses
+        function initAddressAutoComplete() {
+            if (!isEmail || currentTable_ID <= 0 || !$.fn.autocomplete) {
+                return;
+            }
+
+            [$to, $cc, $bcc].forEach(function ($box) {
+                if (!$box || $box.length === 0) {
+                    return;
+                }
+                initBoxAutoComplete($box);
+            });
+        }
+
+        function initBoxAutoComplete($box) {
+            $box.autocomplete({
+                minLength: 2,
+                delay: 300,
+                source: function (request, response) {
+                    // only the address being typed (after the last ';') is searched
+                    var parts = request.term.split(';');
+                    var term = parts.pop().trim();
+                    // right after "; " show the list for the next address without waiting for 2 characters
+                    var afterSeparator = parts.length > 0 && term.length == 0;
+                    if (term.length < 2 && !afterSeparator) {
+                        response([]);
+                        return;
+                    }
+                    // addresses already entered are not suggested again
+                    var entered = parts.map(function (p) { return p.trim().toLowerCase(); });
+                    var t = getTableInfo();
+                    searchEmails(term, t.tableName, t.tableID, [], {
+                        success: function (list) {
+                            response($.grep(list, function (e) {
+                                return entered.indexOf(String(e).toLowerCase()) == -1;
+                            }));
+                        }
+                    });
+                },
+                focus: function () {
+                    // keep the typed text while moving through the suggestions
+                    return false;
+                },
+                select: function (event, ui) {
+                    // replace the address being typed; no trailing ';' because send validates every ';' separated part
+                    var parts = this.value.split(';');
+                    parts.pop();
+                    parts.push(ui.item.value);
+                    this.value = parts.map(function (p) { return p.trim(); }).join('; ');
+                    resizeAddressBox($box);
+                    return false;
+                },
+                open: function () {
+                    // the form sits in a modal dialog, lift the list above it
+                    var z = 0;
+                    $box.parents().each(function () {
+                        var pz = parseInt($(this).css("z-index"), 10);
+                        if (!isNaN(pz) && pz > z) {
+                            z = pz;
+                        }
+                    });
+                    $box.autocomplete("widget").css("z-index", z + 1);
+                }
+            });
+        }
+
+        // To / Cc / Bcc are one-line textareas so several ';' separated addresses wrap instead of running out of view
+        function initAddressBoxes() {
+            [$to, $cc, $bcc].forEach(function ($box) {
+                if (!$box || $box.length === 0) {
+                    return;
+                }
+                $box.on("keydown", function (e) {
+                    // no new lines in an address box; Enter still picks an autocomplete item
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+                $box.on("input focus", function () {
+                    // pasted lines become ';' separated addresses
+                    if (/[\r\n]/.test(this.value)) {
+                        this.value = this.value.replace(/\s*[\r\n]+\s*/g, "; ").replace(/^; |; $/g, "");
+                    }
+                    resizeAddressBox($(this));
+                });
+                resizeAddressBox($box);
+            });
+        }
+
+        // fits the box height to its text up to the css max-height, then scrolls
+        function resizeAddressBox($box) {
+            if (!$box || $box.length === 0 || !$box.is(":visible")) {
+                return;
+            }
+            var box = $box[0];
+            var oldHeight = $box.outerHeight();
+            box.style.height = "auto";
+            var borders = box.offsetHeight - box.clientHeight;
+            var maxHeight = parseInt($box.css("max-height"), 10) || 100;
+            var fullHeight = box.scrollHeight + borders;
+            box.style.height = Math.min(fullHeight, maxHeight) + "px";
+            box.style.overflowY = fullHeight > maxHeight ? "auto" : "hidden";
+
+            // the Bcc checklist below has a fixed height, give it back / take the height the box changed by
+            var delta = $box.outerHeight() - oldHeight;
+            if (delta != 0 && !callingFromOutsideofWindow) {
+                var $list = $root.find('.vis-Email-BccList');
+                $list.height($list.height() - delta);
+            }
+        }
+
+        function searchEmails(term, tableName, tableID, local, options) {
+            var t = getTableInfo();
+            $.ajax({
+                url: VIS.Application.contextUrl + "Email/SearchEmails",
+                type: "POST",
+                dataType: "json",
+                cache: false,
+                data: {
+                    term: term,
+                    tableName: tableName,
+                    tableID: tableID
+                },
+                success: function (data) {
+                    var remote = [];
+                    try {
+                        remote = (typeof data === "string") ? JSON.parse(data) : data;
+                    } catch (ex) {
+                        remote = [];
+                    }
+
+                    if (!$.isArray(remote)) remote = [];
+
+                    var seen = {};
+                    var merged = [];
+
+                    local.concat(remote).forEach(function (e) {
+                        var key = String(e).toLowerCase();
+                        if (!seen[key]) {
+                            seen[key] = true;
+                            merged.push(e);
+                        }
+                    });
+
+                    options.success(merged);
+                },
+                error: function () {
+                    options.success(local);
+                }
+            });
+        }
+        // returns window id / name of the window the mail form was opened from
+        function getTableInfo() {
+            var info = { tableName: "", tableID: currentTable_ID || 0 };
+
+            if (_curtab != null && _curtab.gridTable && _curtab.gridTable.gTable) {
+                info.tableName = _curtab.gridTable.gTable._tableName || "";
+            }
+            return info;
+        }
         this.showCcBccMails = function (mailcc, mailbcc) {
             if (mailcc != undefined && mailcc != null && mailcc != '')
                 ccmail = mailcc;

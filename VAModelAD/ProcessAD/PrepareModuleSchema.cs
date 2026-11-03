@@ -285,6 +285,28 @@ namespace VAdvantage.Process
             GetWindowTabField(AD_ModuleInfo_ID);
             GetProcesses(AD_ModuleInfo_ID);
             GetTables(AD_ModuleInfo_ID);
+            GetDBScripts(AD_ModuleInfo_ID);
+        }
+
+        /// <summary>
+        /// Generate Export ID for DB Scripts of the module, if not generated earlier.
+        /// DB Scripts are not inserted in DB Schema, as these are exported separately
+        /// </summary>
+        /// <param name="AD_ModuleInfo_ID">Module</param>
+        private void GetDBScripts(int AD_ModuleInfo_ID)
+        {
+            List<int> scriptIds = GetIDs("AD_Module_DBScript", "AD_Module_DBScript_ID", "AD_ModuleInfo_ID = " + AD_ModuleInfo_ID
+                                         + " AND (Export_ID IS NULL OR Export_ID = '')");
+            for (int i = 0; i < scriptIds.Count; i++)
+            {
+                string sql = "UPDATE AD_Module_DBScript SET Export_ID = " + DB.TO_STRING(GenerateExportID(currentPrefix))
+                            + " WHERE AD_Module_DBScript_ID = " + scriptIds[i];
+                // insert Export Id
+                if (DB.ExecuteQuery(sql, null, Get_TrxName()) != 1)
+                {
+                    throw new InvalidConstraintException("error =>  " + sql);
+                }
+            }
         }
 
         /// <summary>
@@ -679,8 +701,8 @@ namespace VAdvantage.Process
                         //string name2;
                         //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetAD_Window_ID(), out name2))
                         //{
-                            GetWindow(sTable.GetAD_Window_ID(),0);
-                            //InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetAD_Window_ID(), X_AD_Window.Table_Name, name2, "AD_Window_ID =" + sTable.GetAD_Window_ID());
+                        GetWindow(sTable.GetAD_Window_ID(), 0);
+                        //InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetAD_Window_ID(), X_AD_Window.Table_Name, name2, "AD_Window_ID =" + sTable.GetAD_Window_ID());
                         //}
                     }
 
@@ -840,7 +862,7 @@ namespace VAdvantage.Process
 
                         if (Util.GetValueOfInt(dr["AD_Field_ID"]) > 0)
                         {
-                            InsertField(false,  "", Util.GetValueOfInt(dr["AD_Field_ID"]));
+                            InsertField(false, "", Util.GetValueOfInt(dr["AD_Field_ID"]));
                             //InsertIntoDBSchema(X_AD_Field.Table_ID, Util.GetValueOfInt(dr["AD_Field_ID"]), X_AD_Field.Table_Name, name, "AD_Field_ID =" + Util.GetValueOfInt(dr["AD_Field_ID"]));
                         }
 
@@ -929,7 +951,7 @@ namespace VAdvantage.Process
 
             if (sField.GetZoomWindow_ID() > 0)
             {
-                GetWindow(sField.GetZoomWindow_ID(),0);
+                GetWindow(sField.GetZoomWindow_ID(), 0);
                 //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sField.GetZoomWindow_ID(), out name))
                 //{
                 //    InsertIntoDBSchema(X_AD_Window.Table_ID, sField.GetZoomWindow_ID(), X_AD_Window.Table_Name, name, " AD_Window_ID = " + sField.GetZoomWindow_ID());
@@ -944,7 +966,7 @@ namespace VAdvantage.Process
             }
 
             //check for field Data Validation 
-            if (Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID"))>0)
+            if (Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID")) > 0)
             {
                 GetValRule(Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID")));
             }
@@ -962,7 +984,7 @@ namespace VAdvantage.Process
             string tableName = DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + sAD_Table_ID).ToString();
 
             string stdWhere = " ColumnName IN ('IsActive','AD_Client_ID', 'AD_Org_ID','Created','CreatedBy','Updated','UpdatedBy','"
-                              + tableName + "_ID','Export_ID','"+ tableName + "_GUID')";
+                              + tableName + "_ID','Export_ID','" + tableName + "_GUID')";
 
             IDataReader dr = DB.ExecuteReader("SELECT AD_Column_ID,Name,ColumnName,AD_Val_Rule_ID FROM AD_Column WHERE AD_Table_ID = " + sAD_Table_ID + " AND  " + stdWhere);
             int id = 0;
@@ -1140,7 +1162,7 @@ namespace VAdvantage.Process
                         int ad_image_ID = Util.GetValueOfInt(dr[2]);
                         if (ad_image_ID > 0)
                         {
-                            CheckImage(ad_image_ID); 
+                            CheckImage(ad_image_ID);
                         }
                         InsertIntoDBSchema(X_AD_Ref_List.Table_ID, Convert.ToInt32(dr[0]), X_AD_Ref_List.Table_Name, dr[1].ToString(), "AD_Ref_List_ID = " + Convert.ToInt32(dr[0]));
                     }
