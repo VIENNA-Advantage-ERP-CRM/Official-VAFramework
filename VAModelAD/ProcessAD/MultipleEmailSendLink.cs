@@ -19,6 +19,7 @@ namespace VAModelAD.ProcessAD
         private string url = null;
         private PO _po = null;
         List<string> warnings = new List<string>();
+        List<string> sentTo = new List<string>();
         string warning;
         protected override void Prepare()
         {
@@ -98,16 +99,14 @@ namespace VAModelAD.ProcessAD
                     if (result == null)
                     {
                         sent++;
+                        sentTo.Add(userName);
                         if (!string.IsNullOrEmpty(warning))
-                          // warnings.Add("UserID " + userID + ": " + warning);
-                           warnings.Add("UserName " + userName + ": " + warning);
+                           warnings.Add(" " + userName + ": " + warning);
                     }
                     else
                     {
-                       // failed.Add("UserID " + userID + " (" + result + ")");
-                       //log.Fine("UserID " + userID + ": " + result);
-                        failed.Add("UserName " + userName + " (" + result + ")");                        
-                        log.Fine("UserName " + userName + ": " + result);
+                        failed.Add(" " + userName + " (" + result + ")");                        
+                        log.Fine(" " + userName + ": " + result);
                     }
                 }
                 catch (Exception ex)
@@ -119,23 +118,23 @@ namespace VAModelAD.ProcessAD
             }
 
             // ---------- Step 4: summary ----------
-            /*string msg = Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + users.Count;
-            if (warnings.Count > 0)
-                 msg += ". " + string.Join("; ", warnings);
-            if (failed.Count > 0)
-            {
-                  msg += ". Failed: " + string.Join("; ", failed);
-            }
-            return msg;*/
-            // ---------- Step 4: summary ----------
             StringBuilder msg = new StringBuilder();
 
-            msg.Append(Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully")
-                + ": " + sent + " / " + users.Count);
+           // msg.Append(Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + users.Count);
+            msg.Append("<b>" + Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ": " + sent + " / " + users.Count + "</b>");
+            if (sentTo.Count > 0)
+            {
+                msg.Append("<br/><br/>" + Msg.GetMsg(GetCtx(), "VIS_SuccessfullySentTo"));
+                foreach (string sentName in sentTo)
+                {
+                    msg.Append("<br/>" + sentName);
+                }
+            }
 
             if (warnings.Count > 0)
             {
-                msg.Append("<br/><br/>Warnings:<br/>");
+                //msg.Append("<br/><br/>Warnings:<br/>");
+                msg.Append("<br/><br/>" + Msg.GetMsg(GetCtx(), "VIS_Warnings") + "<br/>");
 
                 foreach (string warningMessage in warnings)
                 {
@@ -145,7 +144,8 @@ namespace VAModelAD.ProcessAD
 
             if (failed.Count > 0)
             {
-                msg.Append("<br/>Failed:<br/>");
+                msg.Append("<br/><br/><b>" + Msg.GetMsg(GetCtx(), "VIS_FailedUserName") + "</b><br/>");
+               // msg.Append("<br/>" + Msg.GetMsg(GetCtx(), "VIS_FailedUserName") + "<br/>");
 
                 foreach (string failedMessage in failed)
                 {
