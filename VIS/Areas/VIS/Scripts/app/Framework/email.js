@@ -429,6 +429,8 @@
                     $to = $root.find('#' + self.windowNo + "_emailTo");
                     $bcc = $root.find('#' + self.windowNo + "_emailBcc");
                     $cc = $root.find('#' + self.windowNo + "_eamilCc");
+                   // $cc.css("margin-top", "2px");
+                    $cc.parent().css("margin-top", "4px");
                     $root.find(".vis-Email-textarea-div").height($root.height() - (115 + 30));
                     $refresh = $root.find('#' + self.windowNo + "_emailRefresh");
 
@@ -3719,7 +3721,7 @@
                             z = pz;
                         }
                     });
-                    $box.autocomplete("widget").css("z-index", z + 1);
+                    $box.autocomplete("widget").css("z-index", z + 9998);
                 }
             });
         }

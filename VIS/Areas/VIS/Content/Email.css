@@ -373,7 +373,7 @@ textarea.vis-email-addrbox {
 .vis-form-rytData .vis-input-wrap textarea.vis-email-addrbox {
     height: 35px;
     min-height: 35px;
-    padding: 6px 10px;
+    padding: 6px 15px;
     line-height: 21px;
 }
 
@@ -383,6 +383,20 @@ textarea.vis-email-addrbox {
         padding-top: 0;
         height: 35px;
     }
+
+/* small, subtle hint under the To box, aligned with the textbox text */
+.vis-email-hint {
+    position: absolute; /* sits in the existing gap under the box, so no layout shift */
+    top: 100%;
+    left: 10px;
+    right: 0;
+    margin-top: 1px;
+    font-size: 10.5px;
+    font-style: italic;
+    line-height: 13px;
+    pointer-events: none;
+    color: rgba(var(--v-c-on-secondary), .6);
+}
 
 .vis-Email-rytForm .vis-form-rytData:first-child {
     margin-top: 5px;
