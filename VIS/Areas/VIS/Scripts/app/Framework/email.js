@@ -3232,8 +3232,8 @@
                         return;
                     }, 2);
                 }
-               mailInfo.Bcc.push(email);
-                hasMail = true;
+                mailInfo.Bcc.push(email);
+                 hasMail = true;
             }
             else if ($bccChkList != null && $bccChkList != undefined) {
                 if (Object.keys(source).indexOf("email") > -1 && selectedValues.indexOf(source['email']) > -1) {
@@ -3342,7 +3342,7 @@
         };
 
         ///For Single View Selection
-        function listofSelectedItems2(html) {
+        function listofSelectedItems2(html) {   
             var copyhtml = html;
             var retValues = {};
             while (copyhtml.indexOf("@@") > -1) {
@@ -3704,11 +3704,12 @@
                     return false;
                 },
                 select: function (event, ui) {
-                    // replace the address being typed; no trailing ';' because send validates every ';' separated part
+                    // replace the address being typed and append ';' so the next address can be typed straight away
+                    // (send skips empty parts, so a trailing ';' is valid)
                     var parts = this.value.split(';');
                     parts.pop();
                     parts.push(ui.item.value);
-                    this.value = parts.map(function (p) { return p.trim(); }).join('; ');
+                    this.value = parts.map(function (p) { return p.trim(); }).join('; ') + ';';
                     resizeAddressBox($box);
                     return false;
                 },
@@ -3736,6 +3737,17 @@
                     // no new lines in an address box; Enter still picks an autocomplete item
                     if (e.keyCode == 13) {
                         e.preventDefault();
+                        // a suggestion list is open: let autocomplete handle Enter (its select appends ';')
+                        if ($box.data("ui-autocomplete") && $box.autocomplete("widget").is(":visible")) {
+                            return;
+                        }
+                        // manually typed address: append ';' so the next one can be typed straight away
+                        var val = this.value.replace(/\s+$/, "");
+                        var last = val.split(';').pop().trim();
+                        if (last.length > 0 && validateEmail(last)) {
+                            this.value = val + ";";
+                            resizeAddressBox($box);
+                        }
                     }
                 });
                 $box.on("input focus", function () {
