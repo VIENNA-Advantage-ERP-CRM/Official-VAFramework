@@ -133,6 +133,20 @@ namespace VAdvantage.Model
         }
 
         /// <summary>
+        /// Is the user an AI user (not a person)? Reads the user's flag through the cached
+        /// user records, so it costs almost nothing. No user (a negative ID) is not an AI user.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="AD_User_ID">user</param>
+        /// <returns>true if the user record is marked as an AI user</returns>
+        public static bool IsAIUser(Ctx ctx, int AD_User_ID)
+        {
+            if (AD_User_ID < 0)
+                return false;
+            return Get(ctx, AD_User_ID).IsAIUser();
+        }
+
+        /// <summary>
         /// Get User from email
         /// </summary>
         /// <param name="ctx">context</param>
@@ -648,7 +662,7 @@ namespace VAdvantage.Model
             // Check applied requested by Product Team
             if (IsLoginUser() && !string.IsNullOrEmpty(GetEMail()))
             {
-                string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
+                string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) = LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND IsLoginUser = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
                 if (newRecord)
                 {
                     int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));

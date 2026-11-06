@@ -87,7 +87,13 @@ namespace VIS.Controllers
             VSetupModel model = new VSetupModel();
             //  null once the session has been dropped by the restart - GetInstallLog allows it
             Ctx ctx = Session["ctx"] as Ctx;
-            return Json(new { result = model.GetInstallLog(ctx, logKey) }, JsonRequestBehavior.AllowGet);
+            /* failure - the error the run stopped with, when Market turned the request
+               down without writing it to its log */
+            return Json(new
+            {
+                result = model.GetInstallLog(ctx, logKey),
+                failure = model.GetInstallFailure(logKey)
+            }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

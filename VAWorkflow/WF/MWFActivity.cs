@@ -107,6 +107,18 @@ namespace VAdvantage.WF
         }
 
         /// <summary>
+        /// Unsaved step, for the approval preview: it holds only a context and a company, so that the approval
+        /// search can run without a workflow run. It is never saved.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="AD_Client_ID">company</param>
+        private MWFActivity(Ctx ctx, int AD_Client_ID)
+            : base(ctx, 0, null)
+        {
+            SetAD_Client_ID(AD_Client_ID);
+        }
+
+        /// <summary>
         /// Parent Contructor
         /// </summary>
         /// <param name="process">process</param>
@@ -257,7 +269,12 @@ namespace VAdvantage.WF
                 _state.SetCtx(GetCtx());
                 if (WFState.Equals(StateEngine.STATE_COMPLETED))
                 {
-                    Set_ValueNoCheck("VA137_ActionUser_ID", GetCtx().GetContextAsInt("#AD_User_ID"));
+                    // An AI user never approves anything (W-101): when the signed-in user is an AI user,
+                    // the action user is the step's recorded user, so no record says an AI user approved.
+                    int actionUser_ID = GetCtx().GetContextAsInt("#AD_User_ID");
+                    if (MUser.IsAIUser(GetCtx(), actionUser_ID))
+                        actionUser_ID = GetAD_User_ID();
+                    Set_ValueNoCheck("VA137_ActionUser_ID", actionUser_ID);
                 }
                 Save();			//	closed in MWFProcess.checkActivities()
                 UpdateEventAudit();
@@ -368,7 +385,12 @@ namespace VAdvantage.WF
                 }
                 else if (WFSTATE_Completed.Equals(wfState))
                 {
-                    MUser user = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
+                    // An AI user never approves anything (W-101): when the signed-in user is an AI user,
+                    // the line names the step's recorded user instead.
+                    int approvedBy_ID = GetCtx().GetAD_User_ID();
+                    if (MUser.IsAIUser(GetCtx(), approvedBy_ID))
+                        approvedBy_ID = GetAD_User_ID();
+                    MUser user = MUser.Get(GetCtx(), approvedBy_ID);
                     MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
                         null, GetAD_WF_Node_ID(), user.GetName() + " " + GetNodeName(),
                         MEventTimeline.MSG_ApprovedBy);
@@ -714,6 +736,27 @@ namespace VAdvantage.WF
         public bool IsInvoker()
         {
             return GetResponsible().IsInvoker();
+        }
+
+        /// <summary>
+        /// Where the approval search ends, without a workflow run or a saved step; saves and locks nothing.
+        /// It runs the step's own search (GetApprovalUser below), so the rule exists once.
+        /// Part of the approval preview, version 1.
+        /// </summary>
+        /// <param name="ctx">context of the session the step would run in</param>
+        /// <param name="AD_Client_ID">company whose conversion rates convert the roles' approval amounts</param>
+        /// <param name="AD_User_ID">starting user</param>
+        /// <param name="currencyId">currency of the amount</param>
+        /// <param name="amount">amount</param>
+        /// <param name="AD_Org_ID">document organization</param>
+        /// <param name="ownDocument">the document is owned by AD_User_ID</param>
+        /// <param name="FetchLastApprover">at the end of the chain, return its last user instead of -1</param>
+        /// <returns>AD_User_ID - if -1 no Approver; the starting user means the document is approved</returns>
+        public static int GetApprovalUser(Ctx ctx, int AD_Client_ID, int AD_User_ID, int currencyId, Decimal amount,
+            int AD_Org_ID, bool ownDocument, bool FetchLastApprover)
+        {
+            return new MWFActivity(ctx, AD_Client_ID).GetApprovalUser(AD_User_ID, currencyId, amount,
+                AD_Org_ID, ownDocument, FetchLastApprover);
         }
 
         /// <summary>
@@ -1257,6 +1300,12 @@ namespace VAdvantage.WF
                             startAD_User_ID == doc.GetDoc_User_ID(), true);	//	own doc
                         //	same user = approved
                         autoApproval = startAD_User_ID == nextAD_User_ID;
+                        // An AI user never approves: the step is given to it and waits for a person
+                        if (autoApproval && MUser.IsAIUser(GetCtx(), nextAD_User_ID))
+                        {
+                            autoApproval = false;
+                            WaitForPerson(nextAD_User_ID);
+                        }
                         if (!autoApproval)
                         {
                             // applied check for user whether user is available or user is active
@@ -1290,6 +1339,12 @@ namespace VAdvantage.WF
 
                         // Change to fetch user from responsible
                         int userID = GetUserFromWFResponsible(_node.GetAD_WF_Responsible_ID(), GetPO(), out isAutoApproveSingleUser);
+                        // An AI user never approves: the step is given to it and waits for a person
+                        if (isAutoApproveSingleUser && MUser.IsAIUser(GetCtx(), userID))
+                        {
+                            isAutoApproveSingleUser = false;
+                            WaitForPerson(userID);
+                        }
                         if (!autoApproval && userID != 0)
                         {
                             CheckUser(userID);
@@ -1376,6 +1431,12 @@ namespace VAdvantage.WF
                                 SetAD_User_ID(startAD_User_ID);
                                 eve.SetAD_User_ID(startAD_User_ID);
                                 eve.Save();
+                                // A document's step never passes with an AI user as starting person: it waits for a person
+                                if (IsDocumentRecord() && MUser.IsAIUser(GetCtx(), startAD_User_ID))
+                                {
+                                    WaitForPerson(startAD_User_ID);
+                                    return false;
+                                }
                                 return true;
                             }
                             if (resp.IsOrganization())
@@ -1392,6 +1453,12 @@ namespace VAdvantage.WF
                             /// VIS0008 Changed done to handle if only one user in Approving Role
                             if (isAutoApproveSingleUser && _node.GetAD_Column_ID() > 0 && !resp.IsOrganization())
                             {
+                                // On a document, an AI user never approves: the step waits for a person
+                                if (IsDocumentRecord() && MUser.IsAIUser(GetCtx(), nextAD_User_ID))
+                                {
+                                    WaitForPerson(nextAD_User_ID);
+                                    return false;
+                                }
                                 if (MColumn.Get(GetCtx(), _node.GetAD_Column_ID()).GetAD_Reference_ID() == DisplayType.YesNo)
                                 {
                                     _po.Set_ValueOfColumn(GetNode().GetAD_Column_ID(), true);
@@ -1429,6 +1496,12 @@ namespace VAdvantage.WF
                         SetAD_User_ID(startAD_User_ID);
                         eve.SetAD_User_ID(startAD_User_ID);
                         eve.Save();
+                        // A document's step never passes with an AI user as starting person: it waits for a person
+                        if (IsDocumentRecord() && MUser.IsAIUser(GetCtx(), startAD_User_ID))
+                        {
+                            WaitForPerson(startAD_User_ID);
+                            return false;
+                        }
                         return true;
                     }
                     SetAD_User_ID(nextAD_User_ID);
@@ -2137,7 +2210,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
         /// </summary>
         /// <param name="AD_User_ID"></param>
         /// <returns>true or false, if user not found or user not active</returns>
-        public bool CheckUser(int AD_User_ID)
+        public virtual bool CheckUser(int AD_User_ID)
         {
             if (AD_User_ID == 0)
                 throw new Exception(Msg.GetMsg(GetCtx(), "Terminated") + " :: " + Msg.GetMsg(GetCtx(), "ApproverNotFound"));
@@ -2148,6 +2221,26 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                     throw new Exception(Msg.GetMsg(GetCtx(), "Terminated") + " :: " + Msg.GetMsg(GetCtx(), "ApproverNotActive"));
             }
             return true;
+        }
+
+        /// <summary>
+        /// Leave this approval step waiting for a person, because Onfinity would otherwise approve it
+        /// with an AI user recorded. Writes the message that says why, and what an administrator does.
+        /// </summary>
+        /// <param name="AD_User_ID">the AI user the step is given to</param>
+        private void WaitForPerson(int AD_User_ID)
+        {
+            log.Info("Approval step waits for a person, instead of approving with AI user AD_User_ID=" + AD_User_ID);
+            SetTextMsg(Msg.GetMsg(GetCtx(), "WFWaitingForPerson"));
+        }
+
+        /// <summary>
+        /// Is the workflow's record a document? The same interface test as the approval step's first branch.
+        /// </summary>
+        /// <returns>true if the record implements DocAction</returns>
+        private bool IsDocumentRecord()
+        {
+            return GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction);
         }
 
         /// <summary>
@@ -2952,6 +3045,9 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
         public bool SetUserChoice(int AD_User_ID, String value, int displayType,
             String textMsg, int AD_Window_ID = 0) //throws Exception
         {
+            // W6: an AI user never answers an approval step; refused before anything changes
+            if (GetNode().IsApprovalStep() && MUser.IsAIUser(GetCtx(), AD_User_ID))
+                throw new Exception(Msg.GetMsg(GetCtx(), "WFAIUserCannotAnswer"));
             if (AD_Window_ID > 0)
             {
                 this.AD_Window_ID = AD_Window_ID;
@@ -2994,6 +3090,10 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
 
             SetWFState(StateEngine.STATE_RUNNING);
             SetAD_User_ID(AD_User_ID);
+            // W7: the history entry this answer closes names the person who answers, never an AI user
+            GetEventAudit();
+            if (MUser.IsAIUser(GetCtx(), _audit.GetAD_User_ID()))
+                _audit.SetAD_User_ID(AD_User_ID);
             bool ok = SetVariable(value, displayType, textMsg);
             if (!ok)
                 return false;
@@ -3087,6 +3187,12 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
         /// <returns>true if forwarded</returns>
         public bool ForwardTo(int AD_User_ID, String textMsg, bool isFromActivityForm = false, bool isForwarded = false)
         {
+            // W6: an AI user never forwards an approval step; refused before anything changes
+            if (GetNode().IsApprovalStep() && MUser.IsAIUser(GetCtx(), GetCtx().GetAD_User_ID()))
+            {
+                log.Log(Level.WARNING, Msg.GetMsg(GetCtx(), "WFAIUserCannotAnswer") + " - AD_User_ID=" + GetCtx().GetAD_User_ID());
+                return false;
+            }
             if (AD_User_ID == GetAD_User_ID())
             {
                 log.Log(Level.WARNING, "Same User - AD_User_ID=" + AD_User_ID);
@@ -3099,6 +3205,9 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             {
                 oldUser = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
             }
+            // W7: a forward never closes a history entry with an AI user; it names the signed-in person instead
+            if (MUser.IsAIUser(GetCtx(), oldUser.GetAD_User_ID()))
+                oldUser = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
             MUser user = MUser.Get(GetCtx(), AD_User_ID);
 
             if (user == null || user.Get_ID() == 0)
@@ -3641,7 +3750,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
 
         }
 
-        private String ParseVariable(String variable, PO po)
+        private static String ParseVariable(String variable, PO po)
         {
             int index = po.Get_ColumnIndex(variable);
             if (index == -1)
@@ -4651,15 +4760,32 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
         }
         private int GetUserFromWFResponsible(int AD_WF_Responsible_ID, PO po, out bool isAutoApproverUser)
         {
+            return GetFixedApprover(GetCtx(), AD_WF_Responsible_ID, po, out isAutoApproverUser, Get_TrxName());
+        }
+
+        /// <summary>
+        /// The user a fixed approver (a step's responsible that is not an Invoker) gives the step to, and whether
+        /// Onfinity approves at once because that user is the only holder of the named role(s), created the record
+        /// and the role approves its holder's own documents. Saves and locks nothing.
+        /// Part of the approval preview, version 1.
+        /// </summary>
+        /// <param name="ctx">context of the session the step would run in</param>
+        /// <param name="AD_WF_Responsible_ID">the step's responsible</param>
+        /// <param name="po">the record the step would run on</param>
+        /// <param name="isAutoApproverUser">true if Onfinity would approve at once for that single holder</param>
+        /// <param name="trxName">transaction to read in; none for a preview</param>
+        /// <returns>AD_User_ID of the fixed approver, or 0</returns>
+        public static int GetFixedApprover(Ctx ctx, int AD_WF_Responsible_ID, PO po, out bool isAutoApproverUser, Trx trxName = null)
+        {
             isAutoApproverUser = false;
-            MWFResponsible resp = new MWFResponsible(GetCtx(), AD_WF_Responsible_ID, Get_TrxName());
+            MWFResponsible resp = new MWFResponsible(ctx, AD_WF_Responsible_ID, trxName);
             if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_Human))
             {
                 return resp.GetAD_User_ID();
             }
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_Organization))
             {
-                return (new MOrgInfo(GetCtx(), Util.GetValueOfInt(po.Get_Value("AD_Org_ID")), Get_TrxName()).GetSupervisor_ID());
+                return (new MOrgInfo(ctx, Util.GetValueOfInt(po.Get_Value("AD_Org_ID")), trxName).GetSupervisor_ID());
             }
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_Role))
             {
@@ -4674,7 +4800,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                     }
                     return UserID;
                 }
-                return GetCtx().GetAD_User_ID();
+                return ctx.GetAD_User_ID();
                 //return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + resp.GetAD_Role_ID() + " AND IsActive='Y' ORDER BY AD_User_ID"));
             }
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_MultiRoles))
@@ -4726,7 +4852,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_SQL))
             {
                 string txt = ParseCustomQuery(po, resp.GetCustomSQL());
-                log.Info("Query Text" + txt);
+                _log.Info("Query Text" + txt);
                 return Util.GetValueOfInt(DB.ExecuteScalar(txt));
             }
             else if (Util.GetValueOfInt(po.Get_Value("SalesRep_ID")) > 0)
@@ -4735,7 +4861,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             }
             else
             {
-                return GetCtx().GetAD_User_ID();
+                return ctx.GetAD_User_ID();
             }
         }
 
@@ -4745,7 +4871,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
         /// <param name="po"></param>
         /// <param name="text"></param>
         /// <returns>String SQL Query</returns>
-        private string ParseCustomQuery(PO po, String text)
+        private static string ParseCustomQuery(PO po, String text)
         {
             if (po == null || text.IndexOf("@") == -1)
                 return text;
