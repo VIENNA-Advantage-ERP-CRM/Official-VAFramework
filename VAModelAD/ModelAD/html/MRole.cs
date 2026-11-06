@@ -184,6 +184,9 @@ namespace VAdvantage.Model
         //  [MethodImpl(MethodImplOptions.Synchronized)]
         public static MRole GetDefault(Ctx ctx, bool reload)
         {
+            // An AI user's setting gets its own role object, never one of the shared role store
+            if (IsAIUserSetting(ctx))
+                return GetForAIUserSetting(ctx, ctx.GetAD_Role_ID(), reload);
             int AD_Role_ID = ctx.GetAD_Role_ID();
             int AD_User_ID = ctx.GetAD_User_ID();
             //if (!Ini.IsClient())	//	none for Server
@@ -268,6 +271,9 @@ namespace VAdvantage.Model
         /// <returns></returns>
         public static MRole Get(Ctx ctx, int AD_Role_ID)
         {
+            // An AI user's setting asked for its own role gets its own role object; any other role runs as today
+            if (AD_Role_ID == ctx.GetAD_Role_ID() && IsAIUserSetting(ctx))
+                return GetForAIUserSetting(ctx, AD_Role_ID, false);
             string key = AD_Role_ID.ToString();
             Trx trxName = null;
             MRole role = new MRole(ctx, AD_Role_ID, trxName);
@@ -276,6 +282,204 @@ namespace VAdvantage.Model
 
             return role;
         }
+
+        #region The roles of AI users' settings
+
+        /// <summary>Setting key: the user whose limits an AI user's setting carries, a person or NO_LIMITS_USER.</summary>
+        public const string CTX_LIMITS_USER = "#AD_LimitsUser_ID";
+        /// <summary>Setting key: the AI user's job's organisations, comma separated, or JOB_ORGS_ALL.</summary>
+        public const string CTX_JOB_ORGS = "#AD_JobOrg_IDs";
+        /// <summary>CTX_LIMITS_USER's value when no person's limits apply (a role an administrator picked).</summary>
+        public const int NO_LIMITS_USER = -1;
+        /// <summary>CTX_JOB_ORGS's value when the job may use every organisation of the setting's company.</summary>
+        public const string JOB_ORGS_ALL = "All";
+
+        /** The separator of CTX_JOB_ORGS's organisations */
+        private const char JOB_ORGS_SEPARATOR = ',';
+        /** The role's column that opens every organisation of its company, before any check reads its list */
+        private const string COLUMN_ACCESS_ALL_ORGS = "IsAccessAllOrgs";
+        /** The organisation "*", shared by every company */
+        private const int SHARED_ORG = 0;
+
+        /** The role objects of AI users' settings, kept with each setting object by role; emptied with the setting object */
+        private static readonly ConditionalWeakTable<Ctx, Dictionary<int, AIUserSettingRole>> s_aiUserSettingRoles
+            = new ConditionalWeakTable<Ctx, Dictionary<int, AIUserSettingRole>>();
+
+        /// <summary>
+        /// A role object of an AI user's setting, with the setting's values it was loaded for.
+        /// </summary>
+        private sealed class AIUserSettingRole
+        {
+            /// <summary>Keeps a loaded role object with the values it was loaded for.</summary>
+            public AIUserSettingRole(MRole role, string loadedFor)
+            {
+                Role = role;
+                LoadedFor = loadedFor;
+            }
+
+            /** The loaded role object */
+            public readonly MRole Role;
+            /** The setting's values it was loaded for (AIUserSettingValues) */
+            public readonly string LoadedFor;
+        }
+
+        /// <summary>
+        /// Is the setting's signed-in user an AI user? Reads the user's stored flag.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <returns>true if the setting's signed-in user is an AI user</returns>
+        private static bool IsAIUserSetting(Ctx ctx)
+        {
+            return MUser.IsAIUser(ctx, ctx.GetAD_User_ID());
+        }
+
+        /// <summary>
+        /// Get the role object of an AI user's setting for one role, from the setting's own store. It is loaded again
+        /// when asked to, and whenever one of the values it was loaded for has changed in the setting since.
+        /// </summary>
+        /// <param name="ctx">an AI user's context</param>
+        /// <param name="AD_Role_ID">the setting's own role</param>
+        /// <param name="reload">if true forces load</param>
+        /// <returns>the role object of this setting object and role</returns>
+        private static MRole GetForAIUserSetting(Ctx ctx, int AD_Role_ID, bool reload)
+        {
+            string loadedFor = AIUserSettingValues(ctx);
+            Dictionary<int, AIUserSettingRole> roles = s_aiUserSettingRoles.GetOrCreateValue(ctx);
+            lock (roles)
+            {
+                AIUserSettingRole kept;
+                if (!reload && roles.TryGetValue(AD_Role_ID, out kept) && kept.LoadedFor == loadedFor)
+                    return kept.Role;
+                MRole role = LoadForAIUserSetting(ctx, AD_Role_ID);
+                roles[AD_Role_ID] = new AIUserSettingRole(role, loadedFor);
+                return role;
+            }
+        }
+
+        /// <summary>
+        /// The setting's values a role object of an AI user's setting depends on: role, signed-in user, the user
+        /// whose limits apply, the job's organisations, company and organisation.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <returns>the values, as one text</returns>
+        private static string AIUserSettingValues(Ctx ctx)
+        {
+            return ctx.GetAD_Role_ID() + "|" + ctx.GetAD_User_ID() + "|" + ctx.GetContext(CTX_LIMITS_USER)
+                + "|" + ctx.GetContext(CTX_JOB_ORGS) + "|" + ctx.GetAD_Client_ID() + "|" + ctx.GetAD_Org_ID();
+        }
+
+        /// <summary>
+        /// Load the role of an AI user's setting in a private rules copy of the setting, whose signed-in user is the
+        /// user whose limits apply (or no user), keeping only the organisations the setting allows. A setting that
+        /// lacks either of its two values has lost them: it gets the role with no user and no organisation at all.
+        /// The role object's access to all organisations is switched off in memory, so that every check reads the
+        /// narrowed list; the object is never saved and never reaches the shared role store.
+        /// </summary>
+        /// <param name="ctx">an AI user's context</param>
+        /// <param name="AD_Role_ID">the setting's own role</param>
+        /// <returns>a new role object, which the rules copy holds as its own context</returns>
+        private static MRole LoadForAIUserSetting(Ctx ctx, int AD_Role_ID)
+        {
+            int limitsUser;
+            List<int> jobOrgs;
+            bool hasLimits = ReadJobLimits(ctx, out limitsUser, out jobOrgs);
+            if (!hasLimits)
+                limitsUser = NO_LIMITS_USER;
+            //	The rules copy: the same values, with the user whose limits apply as its user, and no session
+            Ctx rulesCopy = new Ctx(ctx.GetMap());
+            rulesCopy.SetAD_User_ID(limitsUser);
+            rulesCopy.Remove("#AD_User_ID");
+            rulesCopy.Remove("#AD_Session_ID");
+            MRole role = Get(rulesCopy, AD_Role_ID, limitsUser, true);
+            if (hasLimits)
+                role._orgAccess = role.GetJobOrgAccess(ctx.GetAD_Client_ID(), limitsUser, jobOrgs);
+            else
+                role._orgAccess = new OrgAccess[0];
+            //	Onfinity's checks pass a role with access to all organisations before they read its list
+            role.Set_ValueNoCheck(COLUMN_ACCESS_ALL_ORGS, false);
+            return role;
+        }
+
+        /// <summary>
+        /// Read the two values of an AI user's setting: the user whose limits apply, and the job's organisations.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="limitsUser">the user whose limits apply, or NO_LIMITS_USER</param>
+        /// <param name="jobOrgs">the job's organisations, or null for all of the company's</param>
+        /// <returns>false if either value is missing or unreadable</returns>
+        private static bool ReadJobLimits(Ctx ctx, out int limitsUser, out List<int> jobOrgs)
+        {
+            jobOrgs = null;
+            if (!int.TryParse(ctx.GetContext(CTX_LIMITS_USER), out limitsUser))
+                return false;
+            string orgs = ctx.GetContext(CTX_JOB_ORGS);
+            if (orgs.Length == 0)
+                return false;
+            if (orgs == JOB_ORGS_ALL)
+                return true;
+            jobOrgs = new List<int>();
+            foreach (string org in orgs.Split(JOB_ORGS_SEPARATOR))
+            {
+                int AD_Org_ID;
+                if (!int.TryParse(org, out AD_Org_ID))
+                    return false;
+                jobOrgs.Add(AD_Org_ID);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// The loaded organisations, narrowed to the AI user's job: only those of the setting's company, and only
+        /// the job's organisations when the setting names them. A role that takes its organisations from the user,
+        /// with no user whose limits apply, gets the job's organisations themselves. A role with access to all
+        /// organisations has every organisation of the company, "*" included, written out as its list.
+        /// </summary>
+        /// <param name="AD_Client_ID">the setting's company</param>
+        /// <param name="limitsUser">the user whose limits apply, or NO_LIMITS_USER</param>
+        /// <param name="jobOrgs">the job's organisations, or null for all of the company's</param>
+        /// <returns>the organisations this role object keeps</returns>
+        private OrgAccess[] GetJobOrgAccess(int AD_Client_ID, int limitsUser, List<int> jobOrgs)
+        {
+            List<OrgAccess> list = new List<OrgAccess>();
+            //	Access to all organisations comes first, as in Onfinity's checks
+            if (IsAccessAllOrgs() || (IsUseUserOrgAccess() && limitsUser == NO_LIMITS_USER))
+            {
+                List<int> orgs = GetCompanyOrgs(AD_Client_ID);
+                if (IsAccessAllOrgs())
+                    orgs.Insert(0, SHARED_ORG);
+                foreach (int AD_Org_ID in orgs)
+                {
+                    if (jobOrgs == null || jobOrgs.Contains(AD_Org_ID))
+                        list.Add(new OrgAccess(AD_Client_ID, AD_Org_ID, false));
+                }
+                return list.ToArray();
+            }
+            foreach (OrgAccess oa in _orgAccess)
+            {
+                if (oa.AD_Client_ID == AD_Client_ID && (jobOrgs == null || jobOrgs.Contains(oa.AD_Org_ID)))
+                    list.Add(oa);
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// The active organisations of a company.
+        /// </summary>
+        /// <param name="AD_Client_ID">company</param>
+        /// <returns>the organisations' IDs</returns>
+        private List<int> GetCompanyOrgs(int AD_Client_ID)
+        {
+            List<int> orgs = new List<int>();
+            string sql = "SELECT AD_Org_ID FROM AD_Org WHERE AD_Client_ID=" + AD_Client_ID + " AND IsActive='Y'";
+            DataSet ds = DataBase.DB.ExecuteDataset(sql, null, Get_TrxName());
+            if (ds == null || ds.Tables.Count == 0)
+                return orgs;
+            foreach (DataRow dr in ds.Tables[0].Rows)
+                orgs.Add(Util.GetValueOfInt(dr[0]));
+            return orgs;
+        }
+
+        #endregion
 
         /// <summary>
         /// Standard Constructor

@@ -133,6 +133,20 @@ namespace VAdvantage.Model
         }
 
         /// <summary>
+        /// Is the user an AI user (not a person)? Reads the user's flag through the cached
+        /// user records, so it costs almost nothing. No user (a negative ID) is not an AI user.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="AD_User_ID">user</param>
+        /// <returns>true if the user record is marked as an AI user</returns>
+        public static bool IsAIUser(Ctx ctx, int AD_User_ID)
+        {
+            if (AD_User_ID < 0)
+                return false;
+            return Get(ctx, AD_User_ID).IsAIUser();
+        }
+
+        /// <summary>
         /// Get User from email
         /// </summary>
         /// <param name="ctx">context</param>
