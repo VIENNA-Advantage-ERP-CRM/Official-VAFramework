@@ -648,7 +648,7 @@ namespace VAdvantage.Model
             // Check applied requested by Product Team
             if (IsLoginUser() && !string.IsNullOrEmpty(GetEMail()))
             {
-                string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
+                string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND IsLoginUser = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
                 if (newRecord)
                 {
                     int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
