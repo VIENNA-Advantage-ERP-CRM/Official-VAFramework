@@ -373,8 +373,9 @@ textarea.vis-email-addrbox {
 .vis-form-rytData .vis-input-wrap textarea.vis-email-addrbox {
     height: 35px;
     min-height: 35px;
-    padding: 6px 10px;
+    /*padding: 6px 10px;*/
     line-height: 21px;
+    padding: 6px 10px;
 }
 
     /* keep the empty-box label centred like the other inputs, not top-aligned like a textarea */
