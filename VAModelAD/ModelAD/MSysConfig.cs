@@ -42,9 +42,11 @@ namespace VAdvantage.Model
             String str = "";
             if (!Reload)
             {
-                str = Util.GetValueOfString(cache.Get(Name));
-                if (!string.IsNullOrEmpty(str))
+                // a cached empty value is an answer too (setting not defined): returning it avoids querying
+                // AD_SysConfig on every call for missing keys, e.g. SYSTEM_NATIVE_SEQUENCE on every new record ID
+                if (cache.TryGetValue(Name, out str) && str != null)
                     return str;
+                str = "";
             }
 
             //

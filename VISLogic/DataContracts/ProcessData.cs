@@ -180,6 +180,8 @@ namespace VIS.Models
         public string CustomHTML { get; set; }
 
         public bool IsBiHTMlReport { get; set; }
+        /// <summary>True when ReportFilePath is an absolute URL to open in an iframe (Onfinity Analytics)</summary>
+        public bool IsEmbedReport { get; set; }
     }
 
     public class GridReportInfo

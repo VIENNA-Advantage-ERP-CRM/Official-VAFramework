@@ -23,6 +23,10 @@ namespace VAdvantage.Common
         public static Dictionary<int, int> columnsTableHirarerichy = new Dictionary<int, int>();
         private static ShareRecordManager _ShareRecordManager = null;
         public static bool isLoading = false;
+        // Guards the dictionaries above: FillData fills them on a background task while saves read and add to them.
+        // Never held across a DB call.
+        private static readonly object _sync = new object();
+        private static readonly object _initLock = new object();
 
 
         private void DoWork(Ctx ctx)
@@ -46,19 +50,24 @@ namespace VAdvantage.Common
                     org.Readonly = ds.Tables[0].Rows[a]["IsReadOnly"].ToString() == "Y" ? true : false;
                     org.ChildShare = ds.Tables[0].Rows[a]["IsChildShare"].ToString() == "Y" ? true : false;
 
-                    if (!tableRecordHirarerichy.ContainsKey(Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])))
-                        tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
-                    //Dictionary of tableID and list of records of that table which are shared
-                    tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])].Add(org);
+                    lock (_sync)
+                    {
+                        if (!tableRecordHirarerichy.ContainsKey(Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])))
+                            tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
+                        //Dictionary of tableID and list of records of that table which are shared
+                        tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])].Add(org);
+                    }
                 }
             }
-            encludedTableHirarichy.Clear();
-
             string qry = "SELECT distinct t.AD_Table_ID FROM AD_Table t INNER JOIN AD_Tab tab ON t.AD_Table_ID=tab.AD_Table_ID WHERE tab.AD_Window_ID IN (SELECT AD_WIndow_ID FROM AD_Window WHERE  IsActive='Y' AND WindowType ='M') AND tab.IsActive='Y' AND IsView='N'";
             ds = DB.ExecuteDataset(qry);
-            for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
+            lock (_sync)
             {
-                encludedTableHirarichy[Convert.ToInt32(ds.Tables[0].Rows[j]["AD_Table_ID"])] = 0;
+                encludedTableHirarichy.Clear();
+                for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
+                {
+                    encludedTableHirarichy[Convert.ToInt32(ds.Tables[0].Rows[j]["AD_Table_ID"])] = 0;
+                }
             }
 
         }
@@ -72,15 +81,18 @@ namespace VAdvantage.Common
 
         public static ShareRecordManager Get(Ctx ctx)
         {
-            if (_ShareRecordManager == null)
+            lock (_initLock)
             {
-                _ShareRecordManager = new ShareRecordManager(ctx);
-            }
-            else
-            {
-                if (tableColumnHirarichy.Count == 0 && !isLoading)
+                if (_ShareRecordManager == null)
                 {
-                    _ShareRecordManager.DoWork(ctx);
+                    _ShareRecordManager = new ShareRecordManager(ctx);
+                }
+                else
+                {
+                    if (tableColumnHirarichy.Count == 0 && !isLoading)
+                    {
+                        _ShareRecordManager.DoWork(ctx);
+                    }
                 }
             }
 
@@ -114,47 +126,7 @@ namespace VAdvantage.Common
                     {
                         for (int j = 0; j < childTabs.Length; j++)
                         {
-
-                            if (!tableColumnHirarichy.ContainsKey(Convert.ToInt32(childTabs[j]["AD_Table_ID"])))
-                                tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])] = new List<int>();
-
-                            //get link column of child tab
-                            int linkColumn = Util.GetValueOfInt(childTabs[j]["AD_Column_ID"]);
-                            MTable linktable = MColumn.Get(ctx, linkColumn).GetFKTable();
-                            if (linktable != null)
-                            {
-                                int parentTableID = linktable.GetAD_Table_ID();
-
-                                //Dictionry of link column and reference table
-                                columnsTableHirarerichy[Convert.ToInt32(childTabs[j]["AD_Column_ID"])] = parentTableID;
-
-                                //Dictionry of  table and respective link column
-                                if (tableColumnHirarichy.ContainsKey(Convert.ToInt32(childTabs[j]["AD_Table_ID"])) && !tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Contains(linkColumn))
-                                    tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Add(linkColumn);
-                            }
-
-                            //C_Order_ID
-                            //C_Order_ID, C_Tax_ID
-                            //Get Parent Link Columns
-                            int[] pColumns = MTable.Get(ctx, childTabs[j]["TableName"].ToString()).GetParentColumnIDs();
-                            if (pColumns != null && pColumns.Length > 0)
-                            {
-                                for (int k = 0; k < pColumns.Length; k++)
-                                {
-                                    MTable table = MColumn.Get(ctx, pColumns[k]).GetFKTable();
-                                    if (table != null)
-                                    {
-                                        int parentTableID = table.GetAD_Table_ID();
-
-                                        //Dictionry of  table and respective link column
-                                        if (tableColumnHirarichy.ContainsKey(Convert.ToInt32(childTabs[j]["AD_Table_ID"])) && !tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Contains(pColumns[k]))
-                                            tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Add(pColumns[k]);
-
-                                        //Dictionry of link column and reference table
-                                        columnsTableHirarerichy[pColumns[k]] = parentTableID;
-                                    }
-                                }
-                            }
+                            AddChildTab(ctx, childTabs[j]);
                         }
                     }
                 }
@@ -164,11 +136,65 @@ namespace VAdvantage.Common
             isLoading = false;
         }
 
+        /// <summary>
+        /// Record a child tab's link column and parent link columns (with the tables they point to)
+        /// </summary>
+        private static void AddChildTab(Ctx ctx, DataRow childTab)
+        {
+            int childTableID = Convert.ToInt32(childTab["AD_Table_ID"]);
+            lock (_sync)
+            {
+                if (!tableColumnHirarichy.ContainsKey(childTableID))
+                    tableColumnHirarichy[childTableID] = new List<int>();
+            }
+
+            //get link column of child tab
+            int linkColumn = Util.GetValueOfInt(childTab["AD_Column_ID"]);
+            MTable linktable = MColumn.Get(ctx, linkColumn).GetFKTable();
+            if (linktable != null)
+            {
+                AddLinkColumn(childTableID, linkColumn, linktable.GetAD_Table_ID());
+            }
+
+            //C_Order_ID
+            //C_Order_ID, C_Tax_ID
+            //Get Parent Link Columns
+            int[] pColumns = MTable.Get(ctx, childTab["TableName"].ToString()).GetParentColumnIDs();
+            if (pColumns != null && pColumns.Length > 0)
+            {
+                for (int k = 0; k < pColumns.Length; k++)
+                {
+                    MTable table = MColumn.Get(ctx, pColumns[k]).GetFKTable();
+                    if (table != null)
+                    {
+                        AddLinkColumn(childTableID, pColumns[k], table.GetAD_Table_ID());
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Dictionry of table and respective link column, and of link column and reference table
+        /// </summary>
+        private static void AddLinkColumn(int childTableID, int columnID, int parentTableID)
+        {
+            lock (_sync)
+            {
+                columnsTableHirarerichy[columnID] = parentTableID;
+                List<int> columns;
+                if (tableColumnHirarichy.TryGetValue(childTableID, out columns) && !columns.Contains(columnID))
+                    columns.Add(columnID);
+            }
+        }
+
         private void FillData(Ctx ctx, PO po)
         {
-            if (tableColumnHirarichy.ContainsKey(po.Get_Table_ID()) || !encludedTableHirarichy.ContainsKey(po.Get_Table_ID()))
+            lock (_sync)
             {
-                return;
+                if (tableColumnHirarichy.ContainsKey(po.Get_Table_ID()) || !encludedTableHirarichy.ContainsKey(po.Get_Table_ID()))
+                {
+                    return;
+                }
             }
 
             DataSet dsTabs = DB.ExecuteDataset("SELECT tab.AD_Window_ID, tab.AD_Table_ID, tbl.TableName, tab.TabLevel, tab.AD_Column_ID FROM AD_Tab tab JOIN AD_Table tbl on tab.AD_table_ID=tbl.AD_Table_ID WHERE tab.AD_window_ID IN (SELECT AD_Window_ID FROM AD_Window WHERE IsActive = 'Y' AND WindowType = 'M') AND tab.IsActive='Y' AND IsView='N' AND tab.AD_Window_ID=" + po.GetAD_Window_ID());
@@ -185,47 +211,7 @@ namespace VAdvantage.Common
                     {
                         for (int j = 0; j < childTabs.Length; j++)
                         {
-
-                            if (!tableColumnHirarichy.ContainsKey(Convert.ToInt32(childTabs[j]["AD_Table_ID"])))
-                                tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])] = new List<int>();
-
-                            //get link column of child tab
-                            int linkColumn = Util.GetValueOfInt(childTabs[j]["AD_Column_ID"]);
-                            MTable linktable = MColumn.Get(ctx, linkColumn).GetFKTable();
-                            if (linktable != null)
-                            {
-                                int parentTableID = linktable.GetAD_Table_ID();
-
-                                //Dictionry of link column and reference table
-                                columnsTableHirarerichy[Convert.ToInt32(childTabs[j]["AD_Column_ID"])] = parentTableID;
-
-                                //Dictionry of  table and respective link column
-                                if (tableColumnHirarichy.ContainsKey(Convert.ToInt32(childTabs[j]["AD_Table_ID"])) && !tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Contains(linkColumn))
-                                    tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Add(linkColumn);
-                            }
-
-                            //C_Order_ID
-                            //C_Order_ID, C_Tax_ID
-                            //Get Parent Link Columns
-                            int[] pColumns = MTable.Get(ctx, childTabs[j]["TableName"].ToString()).GetParentColumnIDs();
-                            if (pColumns != null && pColumns.Length > 0)
-                            {
-                                for (int k = 0; k < pColumns.Length; k++)
-                                {
-                                    MTable table = MColumn.Get(ctx, pColumns[k]).GetFKTable();
-                                    if (table != null)
-                                    {
-                                        int parentTableID = table.GetAD_Table_ID();
-
-                                        //Dictionry of  table and respective link column
-                                        if (tableColumnHirarichy.ContainsKey(Convert.ToInt32(childTabs[j]["AD_Table_ID"])) && !tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Contains(pColumns[k]))
-                                            tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Add(pColumns[k]);
-
-                                        //Dictionry of link column and reference table
-                                        columnsTableHirarerichy[pColumns[k]] = parentTableID;
-                                    }
-                                }
-                            }
+                            AddChildTab(ctx, childTabs[j]);
                         }
                     }
                 }
@@ -239,9 +225,12 @@ namespace VAdvantage.Common
 
             //Get list of parent link cols of current Table
             List<int> parentColumnIDs = null;
-            if (tableColumnHirarichy.ContainsKey(po.Get_Table_ID()))
+            lock (_sync)
             {
-                parentColumnIDs = tableColumnHirarichy[po.Get_Table_ID()];
+                if (tableColumnHirarichy.ContainsKey(po.Get_Table_ID()))
+                {
+                    parentColumnIDs = new List<int>(tableColumnHirarichy[po.Get_Table_ID()]);
+                }
             }
 
             if (parentColumnIDs != null && parentColumnIDs.Count > 0)
@@ -253,16 +242,24 @@ namespace VAdvantage.Common
                     MColumn clm = MColumn.Get(p_ctx, parentColumnIDs[i]);
                     int tablID = clm.GetFKTable().GetAD_Table_ID();
 
-                    //check if table has shared record 
-                    if (tableRecordHirarerichy.ContainsKey(tablID))
+                    //check if table has shared record
+                    bool tableHasShares;
+                    lock (_sync)
+                        tableHasShares = tableRecordHirarerichy.ContainsKey(tablID);
+                    if (tableHasShares)
                     {
                         int parentID = po.Get_ValueAsInt(clm.GetColumnName());
 
                         //Get table's Shared record based on parent link column
                         List<ShareOrg> sharedRec = null;
-                        if (columnsTableHirarerichy.ContainsKey(parentColumnIDs[i]))
+                        lock (_sync)
                         {
-                            sharedRec = tableRecordHirarerichy[columnsTableHirarerichy[parentColumnIDs[i]]];
+                            List<ShareOrg> stored;
+                            if (columnsTableHirarerichy.ContainsKey(parentColumnIDs[i])
+                                && tableRecordHirarerichy.TryGetValue(columnsTableHirarerichy[parentColumnIDs[i]], out stored))
+                            {
+                                sharedRec = new List<ShareOrg>(stored);
+                            }
                         }
 
                         if (sharedRec != null && sharedRec.Count > 0)
@@ -405,12 +402,15 @@ namespace VAdvantage.Common
 
         public static void DeleteRecordFromTable(int table, int record, int OrgID)
         {
-            if (tableRecordHirarerichy.ContainsKey(table) &&
-                               tableRecordHirarerichy[table].Find(a => a.RecordID == record && a.OrgID == OrgID) != null)
+            lock (_sync)
             {
-                int removaed = tableRecordHirarerichy[table]
-                       .RemoveAll(a => a.RecordID == record
-                       && a.OrgID == OrgID);
+                if (tableRecordHirarerichy.ContainsKey(table) &&
+                                   tableRecordHirarerichy[table].Find(a => a.RecordID == record && a.OrgID == OrgID) != null)
+                {
+                    int removaed = tableRecordHirarerichy[table]
+                           .RemoveAll(a => a.RecordID == record
+                           && a.OrgID == OrgID);
+                }
             }
 
         }
@@ -423,12 +423,15 @@ namespace VAdvantage.Common
                 DeleteRecordFromTable(table, record.RecordID, record.OrgID);
             }
 
-            if (!tableRecordHirarerichy.ContainsKey(table))
-                tableRecordHirarerichy[table] = new List<VAdvantage.Common.ShareOrg>();
+            lock (_sync)
+            {
+                if (!tableRecordHirarerichy.ContainsKey(table))
+                    tableRecordHirarerichy[table] = new List<VAdvantage.Common.ShareOrg>();
 
-            ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
-            if (org == null)
-                tableRecordHirarerichy[table].Add(record);
+                ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
+                if (org == null)
+                    tableRecordHirarerichy[table].Add(record);
+            }
 
 
         }
@@ -441,14 +444,17 @@ namespace VAdvantage.Common
         /// <returns></returns>
         public static bool CheckRecordInTable(int table, ShareOrg record)
         {
-            if (!tableRecordHirarerichy.ContainsKey(table))
-                return false;
+            lock (_sync)
+            {
+                if (!tableRecordHirarerichy.ContainsKey(table))
+                    return false;
 
-            ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
-            if (org == null)
-                return false;
+                ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
+                if (org == null)
+                    return false;
 
-            return true;
+                return true;
+            }
 
         }
 
@@ -460,9 +466,12 @@ namespace VAdvantage.Common
         public List<int> GetRecordFromTable(int table)
         {
             List<int> parentColumnIDs = null;
-            if (tableColumnHirarichy.ContainsKey(table))
+            lock (_sync)
             {
-                parentColumnIDs = tableColumnHirarichy[table];
+                if (tableColumnHirarichy.ContainsKey(table))
+                {
+                    parentColumnIDs = new List<int>(tableColumnHirarichy[table]);
+                }
             }
             return parentColumnIDs;
         }

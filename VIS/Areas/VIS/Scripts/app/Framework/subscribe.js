@@ -10,7 +10,7 @@
 (function (VIS, $) {
     function subscribe(record_ID, reloadSubscribe, self) {
         var $root_subs = null;
-        var subscribedItems = self.curTab._subscribe;
+        var subscribedItems = self.curTab._subscribe || [];
 
         reloadSubscribe();
 

@@ -1323,6 +1323,10 @@
     function APrint(AD_Process_ID, table_ID, record_ID, WindowNo, recIds, curTab, isShowRTF) {
         //var overla = null;
         var windowID = curTab == null ? 0 : curTab.getAD_Window_ID();
+        // the file types differ per process (e.g. Analytics: PDF / CSV only), so the cached list belongs to one process
+        if ($menu.data("pid") !== AD_Process_ID) {
+            $menu.empty();
+        }
         $menu.off("click");
         $menu.on("click", "LI", function (e) {
             var filetype = $(e.target).data("val");
@@ -1350,6 +1354,7 @@
 
                         return;
                     }
+                    $menu.empty().data("pid", AD_Process_ID);
                     for (var i = 0; i < d.length; i++) {
                         var li = '';
                         if (i == 0) {

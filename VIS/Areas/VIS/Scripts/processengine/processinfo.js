@@ -42,6 +42,7 @@
         this.ActionOrigin = "";
         this.OriginName = "";
         this.isBiHtml = false;
+        this.isEmbedReport = false; // report file path is an absolute URL (Onfinity Analytics)
     };
 
     ProcessInfo.prototype.toJson = function () {
@@ -425,6 +426,14 @@
 
     ProcessInfo.prototype.getIsBiHtml = function () {
         return this.isBiHtml;
+    };
+
+    ProcessInfo.prototype.setIsEmbedReport = function (isEmbed) {
+        this.isEmbedReport = isEmbed;
+    };
+
+    ProcessInfo.prototype.getIsEmbedReport = function () {
+        return this.isEmbedReport;
     };
 
     ProcessInfo.prototype.setSummary = function (summary, error) {

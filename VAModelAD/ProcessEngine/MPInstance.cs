@@ -325,7 +325,11 @@ namespace VAdvantage.ProcessEngine
                 && Is_ValueChanged("IsProcessing"))
             {
                 //long ms = System.currentTimeMillis() - GetCreated().getTime();
-                long ms =DateTime.Now.Millisecond - GetCreated().Millisecond;
+                // elapsed time since the instance was created (subtracted only the millisecond parts before, so every
+                // run counted as about 1 second)
+                long ms = (long)(DateTime.Now - GetCreated()).TotalMilliseconds;
+                if (ms < 0)
+                    ms = 0;
                 long seconds = (long)(ms / 1000);
                 if (seconds < 1)
                 {

@@ -39,7 +39,9 @@ namespace VAdvantage.ProcessEngine
         public static void SetSummaryFromDB(ProcessInfo pi)
         {
             int sleepTime = 2000;	//	2 secomds
-            int noRetry = 5;        //  10 seconds total
+            // One read: every caller runs the procedure synchronously (StartDBProcess) before this, so it has
+            // finished; retrying only added 10 seconds of sleep when a procedure does not set Result.
+            int noRetry = 1;
             //
             String sql = "SELECT Result, ErrorMsg FROM AD_PInstance "
                 + "WHERE AD_PInstance_ID=@instanceid"
@@ -77,6 +79,8 @@ namespace VAdvantage.ProcessEngine
                     }
 
                     dr.Close();
+                    if (noTry == noRetry - 1)
+                        break;      //	no sleep after the last read
                     //	sleep
                     try
                     {

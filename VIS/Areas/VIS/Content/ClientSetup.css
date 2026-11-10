@@ -353,6 +353,29 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
     opacity: 1;
 }
 
+.vis-its-module-notinstalled .vis-its-module-icon {
+    opacity: .5;
+}
+
+/* Why the run stopped, when Market turned the request down */
+.vis-its-install-error {
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+    color: #e53935;
+    word-break: break-word;
+}
+
+    .vis-its-install-error i {
+        margin-right: 6px;
+        margin-top: 3px;
+    }
+
+html[dir="rtl"] .vis-its-install-error i {
+    margin-right: 0;
+    margin-left: 6px;
+}
+
 html[dir="rtl"] .vis-its-dots {
     margin-left: 0;
     margin-right: 4px;

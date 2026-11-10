@@ -1110,6 +1110,9 @@ OR
             {
                 List<int> activitiesID = activityID.Split(',').Select(int.Parse).ToList();
                 activitiesID.Sort();
+                // W6: an AI user never answers or forwards an approval step; refused before any step changes
+                if (IsAIUserOnApprovalStep(ctx, activitiesID))
+                    return "WFAIUserCannotAnswer";
                 string chkUserTxt = "";
                 for (int i = 0; i < activitiesID.Count; i++)
                 {
@@ -1286,6 +1289,24 @@ OR
             }
 
             return "";
+        }
+
+        /// <summary>
+        /// Is the signed-in user an AI user, and any of the steps an approval step (spec 1, W6)?
+        /// </summary>
+        /// <param name="ctx">context of the signed-in user</param>
+        /// <param name="activitiesID">the steps answered or forwarded</param>
+        /// <returns>true if the answer or forward is refused</returns>
+        private bool IsAIUserOnApprovalStep(Ctx ctx, List<int> activitiesID)
+        {
+            if (!MUser.IsAIUser(ctx, ctx.GetAD_User_ID()))
+                return false;
+            foreach (int AD_WF_Activity_ID in activitiesID)
+            {
+                if (new MWFActivity(ctx, AD_WF_Activity_ID, null).GetNode().IsApprovalStep())
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>

@@ -122,7 +122,7 @@ namespace VIS.Helpers
                 // bool success = OpenForm(AD_Form_ID, className, name);
                 //	Log
                 MSession session = MSession.Get(ctx, true);
-                session.WindowLog(ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), 0, AD_Form_ID);
+                VAdvantage.Common.AuditLogQueue.WindowLog(session, ctx.GetAD_Client_ID(), ctx.GetAD_Org_ID(), 0, AD_Form_ID);
             }
 
             return outt;

@@ -216,6 +216,7 @@
     <Compile Include="Classes\TokenManager.cs" />
     <Compile Include="Classes\WindowCtx.cs" />
     <Compile Include="Classes\ZoomTarget.cs" />
+    <Compile Include="Common\AuditLogQueue.cs" />
     <Compile Include="Common\Common.cs" />
     <Compile Include="Common\ShareRecordManager.cs" />
     <Compile Include="Controller\ActionParams.cs" />

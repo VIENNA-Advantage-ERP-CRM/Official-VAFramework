@@ -123,6 +123,7 @@
         this.jObjectFromServer = jObject;
         this.pi.setAD_PInstance_ID(jObject.AD_PInstance_ID);
         this.pi.setIsBiHtml(jObject.IsBiHTMlReport)
+        this.pi.setIsEmbedReport(jObject.IsEmbedReport);
         // Change Lokesh Chauhan
         this.pi.setCustomHTML(jObject.CustomHTML);
         this.pi.set_AD_PrintFormat_ID(jObject.AD_PrintFormat_ID);
@@ -200,14 +201,16 @@
                     }
                     else if (jObject.ReportFilePath) {
 
+                        // embedded (Analytics) reports carry an absolute URL, everything else is relative to the app
+                        var reportUrl = jObject.IsEmbedReport ? jObject.ReportFilePath : VIS.Application.contextUrl + jObject.ReportFilePath;
                         var ismobile = /ipad|iphone|ipod|mobile|android|blackberry|webos|windows phone/i.test(navigator.userAgent.toLowerCase());
                         if (ismobile) {
                             // window.setTimeout(function () {
-                            window.open(VIS.Application.contextUrl + jObject.ReportFilePath);
+                            window.open(reportUrl);
                             // }, 200);                      
                         }
                         else if (!this.parent.setReportBytes) {
-                            window.open(VIS.Application.contextUrl + jObject.ReportFilePath);
+                            window.open(reportUrl);
                         }
                         else {
                             this.parent.setReportBytes(jObject.Report);
@@ -471,6 +474,14 @@
                 $rightDiv.append($innerRightDiv);
 
                 $innerRightDiv.html(rptName);
+            }
+            else if (pi && pi.getIsEmbedReport()) // absolute URL from the Analytics server, no contextUrl prefix
+            {
+                $object = $("<iframe style = 'width:100%;height:99.4%;border:0;' allow='fullscreen'>");
+                $object.attr("src", rptName);
+                $rightDiv.css('height', '95%');
+                $rightDiv.css('width', '100%');
+                $rightDiv.append($object);
             }
             else if (pi.getIsBiHtml())// if report is Bi html report, then send request to respective view
             {

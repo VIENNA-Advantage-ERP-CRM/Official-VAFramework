@@ -72,8 +72,9 @@ namespace VAdvantage.Model
 
         #endregion
 
-        /**	Cache						*/
-        private static CCache<int, MRole> s_cache = new CCache<int, MRole>("AD_Role", 10);
+        /**	Cache: one role object per role and user ("role_user"); it holds user org access and the user for
+         *  private records, so a key by role only made every other user of the role reload all access rules */
+        private static CCache<string, MRole> s_cache = new CCache<string, MRole>("AD_Role", 10);
 
         /// <summary>
         ///Get Default (Client) Role
@@ -183,25 +184,29 @@ namespace VAdvantage.Model
         //  [MethodImpl(MethodImplOptions.Synchronized)]
         public static MRole GetDefault(Ctx ctx, bool reload)
         {
+            // An AI user's setting gets its own role object, never one of the shared role store
+            if (IsAIUserSetting(ctx))
+                return GetForAIUserSetting(ctx, ctx.GetAD_Role_ID(), reload);
             int AD_Role_ID = ctx.GetAD_Role_ID();
             int AD_User_ID = ctx.GetAD_User_ID();
             //if (!Ini.IsClient())	//	none for Server
             //    AD_User_ID = 0; //Form Preference
 
-            MRole role = (MRole)s_cache.Get(AD_Role_ID);
+            string key = AD_Role_ID + "_" + AD_User_ID;
+            MRole role = (MRole)s_cache.Get(key);
 
             if (reload || role == null || role.GetAD_Role_ID() != AD_Role_ID
             || role.GetAD_User_ID() != AD_User_ID)
             {
-                if (s_cache.ContainsKey(AD_Role_ID))
-                    s_cache.Remove(AD_Role_ID);
+                if (s_cache.ContainsKey(key))
+                    s_cache.Remove(key);
                 lock (_lock)
                 {
-                    role = (MRole)s_cache.Get(AD_Role_ID);
+                    role = (MRole)s_cache.Get(key);
                     if (role == null)
                     {
                         role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-                        s_cache[AD_Role_ID] = role;
+                        s_cache[key] = role;
                     }
                 }
             }
@@ -266,6 +271,9 @@ namespace VAdvantage.Model
         /// <returns></returns>
         public static MRole Get(Ctx ctx, int AD_Role_ID)
         {
+            // An AI user's setting asked for its own role gets its own role object; any other role runs as today
+            if (AD_Role_ID == ctx.GetAD_Role_ID() && IsAIUserSetting(ctx))
+                return GetForAIUserSetting(ctx, AD_Role_ID, false);
             string key = AD_Role_ID.ToString();
             Trx trxName = null;
             MRole role = new MRole(ctx, AD_Role_ID, trxName);
@@ -274,6 +282,204 @@ namespace VAdvantage.Model
 
             return role;
         }
+
+        #region The roles of AI users' settings
+
+        /// <summary>Setting key: the user whose limits an AI user's setting carries, a person or NO_LIMITS_USER.</summary>
+        public const string CTX_LIMITS_USER = "#AD_LimitsUser_ID";
+        /// <summary>Setting key: the AI user's job's organisations, comma separated, or JOB_ORGS_ALL.</summary>
+        public const string CTX_JOB_ORGS = "#AD_JobOrg_IDs";
+        /// <summary>CTX_LIMITS_USER's value when no person's limits apply (a role an administrator picked).</summary>
+        public const int NO_LIMITS_USER = -1;
+        /// <summary>CTX_JOB_ORGS's value when the job may use every organisation of the setting's company.</summary>
+        public const string JOB_ORGS_ALL = "All";
+
+        /** The separator of CTX_JOB_ORGS's organisations */
+        private const char JOB_ORGS_SEPARATOR = ',';
+        /** The role's column that opens every organisation of its company, before any check reads its list */
+        private const string COLUMN_ACCESS_ALL_ORGS = "IsAccessAllOrgs";
+        /** The organisation "*", shared by every company */
+        private const int SHARED_ORG = 0;
+
+        /** The role objects of AI users' settings, kept with each setting object by role; emptied with the setting object */
+        private static readonly ConditionalWeakTable<Ctx, Dictionary<int, AIUserSettingRole>> s_aiUserSettingRoles
+            = new ConditionalWeakTable<Ctx, Dictionary<int, AIUserSettingRole>>();
+
+        /// <summary>
+        /// A role object of an AI user's setting, with the setting's values it was loaded for.
+        /// </summary>
+        private sealed class AIUserSettingRole
+        {
+            /// <summary>Keeps a loaded role object with the values it was loaded for.</summary>
+            public AIUserSettingRole(MRole role, string loadedFor)
+            {
+                Role = role;
+                LoadedFor = loadedFor;
+            }
+
+            /** The loaded role object */
+            public readonly MRole Role;
+            /** The setting's values it was loaded for (AIUserSettingValues) */
+            public readonly string LoadedFor;
+        }
+
+        /// <summary>
+        /// Is the setting's signed-in user an AI user? Reads the user's stored flag.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <returns>true if the setting's signed-in user is an AI user</returns>
+        private static bool IsAIUserSetting(Ctx ctx)
+        {
+            return MUser.IsAIUser(ctx, ctx.GetAD_User_ID());
+        }
+
+        /// <summary>
+        /// Get the role object of an AI user's setting for one role, from the setting's own store. It is loaded again
+        /// when asked to, and whenever one of the values it was loaded for has changed in the setting since.
+        /// </summary>
+        /// <param name="ctx">an AI user's context</param>
+        /// <param name="AD_Role_ID">the setting's own role</param>
+        /// <param name="reload">if true forces load</param>
+        /// <returns>the role object of this setting object and role</returns>
+        private static MRole GetForAIUserSetting(Ctx ctx, int AD_Role_ID, bool reload)
+        {
+            string loadedFor = AIUserSettingValues(ctx);
+            Dictionary<int, AIUserSettingRole> roles = s_aiUserSettingRoles.GetOrCreateValue(ctx);
+            lock (roles)
+            {
+                AIUserSettingRole kept;
+                if (!reload && roles.TryGetValue(AD_Role_ID, out kept) && kept.LoadedFor == loadedFor)
+                    return kept.Role;
+                MRole role = LoadForAIUserSetting(ctx, AD_Role_ID);
+                roles[AD_Role_ID] = new AIUserSettingRole(role, loadedFor);
+                return role;
+            }
+        }
+
+        /// <summary>
+        /// The setting's values a role object of an AI user's setting depends on: role, signed-in user, the user
+        /// whose limits apply, the job's organisations, company and organisation.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <returns>the values, as one text</returns>
+        private static string AIUserSettingValues(Ctx ctx)
+        {
+            return ctx.GetAD_Role_ID() + "|" + ctx.GetAD_User_ID() + "|" + ctx.GetContext(CTX_LIMITS_USER)
+                + "|" + ctx.GetContext(CTX_JOB_ORGS) + "|" + ctx.GetAD_Client_ID() + "|" + ctx.GetAD_Org_ID();
+        }
+
+        /// <summary>
+        /// Load the role of an AI user's setting in a private rules copy of the setting, whose signed-in user is the
+        /// user whose limits apply (or no user), keeping only the organisations the setting allows. A setting that
+        /// lacks either of its two values has lost them: it gets the role with no user and no organisation at all.
+        /// The role object's access to all organisations is switched off in memory, so that every check reads the
+        /// narrowed list; the object is never saved and never reaches the shared role store.
+        /// </summary>
+        /// <param name="ctx">an AI user's context</param>
+        /// <param name="AD_Role_ID">the setting's own role</param>
+        /// <returns>a new role object, which the rules copy holds as its own context</returns>
+        private static MRole LoadForAIUserSetting(Ctx ctx, int AD_Role_ID)
+        {
+            int limitsUser;
+            List<int> jobOrgs;
+            bool hasLimits = ReadJobLimits(ctx, out limitsUser, out jobOrgs);
+            if (!hasLimits)
+                limitsUser = NO_LIMITS_USER;
+            //	The rules copy: the same values, with the user whose limits apply as its user, and no session
+            Ctx rulesCopy = new Ctx(ctx.GetMap());
+            rulesCopy.SetAD_User_ID(limitsUser);
+            rulesCopy.Remove("#AD_User_ID");
+            rulesCopy.Remove("#AD_Session_ID");
+            MRole role = Get(rulesCopy, AD_Role_ID, limitsUser, true);
+            if (hasLimits)
+                role._orgAccess = role.GetJobOrgAccess(ctx.GetAD_Client_ID(), limitsUser, jobOrgs);
+            else
+                role._orgAccess = new OrgAccess[0];
+            //	Onfinity's checks pass a role with access to all organisations before they read its list
+            role.Set_ValueNoCheck(COLUMN_ACCESS_ALL_ORGS, false);
+            return role;
+        }
+
+        /// <summary>
+        /// Read the two values of an AI user's setting: the user whose limits apply, and the job's organisations.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="limitsUser">the user whose limits apply, or NO_LIMITS_USER</param>
+        /// <param name="jobOrgs">the job's organisations, or null for all of the company's</param>
+        /// <returns>false if either value is missing or unreadable</returns>
+        private static bool ReadJobLimits(Ctx ctx, out int limitsUser, out List<int> jobOrgs)
+        {
+            jobOrgs = null;
+            if (!int.TryParse(ctx.GetContext(CTX_LIMITS_USER), out limitsUser))
+                return false;
+            string orgs = ctx.GetContext(CTX_JOB_ORGS);
+            if (orgs.Length == 0)
+                return false;
+            if (orgs == JOB_ORGS_ALL)
+                return true;
+            jobOrgs = new List<int>();
+            foreach (string org in orgs.Split(JOB_ORGS_SEPARATOR))
+            {
+                int AD_Org_ID;
+                if (!int.TryParse(org, out AD_Org_ID))
+                    return false;
+                jobOrgs.Add(AD_Org_ID);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// The loaded organisations, narrowed to the AI user's job: only those of the setting's company, and only
+        /// the job's organisations when the setting names them. A role that takes its organisations from the user,
+        /// with no user whose limits apply, gets the job's organisations themselves. A role with access to all
+        /// organisations has every organisation of the company, "*" included, written out as its list.
+        /// </summary>
+        /// <param name="AD_Client_ID">the setting's company</param>
+        /// <param name="limitsUser">the user whose limits apply, or NO_LIMITS_USER</param>
+        /// <param name="jobOrgs">the job's organisations, or null for all of the company's</param>
+        /// <returns>the organisations this role object keeps</returns>
+        private OrgAccess[] GetJobOrgAccess(int AD_Client_ID, int limitsUser, List<int> jobOrgs)
+        {
+            List<OrgAccess> list = new List<OrgAccess>();
+            //	Access to all organisations comes first, as in Onfinity's checks
+            if (IsAccessAllOrgs() || (IsUseUserOrgAccess() && limitsUser == NO_LIMITS_USER))
+            {
+                List<int> orgs = GetCompanyOrgs(AD_Client_ID);
+                if (IsAccessAllOrgs())
+                    orgs.Insert(0, SHARED_ORG);
+                foreach (int AD_Org_ID in orgs)
+                {
+                    if (jobOrgs == null || jobOrgs.Contains(AD_Org_ID))
+                        list.Add(new OrgAccess(AD_Client_ID, AD_Org_ID, false));
+                }
+                return list.ToArray();
+            }
+            foreach (OrgAccess oa in _orgAccess)
+            {
+                if (oa.AD_Client_ID == AD_Client_ID && (jobOrgs == null || jobOrgs.Contains(oa.AD_Org_ID)))
+                    list.Add(oa);
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// The active organisations of a company.
+        /// </summary>
+        /// <param name="AD_Client_ID">company</param>
+        /// <returns>the organisations' IDs</returns>
+        private List<int> GetCompanyOrgs(int AD_Client_ID)
+        {
+            List<int> orgs = new List<int>();
+            string sql = "SELECT AD_Org_ID FROM AD_Org WHERE AD_Client_ID=" + AD_Client_ID + " AND IsActive='Y'";
+            DataSet ds = DataBase.DB.ExecuteDataset(sql, null, Get_TrxName());
+            if (ds == null || ds.Tables.Count == 0)
+                return orgs;
+            foreach (DataRow dr in ds.Tables[0].Rows)
+                orgs.Add(Util.GetValueOfInt(dr[0]));
+            return orgs;
+        }
+
+        #endregion
 
         /// <summary>
         /// Standard Constructor
@@ -1622,9 +1828,34 @@ namespace VAdvantage.Model
         {
             if (_tableAccessLevel != null && _tableName != null && !reload)
                 return;
-            _tableAccessLevel = new Dictionary<int, string>(300);
-            _tableName = new Dictionary<string, int>(300);
+            // Same for every role and user, so one read-only copy is shared instead of reading AD_Table
+            // into every cached role_user instance; reset with AD_Table (CacheMgt prefix "AD_Table")
+            TableInfo info;
+            if (!s_tableInfo.TryGetValue(0, out info) || info == null)
+            {
+                info = new TableInfo();
+                if (ReadTableInfo(info))
+                    s_tableInfo[0] = info;
+            }
+            _tableAccessLevel = info.AccessLevel;
+            _tableName = info.Names;
+        }
 
+        /** AD_Table AccessLevel / TableName; shared, read-only */
+        private sealed class TableInfo
+        {
+            public Dictionary<int, string> AccessLevel = new Dictionary<int, string>(300);
+            public Dictionary<string, int> Names = new Dictionary<string, int>(300);
+        }
+
+        private static CCache<int, TableInfo> s_tableInfo = new CCache<int, TableInfo>("AD_Table_RoleInfo", 1, 10);   // 10 min: other servers of a farm see new tables soon
+
+        /// <summary>
+        /// Read the active tables into info
+        /// </summary>
+        /// <returns>false on a database error (info is partial and not cached)</returns>
+        private bool ReadTableInfo(TableInfo info)
+        {
             String sql = "SELECT AD_Table_ID, AccessLevel, TableName "
                 + "FROM AD_Table WHERE IsActive='Y'";
             IDataReader dr = null;
@@ -1634,8 +1865,8 @@ namespace VAdvantage.Model
                 while (dr.Read())
                 {
                     int ii = Utility.Util.GetValueOfInt(dr[0]);
-                    _tableAccessLevel.Add(ii, CommonFunctions.GetString(dr[1]));
-                    _tableName.Add(CommonFunctions.GetString(dr[2]), ii);
+                    info.AccessLevel.Add(ii, CommonFunctions.GetString(dr[1]));
+                    info.Names.Add(CommonFunctions.GetString(dr[2]), ii);
                 }
                 dr.Close();
                 dr = null;
@@ -1648,9 +1879,10 @@ namespace VAdvantage.Model
                     dr = null;
                 }
                 log.Log(Level.SEVERE, sql, e);
-
+                return false;
             }
-            log.Fine("#" + _tableAccessLevel.Count);
+            log.Fine("#" + info.AccessLevel.Count);
+            return true;
         }
 
         public Dictionary<int, string> GetTableAccessLevel()
@@ -2627,9 +2859,37 @@ namespace VAdvantage.Model
             return "AD_Org_ID IN(" + sb.ToString() + ")";
         }	//	getOrgWhereValue
 
+        /** Can AD_Org_ID be NULL in the table (view, missing or optional column)? By table name; reset with AD_Column */
+        private static CCache<string, bool> s_orgNullable = new CCache<string, bool>("AD_Column_OrgNullable", 50, 60);
+
+        /// <summary>
+        /// Org column for the access filter: plain AD_Org_ID where the column is mandatory on a real table, so that
+        /// indexes and statistics on it can be used; COALESCE(AD_Org_ID,0) where it can be NULL (views, optional
+        /// column, unknown table), which treats NULL as org 0 as before.
+        /// </summary>
+        private string OrgColumnSQL(string tableName, string mainTableName)
+        {
+            string column = (tableName == null ? "" : tableName + ".") + "AD_Org_ID";
+            return IsOrgNullable(mainTableName) ? "COALESCE(" + column + ",0)" : column;
+        }
+
+        private bool IsOrgNullable(string mainTableName)
+        {
+            if (string.IsNullOrEmpty(mainTableName))
+                return true;
+            bool nullable;
+            if (s_orgNullable.TryGetValue(mainTableName, out nullable))
+                return nullable;
+            MTable table = MTable.Get(GetCtx(), mainTableName);
+            MColumn column = table == null ? null : table.GetColumn("AD_Org_ID");
+            nullable = table == null || table.IsView() || column == null || !column.IsMandatory();
+            s_orgNullable[mainTableName] = nullable;
+            return nullable;
+        }
+
         /**
 	 * Get Org Where Clause Value
-	 * 
+	 *
 	 * @param rw
 	 *            read write
 	 * @return "AD_Org_ID=0" or "AD_Org_ID IN(0,1)" or null (if access all org)
@@ -2693,9 +2953,10 @@ namespace VAdvantage.Model
                 //}
             }
             //
+            string orgColumn = OrgColumnSQL(tableName, mainTableName);
             if (set.Count == 1)
             {
-                return "COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0)=" + set[0];
+                return orgColumn + "=" + set[0];
             }
             else if (set.Count == 0)
             {
@@ -2721,14 +2982,15 @@ namespace VAdvantage.Model
                     if (sql.Length > 0)
                         sql.Append(" OR ");
 
-                    sql.Append("COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0) IN(").Append(sb.ToString()).Append(")");
+                    sql.Append(orgColumn + " IN(").Append(sb.ToString()).Append(")");
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
                     if (!string.IsNullOrEmpty(mainTableName))
                     {
 
-                        string isView = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsView FROM AD_Table WHERE TableName='" + mainTableName + "'"));
+                        MTable mainTable = MTable.Get(GetCtx(), mainTableName);    // cached, was a query per call
+                        string isView = mainTable == null ? "" : (mainTable.IsView() ? "Y" : "N");
                         // Get Shared record with organisation.
                         if (isView != "Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
                         {
@@ -2753,23 +3015,10 @@ namespace VAdvantage.Model
             if (!IsUseBPRestrictions())
                 return "";
 
-            bool hasBPColumn = false;
-            string sql = "SELECT count(*) FROM AD_Table t "
-                            + "INNER JOIN AD_Column c ON (t.AD_Table_ID=c.AD_Table_ID) "
-                            + "WHERE t.TableName='" + TableName
-                            + "' AND c.ColumnName='C_BPartner_ID' ";
-            try
-            {
-                string ret = DataBase.DB.ExecuteScalar(sql).ToString();
-                if (ret != "")
-                {
-                    hasBPColumn = int.Parse(ret) != 0;
-                }
-            }
-            catch (Exception e)
-            {
-                log.Log(Level.SEVERE, sql, e);
-            }
+            // columns from the cached table definition (were two queries per call, the second one the wrong query:
+            // it re-ran the C_BPartner_ID check, so AD_User_ID was assumed on tables that do not have it)
+            MTable table = MTable.Get(GetCtx(), TableName);
+            bool hasBPColumn = table != null && table.GetColumn("C_BPartner_ID") != null;
             if (!hasBPColumn)
                 return "";
 
@@ -2784,24 +3033,7 @@ namespace VAdvantage.Model
                                         + " WHERE u.AD_User_ID=" + AD_User_ID
                                         + " AND bpr.C_BPartner_ID=" + TableName + ".C_BPartner_ID)";
 
-            bool hasUserColumn = false;
-            string sql1 = "SELECT count(*) FROM AD_Table t "
-                            + "INNER JOIN AD_Column c ON (t.AD_Table_ID=c.AD_Table_ID) "
-                            + "WHERE t.tableName='" + TableName
-                            + "' AND c.ColumnName='AD_User_ID' ";
-            try
-            {
-
-                string ret = DataBase.DB.ExecuteScalar(sql).ToString();
-                if (ret != "")
-                {
-                    hasUserColumn = int.Parse(ret) != 0;
-                }
-            }
-            catch (Exception e)
-            {
-                log.Log(Level.SEVERE, sql, e);
-            }
+            bool hasUserColumn = table.GetColumn("AD_User_ID") != null;
 
             if (hasUserColumn)
                 docAccess += " OR " + TableName + ".AD_User_ID =" + AD_User_ID;
@@ -2888,15 +3120,17 @@ namespace VAdvantage.Model
             {
                 //Lakhwinder
                 MTable table = MTable.Get(GetCtx(), AD_Table_ID);
-                if (!table.IsView() && table.Haskey(AD_Table_ID))
+                // only tables with at least one private lock get the filter (cached, reset when a lock changes)
+                if (!table.IsView() && table.Haskey(AD_Table_ID) && MPrivateAccess.HasLocks(AD_Table_ID))
                 {
-                    string lockedIDs = MPrivateAccess.GetLockedRecordWhere(AD_Table_ID, _AD_User_ID);
-                    if (lockedIDs != null)
-                    {
-                        if (sb.Length > 0)
-                            sb.Append(" AND ");
-                        sb.Append(keyColumnName).Append(lockedIDs);
-                    }
+                    // NOT EXISTS needs the qualified key; an unqualified one (e.g. AD_User_ID) would bind to a column of
+                    // AD_Private_Access inside the subquery, so that case keeps NOT IN
+                    string lockedWhere = keyColumnName.IndexOf('.') > 0
+                        ? MPrivateAccess.GetLockedRecordNotExists(AD_Table_ID, _AD_User_ID, keyColumnName)
+                        : keyColumnName + MPrivateAccess.GetLockedRecordWhere(AD_Table_ID, _AD_User_ID);
+                    if (sb.Length > 0)
+                        sb.Append(" AND ");
+                    sb.Append(lockedWhere);
                 }
             }
             //
@@ -3224,9 +3458,11 @@ namespace VAdvantage.Model
         /// <param name="tableName"></param>
         public void GetShareRecord(ref StringBuilder sql, string tableName, string mainTableName)
         {
-            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(mainTableName);
-            DataSet ds = DB.ExecuteDataset(qry);
-            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            int AD_Table_ID = GetAD_Table_ID(mainTableName);
+            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + AD_Table_ID;
+            // cached "is anything shared with this org for the table" instead of running the query on every call;
+            // the subquery added below is still evaluated live by the database
+            if (MShareRecordOrg.HasShares(GetCtx().GetAD_Org_ID(), AD_Table_ID))
             {
                 sql.Append(" OR (");
 

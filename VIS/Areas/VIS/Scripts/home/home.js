@@ -522,8 +522,7 @@
                 $home.find('.vis-widget-body').empty();
                 $home.find('#divfeedbsy').show();
                 widgetList = {};
-                var url = VIS.Application.contextUrl + "Home/GetWidgets";
-                VIS.dataContext.getJSONData(url, { windowID: 0 }, function (result) {
+                getWidgetData("widgets", "Home/GetWidgets", function (result) {
                     $home.find('#divfeedbsy').hide();
                     if (!result) {
                         return;
@@ -592,9 +591,9 @@
 
             function loadHomeWidgets() {
                 $home.find('.vis-widget-container .vis-widget-item').remove();
-                var url = VIS.Application.contextUrl + "Home/GetUserWidgets";
                 $home.find('#divfeedbsy').show();
                 hiddenRows = [];
+                var url = VIS.Application.contextUrl + "Home/GetUserWidgets";
                 VIS.dataContext.getJSONData(url, { windowID: 0, dashboardID: currentDashboardID }, function (result) {
                     if (result && result.length > 0) {
                         $home.find('.vis-add-widgetContainer').hide();
@@ -1298,6 +1297,28 @@
                 else {
                     doSwitch();
                 }
+            }
+
+            // The widget catalog needs only the window, so its request starts together with the page HTML instead of after
+            // the dashboards; the first loadWidgets uses this answer, a refresh asks again. The user's widgets depend on the
+            // dashboard loadDashboards picks, so they are not requested early.
+            var widgetPrefetch = {
+                widgets: requestWidgetData("Home/GetWidgets")
+            };
+
+            function requestWidgetData(action) {
+                var answer = $.Deferred();
+                VIS.dataContext.getJSONData(VIS.Application.contextUrl + action, { windowID: 0 }, function (result) {
+                    answer.resolve(result);
+                });
+                return answer;
+            }
+
+            /** the prefetched answer the first time, a new request after that (refresh) */
+            function getWidgetData(key, action, callback) {
+                var pending = widgetPrefetch[key];
+                widgetPrefetch[key] = null;
+                (pending || requestWidgetData(action)).done(callback);
             }
 
             // Load the home widget content and initialize it

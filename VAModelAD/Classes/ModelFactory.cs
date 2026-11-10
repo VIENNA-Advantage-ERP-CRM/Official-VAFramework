@@ -38,6 +38,8 @@ namespace VAModelAD.Classes
     class ModelFactory : IModelFactory
     {
         private static CCache<String, Type> s_classCache = new CCache<String, Type>("PO_Class", 20);
+        /** Tables without a model class (GenericPO) */
+        private static CCache<String, bool> s_classMiss = new CCache<String, bool>("PO_Class_Miss", 20);
         private static VLogger log = VLogger.GetVLogger(typeof(ModelFactory).Name);
 
 
@@ -111,6 +113,8 @@ namespace VAModelAD.Classes
             {
                 return cache;
             }
+            if (s_classMiss.ContainsKey(tableName))
+                return null;
 
             //	Import Tables (Name conflict)
             if (tableName.StartsWith("I_"))
@@ -162,69 +166,76 @@ namespace VAModelAD.Classes
             //for (int i = 0; i < packages.length; i++)
             //{
 
-            string namspace = "";
+            // M classes first (customization, modules, product), X_ classes only when the table has no M class. The X_
+            // check used to test the whole array instead of the entry, so X_ classes were never found: those tables
+            // fell back to GenericPO after every probe, on every load. Testing the entry in the same loops would let
+            // VAdvantage.Model.X_ win over an M class of a later package (e.g. MWFProcess in VAdvantage.WF).
+            Type found = FindClass(tableName, classNm, false) ?? FindClass(tableName, classNm, true);
+            if (found != null)
+            {
+                s_classCache.Add(tableName, found);
+                return found;
+            }
+            s_classMiss.Add(tableName, true);  // GenericPO: do not probe again until the cache is reset
+            return null;
+        }
 
-            /*********** Module Section  **************/
-
-            Tuple<String, String, String> moduleInfo;
-            Assembly asm = null;
+        /// <summary>
+        /// Search the customization, module and product packages for the table's class
+        /// </summary>
+        /// <param name="tableName">table name (X_ classes are named after it)</param>
+        /// <param name="classNm">class name without prefix and underscores (M classes)</param>
+        /// <param name="xClasses">true: only the X_ packages, false: only the others</param>
+        private Type FindClass(string tableName, string classNm, bool xClasses)
+        {
+            string namspace;
+            Type clazzsn;
 
             //////Check MClasses through list
             for (int i = 0; i < _projectClasses.Length; i++)
             {
-                namspace = _projectClasses[i] + classNm;
-                if (_projectClasses.Contains("X_"))
-                {
-                    namspace = _projectClasses[i] + tableName;
-                }
-
-                Type clazzsn = GetFromCustomizationPOclass(namspace);
+                if (_projectClasses[i].Contains("X_") != xClasses)
+                    continue;
+                namspace = _projectClasses[i] + (xClasses ? tableName : classNm);
+                clazzsn = GetFromCustomizationPOclass(namspace);
+                if (clazzsn == null && xClasses && classNm != tableName)   // X_ classes named like the old lookup did
+                    clazzsn = GetFromCustomizationPOclass(_projectClasses[i] + classNm);
                 if (clazzsn != null)
-                {
-                    s_classCache.Add(tableName, clazzsn);
                     return clazzsn;
-                }
             }
 
-            //Modules
+            /*********** Module Section  **************/
+            Tuple<String, String, String> moduleInfo;
             if (Env.HasModulePrefix(tableName, out moduleInfo))
             {
-                asm = GetAssembly(moduleInfo.Item1);
+                Assembly asm = GetAssembly(moduleInfo.Item1);
                 if (asm != null)
                 {
                     for (int i = 0; i < _moduleClasses.Length; i++)
                     {
-                        namspace = moduleInfo.Item2 + _moduleClasses[i] + classNm;
-                        if (_moduleClasses.Contains("X_"))
-                        {
-                            namspace = moduleInfo.Item2 + _moduleClasses[i] + tableName;
-                        }
-                        Type clazzsn = GetClassFromAsembly(asm, namspace);
+                        if (_moduleClasses[i].Contains("X_") != xClasses)
+                            continue;
+                        namspace = moduleInfo.Item2 + _moduleClasses[i] + (xClasses ? tableName : classNm);
+                        clazzsn = GetClassFromAsembly(asm, namspace);
+                        if (clazzsn == null && xClasses && classNm != tableName)
+                            clazzsn = GetClassFromAsembly(asm, moduleInfo.Item2 + _moduleClasses[i] + classNm);
                         if (clazzsn != null)
-                        {
-                            s_classCache.Add(tableName, clazzsn);
                             return clazzsn;
-                        }
                     }
                 }
             }
             /********  End  **************/
+
             for (int i = 0; i < _productClasses.Length; i++)
             {
-                namspace = _productClasses[i] + classNm;
-                if (_productClasses.Contains("X_"))
-                {
-                    namspace = _productClasses[i] + tableName;
-                }
-
-                Type clazzsn = Env.GetTypeFromPackage(namspace);
-
-                //Type clazzsn = GetPOclass(namspace);
+                if (_productClasses[i].Contains("X_") != xClasses)
+                    continue;
+                namspace = _productClasses[i] + (xClasses ? tableName : classNm);
+                clazzsn = Env.GetTypeFromPackage(namspace);
+                if (clazzsn == null && xClasses && classNm != tableName)
+                    clazzsn = Env.GetTypeFromPackage(_productClasses[i] + classNm);
                 if (clazzsn != null)
-                {
-                    s_classCache.Add(tableName, clazzsn);
                     return clazzsn;
-                }
             }
             return null;
         }

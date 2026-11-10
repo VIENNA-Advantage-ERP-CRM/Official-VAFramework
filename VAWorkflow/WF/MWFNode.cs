@@ -352,6 +352,16 @@ namespace VAdvantage.WF
         }
 
         /// <summary>
+        /// Is this an approval step: a document's approval step, or a multi-approval step of any record?
+        /// An AI user never answers or forwards one (spec 1, W6).
+        /// </summary>
+        /// <returns>true if an approval step</returns>
+        public bool IsApprovalStep()
+        {
+            return IsUserApproval() || (ACTION_UserChoice.Equals(GetAction()) && IsMultiApproval());
+        }
+
+        /// <summary>
         ///Is this a User Choice step?
         /// </summary>
         /// <returns>true if User Choice</returns>

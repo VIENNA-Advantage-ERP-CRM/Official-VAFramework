@@ -221,6 +221,9 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="VA149Svc">
+      <HintPath>..\..\GitSource\VA049_OnfinityBITool\ViennaAdvantageWeb\bin\VA149Svc.dll</HintPath>
+    </Reference>
     <Reference Include="ViennaBase">
       <HintPath>Dll\ViennaBase.dll</HintPath>
     </Reference>

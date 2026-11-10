@@ -96,6 +96,8 @@ namespace VAdvantage.ProcessEngine
         string recIDs = "";
         bool _isTelerikReport = false;
         bool _isJasperReport = false;
+        // false (default) = engines that can embed (Onfinity Analytics) produce a PDF / CSV file
+        bool _isEmbedView = false;
         bool _isSupportPaging = false;          //25
         Object _SerializableObject = null;
 
@@ -554,6 +556,23 @@ namespace VAdvantage.ProcessEngine
             return recIDs;
         }
 
+        /** Report made by a workflow report node of this run (methods, not a property: never serialized) */
+        private VAdvantage.Print.IReportEngine _workflowReport = null;
+
+        /// <summary>
+        /// Report produced by a report node of the workflow started for this run; ProcessCtl reads it after the
+        /// workflow. Kept on the run's own ProcessInfo so concurrent workflows never see each other's reports.
+        /// </summary>
+        public VAdvantage.Print.IReportEngine GetWorkflowReport()
+        {
+            return _workflowReport;
+        }
+
+        public void SetWorkflowReport(VAdvantage.Print.IReportEngine report)
+        {
+            _workflowReport = report;
+        }
+
         /// <summary>
         /// get record id
         /// </summary>
@@ -904,6 +923,20 @@ namespace VAdvantage.ProcessEngine
         public bool GetIsJasperReport()
         {
             return _isJasperReport;
+        }
+
+        /// <summary>
+        /// Report is shown in the interactive viewer (menu / button run): engines that can embed
+        /// (Onfinity Analytics) return an embed URL instead of a PDF / CSV file.
+        /// </summary>
+        /// <param name="isEmbedView"></param>
+        public void SetIsEmbedView(bool isEmbedView)
+        {
+            _isEmbedView = isEmbedView;
+        }
+        public bool GetIsEmbedView()
+        {
+            return _isEmbedView;
         }
 
         public bool GetIsSupportPaging()

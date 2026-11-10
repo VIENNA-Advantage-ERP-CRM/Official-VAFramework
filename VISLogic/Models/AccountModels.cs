@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.ServiceModel.Web;
 using System.Web.Security;
 using VAdvantage.Model;

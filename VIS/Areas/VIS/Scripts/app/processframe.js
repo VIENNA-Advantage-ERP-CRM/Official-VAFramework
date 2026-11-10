@@ -1066,6 +1066,12 @@
             btnCustomize.css('display', 'none');
             btnRF.css('display', 'none');
         }
+        if (pctl.pi.getIsEmbedReport && pctl.pi.getIsEmbedReport()) {
+            // embedded Analytics viewer exports from inside the frame; file-based buttons don't apply
+            $.each([btnSaveCsv, btnSavePdf, btnSaveCsvAll, btnsavepdfall, btnArchive], function (i, btn) {
+                if (btn) btn.css('display', 'none');
+            });
+        }
         actionContainer.append(ulAction);
         toolbar.append(actionContainer);
         if (!self.hideclose) {

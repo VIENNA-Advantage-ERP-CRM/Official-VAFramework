@@ -122,6 +122,15 @@ namespace VAdvantage.WF
         }
 
         /// <summary>
+        /// Process info of the run that started this workflow (null when the workflow process was loaded from the
+        /// database, e.g. resumed later)
+        /// </summary>
+        public ProcessInfo GetProcessInfo()
+        {
+            return _pi;
+        }
+
+        /// <summary>
         /// Get active Activities of Process
         /// </summary>
         /// <param name="requery">if true requery</param>
@@ -388,13 +397,23 @@ namespace VAdvantage.WF
         /// </summary>
         public void SetAD_WF_Responsible_ID()
         {
-            int AD_WF_Responsible_ID = DataBase.DB.GetSQLValue(null,
-                    MRole.GetDefault(GetCtx(), false).AddAccessSQL(
+            SetAD_WF_Responsible_ID(GetDefaultResponsible_ID(GetCtx()));
+        }
+
+        /// <summary>
+        /// The responsible of a workflow that names none: an Invoker, the company's before the system's.
+        /// Read only; part of the approval preview, version 1.
+        /// </summary>
+        /// <param name="ctx">context of the session the workflow would run in</param>
+        /// <returns>AD_WF_Responsible_ID, or 0 if there is none</returns>
+        public static int GetDefaultResponsible_ID(Ctx ctx)
+        {
+            return DataBase.DB.GetSQLValue(null,
+                    MRole.GetDefault(ctx, false).AddAccessSQL(
                     "SELECT AD_WF_Responsible_ID FROM AD_WF_Responsible "
                     + "WHERE ResponsibleType='H' AND COALESCE(AD_User_ID,0)=0 "
                     + "ORDER BY AD_Client_ID DESC",
                     "AD_WF_Responsible", MRole.SQL_NOTQUALIFIED, MRole.SQL_RO));
-            SetAD_WF_Responsible_ID(AD_WF_Responsible_ID);
         }
 
         /// <summary>
@@ -407,32 +426,53 @@ namespace VAdvantage.WF
         /// <param name="User_ID">process invoker</param>
         private void SetUser_ID(int User_ID)
         {
+            SetAD_User_ID(GetStartUser(GetCtx(), GetAD_WF_Responsible_ID(), GetPO(), User_ID));
+        }
+
+        /// <summary>
+        /// The starting person of a workflow run, as SetUser_ID records it, without saving or locking anything.
+        /// Part of the approval preview, version 1.
+        /// - (1) Responsible
+        /// - (2) Document's own rule (Doc_User_ID)
+        /// - (3) Document Sales Rep
+        /// - (4) Document UpdatedBy
+        /// - (5) Process invoker
+        /// - (6) Signed-in user
+        /// </summary>
+        /// <param name="ctx">context of the session the workflow would run in</param>
+        /// <param name="AD_WF_Responsible_ID">the workflow's responsible; 0 takes the default responsible</param>
+        /// <param name="po">the record the workflow would run on, or null</param>
+        /// <param name="User_ID">process invoker</param>
+        /// <returns>AD_User_ID of the starting person</returns>
+        public static int GetStartUser(Ctx ctx, int AD_WF_Responsible_ID, PO po, int User_ID)
+        {
+            if (AD_WF_Responsible_ID == 0)
+                AD_WF_Responsible_ID = GetDefaultResponsible_ID(ctx);
             //	Responsible
-            MWFResponsible resp = MWFResponsible.Get(GetCtx(), GetAD_WF_Responsible_ID());
+            MWFResponsible resp = MWFResponsible.Get(ctx, AD_WF_Responsible_ID);
             //	(1) User - Directly responsible
             int AD_User_ID = resp.GetAD_User_ID();
 
             //	Invoker - get Sales Rep or last updater of Document
             if (AD_User_ID == 0 && resp.IsInvoker())
             {
-                GetPO();
                 //	(2) Doc Owner
                 //if (_po != null && _po instanceof DocAction)
-                if (_po != null && (_po.GetType() == typeof(DocAction) || _po.GetType().GetInterface("DocAction") == typeof(DocAction)))
+                if (po != null && (po.GetType() == typeof(DocAction) || po.GetType().GetInterface("DocAction") == typeof(DocAction)))
                 {
-                    DocAction da = (DocAction)_po;
+                    DocAction da = (DocAction)po;
                     AD_User_ID = da.GetDoc_User_ID();
                 }
                 //	(2) Sales Rep
-                if (AD_User_ID == 0 && _po != null && _po.Get_ColumnIndex("SalesRep_ID") != -1)
+                if (AD_User_ID == 0 && po != null && po.Get_ColumnIndex("SalesRep_ID") != -1)
                 {
-                    Object sr = _po.Get_Value("SalesRep_ID");
+                    Object sr = po.Get_Value("SalesRep_ID");
                     if (sr != null && sr.GetType() == typeof(int))
                         AD_User_ID = int.Parse(sr.ToString());
                 }
                 //	(3) UpdatedBy
-                if (AD_User_ID == 0 && _po != null)
-                    AD_User_ID = _po.GetUpdatedBy();
+                if (AD_User_ID == 0 && po != null)
+                    AD_User_ID = po.GetUpdatedBy();
             }
 
             //	(4) Process Owner
@@ -440,9 +480,9 @@ namespace VAdvantage.WF
                 AD_User_ID = User_ID;
             //	Fallback 
             if (AD_User_ID == 0)
-                AD_User_ID = GetCtx().GetAD_User_ID();
+                AD_User_ID = ctx.GetAD_User_ID();
             //
-            SetAD_User_ID(AD_User_ID);
+            return AD_User_ID;
         }
 
         /// <summary>

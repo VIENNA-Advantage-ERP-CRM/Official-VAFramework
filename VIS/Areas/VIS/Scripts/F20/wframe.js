@@ -409,6 +409,7 @@
 
 
             VIS.context.setContextOfWindow($.parseJSON(json.wCtx), windowNo);// set window context
+            VIS.AEnv.setUserQueries(windowNo, json.userQueries);    // saved / default searches of all tabs
             //console.log(jsonData);
 
             self.cPanel.initPanel(jsonData, query, self, false, sel, aParams); //initPanel

@@ -1305,8 +1305,40 @@
         };
         //
 
+        // The user's saved / default searches per window and tab, sent with the window (GetGridWindow userQueries).
+        // Read by GridTab.prepareQuery, APanel.setDefaultSearch and the saved-search list instead of their own
+        // blocking per-tab lookups. Missing (other containers, server error) -> callers use their lookups as before.
+        var userQueries = {};
+
+        /** stores the userQueries JSON string of a GetGridWindow response for the window */
+        function setUserQueries(windowNo, json) {
+            try {
+                userQueries[windowNo] = json ? JSON.parse(json) : null;
+            }
+            catch (e) {
+                userQueries[windowNo] = null;
+            }
+        };
+
+        /** { queries, defaults } of the tab, or null when not available */
+        function getTabUserQueries(windowNo, AD_Tab_ID) {
+            var w = userQueries[windowNo];
+            return w && w[AD_Tab_ID] ? w[AD_Tab_ID] : null;
+        };
+
+        /** rows as the DataSet the callers read (data.tables[0].rows[i].cells[...]) */
+        function userQueryDataSet(rows) {
+            var dsRows = [];
+            for (var i = 0; rows && i < rows.length; i++)
+                dsRows.push({ cells: rows[i] });
+            return { tables: [{ rows: dsRows }] };
+        };
+
         return {
             getGridWindow: getGridWindow,
+            setUserQueries: setUserQueries,
+            getTabUserQueries: getTabUserQueries,
+            userQueryDataSet: userQueryDataSet,
             getContextPopup: getContextPopup,
             getZoomButton: getZoomButton,
             getIsWorkflowProcess: getIsWorkflowProcess,
