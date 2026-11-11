@@ -1229,49 +1229,31 @@ namespace VIS.Models
         public List<string> SearchEmails(string term, string tableName, int tableID, Ctx ctx)
         {
             var list = new List<string>();
-            // an empty term (To box right after "; ") returns the first addresses of the table
+            // an empty term (To box right after "; ") returns the first addresses
             if (term == null)
                 term = "";
-            // the table is always read from AD_Table by id, the name sent by the client is never used in the query
-            string validTable = ResolveTableName(tableName, tableID);
-            if (validTable.Length == 0)
-                return list;
 
-            // not every table has an Email column (e.g. document tables), so check before querying
-            DataSet dsCols = DB.ExecuteDataset("SELECT UPPER(ColumnName) FROM AD_Column WHERE AD_Table_ID = @tableID AND IsActive = 'Y' AND UPPER(ColumnName) IN ('EMAIL', 'ISACTIVE', 'AD_CLIENT_ID')",
-                new SqlParameter[] { new SqlParameter("@tableID", tableID) });
-            var columns = new HashSet<string>();
-            if (dsCols != null && dsCols.Tables.Count > 0)
+            string sql = @"SELECT DISTINCT Email FROM AD_User
+                           WHERE Email IS NOT NULL AND UPPER(Email) LIKE UPPER(@term)
+                             AND IsActive = 'Y' AND AD_Client_ID = @clientId
+                           ORDER BY Email";
+            var param = new SqlParameter[]
             {
-                foreach (DataRow dr in dsCols.Tables[0].Rows)
-                    columns.Add(Util.GetValueOfString(dr[0]).ToUpper());
-            }
-            if (!columns.Contains("EMAIL"))
-                return list;
+                new SqlParameter("@term", "%" + term.Trim() + "%"),
+                new SqlParameter("@clientId", ctx.GetAD_Client_ID())
+            };
 
-            string sql = "SELECT DISTINCT Email FROM " + validTable + " WHERE Email IS NOT NULL AND UPPER(Email) LIKE UPPER(@term)";
-            var param = new List<SqlParameter>();
-            param.Add(new SqlParameter("@term", "%" + term.Trim() + "%"));
-            if (columns.Contains("ISACTIVE"))
-                sql += " AND IsActive = 'Y'";
-            if (columns.Contains("AD_CLIENT_ID"))
-            {
-                sql += " AND AD_Client_ID = @clientId";
-                param.Add(new SqlParameter("@clientId", ctx.GetAD_Client_ID()));
-            }
-            sql += " ORDER BY Email";
-
-            DataSet ds = DB.ExecuteDataset(sql, param.ToArray());
+            DataSet ds = DB.ExecuteDataset(sql, param);
             if (ds == null || ds.Tables.Count == 0)
                 return list;
 
-            // the box only needs a handful of suggestions
+            // cap the suggestions so a large client does not send thousands of rows per keystroke
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
                 string email = Util.GetValueOfString(dr["Email"]).Trim();
                 if (email.Length > 0)
                     list.Add(email);
-                if (list.Count >= 20)
+                if (list.Count >= 100)
                     break;
             }
             return list;
