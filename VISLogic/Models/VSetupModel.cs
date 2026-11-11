@@ -774,6 +774,8 @@ namespace VIS.Models
                     + HttpRuntime.AppDomainAppVirtualPath;
             }
 
+            baseUrl = "http://localhost/MarketG/";
+
             return (baseUrl == null ? "" : baseUrl.TrimEnd('/')) + "/api/Market_ModuleAPI";
         }
 
