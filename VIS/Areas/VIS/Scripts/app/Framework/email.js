@@ -717,7 +717,8 @@
                             // 2) only one email -> To field, not the checklist
                             var onlyEmail = $.trim(withEmail[0]["email"]);
                             if ($to && $to.length > 0 && $.trim($to.val()) == "") {
-                                $to.val(onlyEmail);
+                               // $to.val(onlyEmail);
+                                $to.val(onlyEmail + ";");
                                 autoToEmail = onlyEmail;
                                 resizeAddressBox($to);
                             }
