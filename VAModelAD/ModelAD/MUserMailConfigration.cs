@@ -14,9 +14,6 @@ namespace VAdvantage.Model
     public class MUserMailConfigration : X_AD_UserMailConfigration
     {
 
-        private static string _protocol = "";
-        private static int _credentialId;
-
         public MUserMailConfigration(Ctx ctx, int AD_UserMailConfigration_ID, Trx trxName)
             : base(ctx, AD_UserMailConfigration_ID, trxName)
         {
@@ -49,14 +46,17 @@ namespace VAdvantage.Model
 
 
 
+        /// <summary>
+        /// Mail protocol and API credential of the context user: the user's latest active mail
+        /// configuration, else the tenant's. Read on every call and not kept in a static field,
+        /// because the result differs per user and tenant and changes when a configuration is saved.
+        /// </summary>
+        /// <param name="ctx">context of the user who sends</param>
+        /// <param name="credentialId">VA101_APIAuthCredential_ID for an API protocol, else 0</param>
+        /// <returns>protocol code, e.g. SM, SI or EX</returns>
         public static string GetMailProtocol(Ctx ctx, out int credentialId)
         {
             credentialId = 0;
-            if (_protocol != "")
-            {
-                credentialId = _credentialId;
-                return _protocol;
-            }
             int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
             string protocol = "SM";
             if (Env.IsModuleInstalled("VA101_"))
@@ -77,8 +77,6 @@ namespace VAdvantage.Model
                 }
 
             }
-            _credentialId = credentialId;
-            _protocol = protocol;
             return protocol;
         }
     }
