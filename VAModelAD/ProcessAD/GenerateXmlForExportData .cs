@@ -122,7 +122,6 @@ namespace VAdvantage.Process
                 markTable.TableName = "ExportDataMarking";
                 markTable.Columns.Add("TableName");
                 markTable.Columns.Add("Export_ID");
-                markTable.Columns.Add("ModulePrefix");
                 ds.Tables.Add(markTable);
 
                 //Parse through the marked record one by one
@@ -250,13 +249,9 @@ namespace VAdvantage.Process
                 if (markTable.Select("TableName = '" + tableName + "' AND Export_ID = '" + exportID + "'").Length > 0)
                     return;
 
-                if (module == null)
-                    module = new X_AD_ModuleInfo(GetCtx(), _AD_ModuleInfo_ID, null);
-
                 DataRow row = markTable.NewRow();
                 row["TableName"] = tableName;
                 row["Export_ID"] = exportID;
-                row["ModulePrefix"] = module.GetPrefix();
                 markTable.Rows.Add(row);
             }
             catch (Exception ex)
