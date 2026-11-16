@@ -69,43 +69,65 @@ namespace VAdvantage.Model
             if (!string.IsNullOrEmpty(GetEmailToInfo()))
             {
                 string emails = GetEmailToInfo();
-                List<string> emailList = emails.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-               .Select(e => e.Trim().ToLower()).ToList();
+                List<string> emailList = emails.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(e => e.Trim().ToLower()).Where(e => e.Length > 0).Distinct().ToList();
 
                 if (emailList.Count > 0)
                 {
-                    string contacts = GetAttendeeInfo();
+                    // One address can belong to several users (e.g. a login user and a contact, or
+                    // users of other tenants): prefer a user of this tenant, then active, then login users
                     StringBuilder sql = new StringBuilder("SELECT AD_User_ID, LOWER(Email) AS Email FROM AD_User WHERE LOWER(Email) IN (");
                     sql.Append(string.Join(",", emailList.Select(e => $"'{e.Replace("'", "''")}'")));
-                    sql.Append(")");
+                    sql.Append(") ORDER BY CASE WHEN AD_Client_ID = ").Append(GetAD_Client_ID()).Append(" THEN 0 ELSE 1 END,")
+                        .Append(" CASE WHEN IsActive = 'Y' THEN 0 ELSE 1 END,")
+                        .Append(" CASE WHEN IsLoginUser = 'Y' THEN 0 ELSE 1 END, AD_User_ID");
                     DataSet ds1 = DB.ExecuteDataset(sql.ToString());
                     if (ds1 != null && ds1.Tables.Count > 0 && ds1.Tables[0].Rows.Count > 0)
                     {
-                        var userDict = ds1.Tables[0].AsEnumerable()
-                            .ToDictionary(r => Util.GetValueOfString(r["Email"]), r => Util.GetValueOfInt(r["AD_User_ID"]));
-                        List<int> contactList = new List<int>();
-                        for (int i = emailList.Count - 1; i >= 0; i--)
+                        Dictionary<string, int> userDict = new Dictionary<string, int>();
+                        foreach (DataRow r in ds1.Tables[0].Rows)
                         {
-                            string email = emailList[i];
-                            if (userDict.TryGetValue(email, out int userId))
+                            string email = Util.GetValueOfString(r["Email"]);
+                            if (!userDict.ContainsKey(email))
                             {
-                                contactList.Add(userId);
-                                emailList.RemoveAt(i);
+                                userDict.Add(email, Util.GetValueOfInt(r["AD_User_ID"]));
                             }
                         }
 
+                        // Attendees already set are kept first; they are stored separated by ';'
+                        List<int> contactList = new List<int>();
+                        string contacts = GetAttendeeInfo();
                         if (!string.IsNullOrWhiteSpace(contacts))
                         {
-                            var ids = contacts.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                            foreach (var idStr in ids.Reverse()) // Reverse if you want the first ID to remain first
+                            foreach (string idStr in contacts.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
                             {
-                                contactList.Insert(0, Util.GetValueOfInt(idStr));
+                                int id = Util.GetValueOfInt(idStr.Trim());
+                                if (id > 0 && !contactList.Contains(id))
+                                {
+                                    contactList.Add(id);
+                                }
+                            }
+                        }
+
+                        List<string> otherEmails = new List<string>();
+                        foreach (string email in emailList)
+                        {
+                            if (userDict.TryGetValue(email, out int userId))
+                            {
+                                if (!contactList.Contains(userId))
+                                {
+                                    contactList.Add(userId);
+                                }
+                            }
+                            else
+                            {
+                                otherEmails.Add(email);
                             }
                         }
 
                         // Update info
                         SetAttendeeInfo(string.Join(";", contactList));
-                        SetEmailToInfo(string.Join(",", emailList));
+                        SetEmailToInfo(string.Join(",", otherEmails));
                     }
                 }
             }
