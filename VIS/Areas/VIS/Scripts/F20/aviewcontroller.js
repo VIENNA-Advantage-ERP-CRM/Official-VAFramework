@@ -1941,6 +1941,27 @@
             return this.gTab.getCurrentRow();
         }
 
+        // Column based commit warning (@ColumnName@ rule in AD_Tab.CommitWarning):
+        // gTab.navigate would save the pending change silently, so ask first.
+        // Stay on the current row now; on Yes save and move on, on No keep the changes.
+        if (tRow != this.gTab.getCurrentRow()) {
+            var colWarning = this.gTab.getCommitWarning(true);
+            if (colWarning.length > 0) {
+                this.cancelSel = true;
+                if (!this._commitWarnOpen) {
+                    var self = this;
+                    this._commitWarnOpen = true;
+                    VIS.ADialog.confirm("SaveChanges?", true, colWarning, 'Confirm', function (results) {
+                        self._commitWarnOpen = false;
+                        if (results && self.dataSave(false)) {
+                            self.navigate(tRow, force);
+                        }
+                    });
+                }
+                return this.gTab.getCurrentRow();
+            }
+        }
+
         //  new position
         var recid = this.gTab.navigate(tRow, true, force);
         if (recid > -1 && !this.rowSetting) {

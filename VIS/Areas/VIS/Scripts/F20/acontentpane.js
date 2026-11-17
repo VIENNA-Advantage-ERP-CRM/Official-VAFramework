@@ -382,7 +382,23 @@
                     if (this.curTab.needSave(true, true)) {
                         //	Automatic Save
                         if (VIS.Env.getCtx().isAutoCommit(this.curWindowNo)) {
-                            if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back	
+                            // column based commit warning (@ColumnName@ rule): ask before the silent save
+                            var colWarning = this.curTab.getCommitWarning(true);
+                            if (colWarning.length > 0) {
+                                canExecute = false;
+                                VIS.ADialog.confirm("SaveChanges?", true, colWarning, 'Confirm', function (results) {
+                                    // No = stay on this tab, keep the pending changes
+                                    if (!results || !selfPanel.curTab.dataSave(true)) {
+                                        selfPanel.setBusy(false, true);
+                                        return false;
+                                    }
+                                    curEle = selfPanel.curGC;
+                                    oldGC = selfPanel.curGC;
+                                    selfPanel.curGC = null;
+                                    selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
+                                });
+                            }
+                            else if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back
                                 //this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
                                 return false;
