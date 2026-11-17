@@ -1896,7 +1896,17 @@
                                             return false;
                                         }
                                     }
-                                    if (!$ths.curTab.dataSave(true)) {	//  there is a problem, so we go back
+                                    // column based commit warning (@ColumnName@ rule): ask before the silent save
+                                    var colWarning = $ths.curTab.getCommitWarning(true);
+                                    if (colWarning.length > 0) {
+                                        var warnTab = $ths.curTab;
+                                        VIS.ADialog.confirm("SaveChanges?", true, colWarning, 'Confirm', function (results) {
+                                            if (results && warnTab.dataSave(true)) {
+                                                warnTab.setLastFocus(activeElement);
+                                            }
+                                        });
+                                    }
+                                    else if (!$ths.curTab.dataSave(true)) {	//  there is a problem, so we go back
                                         //$ths.lastFocus.focus();
                                         //$ths.curTab.getLastFocus().focus();
                                         return false;
@@ -3596,6 +3606,26 @@
 
             var canExecute = true;
 
+            // finish the tab switch after an asynchronous save confirmation
+            var continueTabChange = function () {
+                curEle = selfPanel.curGC;
+                oldGC = selfPanel.curGC;
+                selfPanel.curGC = null;
+
+                if (selfPanel.curST != null) {
+                    selfPanel.curST.saveData();
+                    selfPanel.curST.unRegisterAPanel();
+                    curEle = selfPanel.curST;
+                    selfPanel.curST = null;
+                }
+
+                selfPanel.curTabIndex = tpIndex;
+                if (!isAPanelTab)
+                    selfPanel.curGC = gc;
+
+                selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
+            };
+
             if (this.curGC != null) {
 
 
@@ -3614,7 +3644,21 @@
                                 return false;
                             }
 
-                            if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back	
+                            // column based commit warning (@ColumnName@ rule): ask before the silent save
+                            var colWarning = this.curTab.getCommitWarning(true);
+                            if (colWarning.length > 0) {
+                                canExecute = false;
+                                VIS.ADialog.confirm("SaveChanges?", true, colWarning, 'Confirm', function (results) {
+                                    // No = stay on this tab, keep the pending changes
+                                    if (!results || !selfPanel.curTab.dataSave(true)) {
+                                        selfPanel.vTabbedPane.restoreTabChange(selfPanel.vTabbedPane.getSelectedOldIndex());
+                                        selfPanel.setBusy(false, true);
+                                        return false;
+                                    }
+                                    continueTabChange();
+                                });
+                            }
+                            else if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back
                                 this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
                                 return false;
