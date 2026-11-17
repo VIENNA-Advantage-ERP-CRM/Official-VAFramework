@@ -453,7 +453,7 @@
     <Compile Include="ProcessAD\DocAction.cs" />
     <Compile Include="ProcessAD\EmailSendLink.cs" />
     <Compile Include="ProcessAD\GenerateXmlFiles.cs" />
-    <Compile Include="ProcessAD\GenerateXmlForExportData .cs" />
+    <Compile Include="ProcessAD\GenerateXmlForExportData.cs" />
     <Compile Include="ProcessAD\LanguageMaintenance.cs" />
     <Compile Include="ProcessAD\MailConfigration.cs" />
     <Compile Include="ProcessAD\MakeItLoginable.cs" />

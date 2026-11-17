@@ -65,6 +65,59 @@ namespace VIS.Helpers
         /// <param name="gTableIn">data record send from client </param>
         /// <param name="ctx">session context </param>
         /// <returns>Data contract to client</returns>
+        /// <summary>
+        /// Context keys of the CommitWarning rules (AD_Tab.CommitWarning "{condition} message")
+        /// that matched the record being saved and that the user confirmed:
+        ///   CommitWarning_Matched    "Y" when any rule matched
+        ///   CommitWarning_Columns    tab columns used by the matched conditions, e.g. "GrandTotal,DocStatus"
+        ///   CommitWarning_Conditions matched conditions separated by ";;"
+        /// The client sends them in the window context of the save request; for the duration of
+        /// the save they are global keys of the session ctx, so model code reads them with
+        /// GetCtx().GetContext("CommitWarning_Columns").
+        /// </summary>
+        public static readonly string[] CommitWarningContextKeys =
+            { "CommitWarning_Matched", "CommitWarning_Columns", "CommitWarning_Conditions" };
+
+        /// <summary>
+        /// Copy the matched CommitWarning keys from the request's window context into the session ctx.
+        /// </summary>
+        /// <returns>true when keys were set (caller must clear them after the save)</returns>
+        private bool ApplyCommitWarningContext(SaveRecordIn gTableIn, Ctx ctx)
+        {
+            if (gTableIn.Ctx == null)
+                return false;
+
+            string matched = null;
+            try
+            {
+                matched = gTableIn.Ctx[gTableIn.WindowNo+"|CommitWarning_Matched"];
+            }
+            catch
+            {
+                return false;
+            }
+            if (matched != "Y")
+                return false;
+
+            foreach (string k in CommitWarningContextKeys)
+            {
+                ctx.SetContext(k, Util.GetValueOfString(gTableIn.Ctx[gTableIn.WindowNo +"|"+ k]));
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Remove the CommitWarning keys from the session ctx after the save.
+        /// </summary>
+        private void ClearCommitWarningContext(Ctx ctx)
+        {
+            foreach (string k in CommitWarningContextKeys)
+            {
+                ctx.SetContext(k, "");
+                ctx.Remove(k);
+            }
+        }
+
         public SaveRecordOut InsertOrUpdateRecord(SaveRecordIn gTableIn, Ctx ctx)
         {
             SaveRecordOut outData = new SaveRecordOut();
@@ -90,7 +143,17 @@ namespace VIS.Helpers
             {
                 if (!tableName.EndsWith("_Trl"))	//	translation tables have no model
                 {
-                    DataSavePO(Record_ID, gTableIn, outData, ctx);
+                    // matched CommitWarning rules -> session ctx, visible to the model's BeforeSave/AfterSave
+                    bool commitWarningSet = ApplyCommitWarningContext(gTableIn, ctx);
+                    try
+                    {
+                        DataSavePO(Record_ID, gTableIn, outData, ctx);
+                    }
+                    finally
+                    {
+                        if (commitWarningSet)
+                            ClearCommitWarningContext(ctx);
+                    }
                     return outData;
                 }
             }

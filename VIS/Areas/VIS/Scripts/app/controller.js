@@ -2134,10 +2134,16 @@
     }
 
     GridTab.prototype.dataSave = function (manualCmd) {
+        var commitCtxSet = false;
         try {
             //check if current tab and its parents have changed.
             // if (hasChangedCurrentTabAndParents())
             ///   return false;
+
+            // Matched CommitWarning condition rules travel to the server in the window
+            // context of this save request (WindowHelper hands them to business logic).
+            // Evaluate before saving: IsChanged() needs the unsaved row.
+            commitCtxSet = this.setCommitWarningContext(this.getMatchedCommitRules());
 
             var retValue = (this.gridTable.dataSave(manualCmd) == VIS.GridTable.prototype.SAVE_OK);
             if (manualCmd)
@@ -2157,8 +2163,43 @@
         catch (e) {
             this.log.log(VIS.Logging.Level.SEVERE, "#" + this.vo.tabNo + " - row=" + this.currentRow, e);
         }
+        finally {
+            if (commitCtxSet)
+                this.setCommitWarningContext(null);
+        }
         return false;
     };  //  dataSave
+
+    /**
+     *  Window context keys describing the matched CommitWarning rules of the record being saved
+     *  (sent with the save request, read on the server as ctx.GetContext("CommitWarning_...")):
+     *    CommitWarning_Matched    "Y"
+     *    CommitWarning_Columns    tab columns used by the matched conditions, e.g. "GrandTotal,DocStatus"
+     *    CommitWarning_Conditions matched conditions separated by ";;"
+     *  @param matched result of getMatchedCommitRules(); null/empty clears the keys
+     *  @return true when keys were set
+     */
+    GridTab.prototype.setCommitWarningContext = function (matched) {
+        var windowNo = this.vo.windowNo;
+        if (!matched || matched.length == 0) {
+            VIS.context.setWindowContext(windowNo, "CommitWarning_Matched", null);
+            VIS.context.setWindowContext(windowNo, "CommitWarning_Columns", null);
+            VIS.context.setWindowContext(windowNo, "CommitWarning_Conditions", null);
+            return false;
+        }
+        var columns = [], conditions = [];
+        for (var i = 0; i < matched.length; i++) {
+            conditions.push(matched[i].condition);
+            for (var c = 0; c < matched[i].columns.length; c++) {
+                if (columns.indexOf(matched[i].columns[c]) < 0)
+                    columns.push(matched[i].columns[c]);
+            }
+        }
+        VIS.context.setWindowContext(windowNo, "CommitWarning_Matched", "Y");
+        VIS.context.setWindowContext(windowNo, "CommitWarning_Columns", columns.join(","));
+        VIS.context.setWindowContext(windowNo, "CommitWarning_Conditions", conditions.join(";;"));
+        return true;
+    };
 
     GridTab.prototype.dataNew = function (copy) {
 
@@ -2666,11 +2707,381 @@
     };
 
     /**
-     *  Get Commit Warning
-     *  @return commit warning
+     *  Get Commit Warning - the text to show before saving the current record.
+     *
+     *  AD_Tab.CommitWarning holds rules separated by ";;". Each rule is one of
+     *   - "{condition} message" : shown when the condition is true for the pending change
+     *   - "@ColumnName@ message": shorthand for "{IsChanged(@ColumnName@)} message"
+     *   - "message"             : plain text, shown on every save (old behaviour)
+     *  condition (see parseCommitCondition):
+     *      @Col@ op value   op: = != ! <> ^ > < >= <=   value: literal, 'text', "text" or @Var@
+     *      IsChanged(@Col@) the user changed the column on an existing record
+     *      & / AND, | / OR, ( ) - AND binds tighter than OR
+     *  e.g. "{@GrandTotal@>=10000 & IsChanged(@DocStatus@)} High value order status change;;
+     *        {(@DocStatus@=CO | @DocStatus@=CL) & IsChanged(@C_BPartner_ID@)} Partner changed on a completed document;;
+     *        Check the totals"
+     *  @Var@ is read from the current row when it is a column of this tab, else from the window context.
+     *  "@Name@ text" where Name is not a column of the tab stays plain text (old warnings keep working).
+     *  A rule with a condition but no message is ignored; an invalid condition never matches.
+     *
+     *  @param conditionRulesOnly true = only the messages of matched condition rules
+     *                            (plain text skipped); used by the auto-save paths that
+     *                            never showed the plain warning before
+     *  @return the warning text for the pending change, "" when nothing applies
      */
-    GridTab.prototype.getCommitWarning = function () {
-        return this.vo.CommitWarning;
+    GridTab.prototype.getCommitWarning = function (conditionRulesOnly) {
+        var rules = this.getCommitRules();
+        var messages = [];
+        for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if (!rule.cond) {
+                if (!conditionRulesOnly)
+                    messages.push(rule.message);
+            }
+            else if (this.evalCommitCondition(rule.cond)) {
+                messages.push(rule.message);
+            }
+        }
+        return messages.join("\n");
+    };
+
+    /**
+     *  Matched condition rules for the pending change - what is handed to the server on save.
+     *  @return [{ condition: "@GrandTotal@>=10000 & IsChanged(@DocStatus@)", columns: ["GrandTotal","DocStatus"], message: "..." }]
+     */
+    GridTab.prototype.getMatchedCommitRules = function () {
+        var rules = this.getCommitRules();
+        var matched = [];
+        for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if (rule.cond && this.evalCommitCondition(rule.cond)) {
+                matched.push({ condition: rule.condition, columns: rule.columns.slice(), message: rule.message });
+            }
+        }
+        return matched;
+    };
+
+    /** Parsed CommitWarning rules, cached per CommitWarning text. */
+    GridTab.prototype.getCommitRules = function () {
+        var raw = this.vo.CommitWarning || "";
+        if (this._commitRules && this._commitRulesRaw === raw) {
+            return this._commitRules;
+        }
+        var rules = [];
+        var parts = raw.split(";;");
+        var shortRx = /^@([A-Za-z0-9_]+)@\s*([\s\S]*)$/;
+        for (var i = 0; i < parts.length; i++) {
+            var text = parts[i].trim();
+            if (text.length == 0)
+                continue;
+            var condition = null, message = text, m;
+            if (text.charAt(0) == "{") {
+                var close = findCommitBraceEnd(text);
+                if (close < 0) {
+                    commitLog("missing '}' => " + text);
+                    continue;
+                }
+                condition = text.substring(1, close).trim();
+                message = text.substring(close + 1).trim();
+            }
+            else if ((m = shortRx.exec(text)) && this.gridTable.getField(m[1])) {
+                condition = "IsChanged(@" + m[1] + "@)";
+                message = m[2].trim();
+            }
+
+            if (condition == null) {
+                rules.push({ cond: null, message: text });
+                continue;
+            }
+            if (message.length == 0) {
+                commitLog("condition without message ignored => " + text);
+                continue;
+            }
+            var cond;
+            try {
+                cond = parseCommitCondition(condition);
+            }
+            catch (e) {
+                commitLog("invalid condition '" + condition + "' - " + e.message);
+                cond = { t: "false", vars: [] };
+            }
+            // columns of this tab used by the condition, in their AD spelling
+            var columns = [];
+            for (var v = 0; v < cond.vars.length; v++) {
+                var f = this.gridTable.getField(cond.vars[v]);
+                if (f && columns.indexOf(f.getColumnName()) < 0)
+                    columns.push(f.getColumnName());
+            }
+            rules.push({ cond: cond, condition: condition, columns: columns, message: message });
+        }
+        this._commitRulesRaw = raw;
+        this._commitRules = rules;
+        return rules;
+    };
+
+    /** Evaluate a parsed condition against the pending row. */
+    GridTab.prototype.evalCommitCondition = function (node) {
+        switch (node.t) {
+            case "or": return this.evalCommitCondition(node.a) || this.evalCommitCondition(node.b);
+            case "and": return this.evalCommitCondition(node.a) && this.evalCommitCondition(node.b);
+            case "changed": return this.isColumnChanged(node.col);
+            case "cmp":
+                return compareCommitValues(this.getCommitOperand(node.l), node.op, this.getCommitOperand(node.r));
+        }
+        return false;
+    };
+
+    /** Value of an operand: literal, or @Var@ from the current row (tab column) or window context. */
+    GridTab.prototype.getCommitOperand = function (op) {
+        if (!op.isVar)
+            return op.v;
+        var table = this.gridTable;
+        var field = table.getField(op.v);
+        var value;
+        if (field) {
+            var row = (table.rowChanged != null && table.rowChanged >= 0) ? table.rowChanged : this.currentRow;
+            value = table.getValueAt(row, field.getColumnName().toLowerCase());
+        }
+        else {
+            value = this.getValueAsString(op.v);
+        }
+        // like display logic: an empty ID compares as 0
+        if ((value === null || typeof value === "undefined" || value === "") && /_ID$/i.test(op.v))
+            value = "0";
+        return value;
+    };
+
+    function commitLog(msg) {
+        if (window.console && console.warn)
+            console.warn("CommitWarning: " + msg);
+    };
+
+    /** index of the "}" closing the leading "{", skipping quoted text; -1 if none */
+    function findCommitBraceEnd(text) {
+        var quote = null;
+        for (var i = 1; i < text.length; i++) {
+            var c = text.charAt(i);
+            if (quote) {
+                if (c == quote) quote = null;
+            }
+            else if (c == "'" || c == '"') quote = c;
+            else if (c == "}") return i;
+        }
+        return -1;
+    };
+
+    /**
+     *  Parse a CommitWarning condition into a tree.
+     *    or   := and ( ("|" | OR) and )*
+     *    and  := term ( ("&" | AND) term )*
+     *    term := "(" or ")" | IsChanged "(" @Col@ ")" | operand op operand
+     *  Nodes: {t:"or"|"and",a,b} {t:"changed",col} {t:"cmp",l,op,r}; the root also carries vars (all @Var@ names).
+     *  Throws on a syntax error.
+     */
+    function parseCommitCondition(text) {
+        var pos = 0, vars = [];
+        var opRx = /^(>=|<=|!=|<>|==|=|!|\^|>|<)/;
+
+        function ws() { while (pos < text.length && /\s/.test(text.charAt(pos))) pos++; }
+        function fail(msg) { throw new Error(msg + " at position " + (pos + 1)); }
+        function keyword(word) {
+            ws();
+            if (text.substr(pos, word.length).toUpperCase() == word
+                && !/[A-Za-z0-9_]/.test(text.charAt(pos + word.length) || "")) {
+                pos += word.length;
+                return true;
+            }
+            return false;
+        }
+        function symbol(c) {
+            ws();
+            if (text.charAt(pos) == c) { pos++; return true; }
+            return false;
+        }
+        function variable() {
+            ws();
+            if (text.charAt(pos) != "@") return null;
+            var end = text.indexOf("@", pos + 1);
+            if (end < 0) fail("missing closing @");
+            var name = text.substring(pos + 1, end).trim();
+            if (!name) fail("empty @@");
+            pos = end + 1;
+            if (vars.indexOf(name) < 0) vars.push(name);
+            return name;
+        }
+        function operand() {
+            ws();
+            var name = variable();
+            if (name != null) return { isVar: true, v: name };
+            var c = text.charAt(pos);
+            if (c == "'" || c == '"') {
+                var end = text.indexOf(c, pos + 1);
+                if (end < 0) fail("missing closing quote");
+                var s = text.substring(pos + 1, end);
+                pos = end + 1;
+                return { isVar: false, v: s };
+            }
+            var start = pos;
+            while (pos < text.length && !/[\s=!<>^&|()]/.test(text.charAt(pos))) pos++;
+            if (pos == start) fail("value expected");
+            return { isVar: false, v: text.substring(start, pos) };
+        }
+        function term() {
+            if (symbol("(")) {
+                var inner = or();
+                if (!symbol(")")) fail("')' expected");
+                return inner;
+            }
+            var save = pos;
+            if (keyword("ISCHANGED")) {
+                if (symbol("(")) {
+                    var col = variable();
+                    if (col == null) fail("IsChanged(@Column@) expected");
+                    if (!symbol(")")) fail("')' expected");
+                    return { t: "changed", col: col };
+                }
+                pos = save;
+            }
+            var l = operand();
+            ws();
+            var m = opRx.exec(text.substring(pos));
+            if (!m) fail("comparison operator expected");
+            pos += m[1].length;
+            var op = m[1];
+            if (op == "==") op = "=";
+            if (op == "!=" || op == "<>" || op == "^") op = "!";
+            return { t: "cmp", l: l, op: op, r: operand() };
+        }
+        function and() {
+            var node = term();
+            while (symbol("&") || keyword("AND")) {
+                node = { t: "and", a: node, b: term() };
+            }
+            return node;
+        }
+        function or() {
+            var node = and();
+            while (symbol("|") || keyword("OR")) {
+                node = { t: "or", a: node, b: and() };
+            }
+            return node;
+        }
+
+        var root = or();
+        ws();
+        if (pos < text.length) fail("unexpected '" + text.charAt(pos) + "'");
+        root.vars = vars;
+        return root;
+    };
+
+    /** compare two values: both numbers by value, both dates by time, else as text */
+    function compareCommitValues(a, op, b) {
+        var x = commitScalar(a), y = commitScalar(b);
+        var c;
+        if (x.n != null && y.n != null)
+            c = x.n - y.n;
+        else if (x.d != null && y.d != null)
+            c = x.d - y.d;
+        else
+            c = x.s < y.s ? -1 : (x.s > y.s ? 1 : 0);
+        switch (op) {
+            case "=": return c == 0;
+            case "!": return c != 0;
+            case ">": return c > 0;
+            case "<": return c < 0;
+            case ">=": return c >= 0;
+            case "<=": return c <= 0;
+        }
+        return false;
+    };
+
+    /** value as {n: number, d: date millis, s: text}: Y/N for booleans, "" for null,
+     *  "2026-11-16", "2026-11-16 10:00" and ISO strings as dates (date-only = local midnight) */
+    function commitScalar(v) {
+        var r = { n: null, d: null, s: "" };
+        if (v === null || typeof v === "undefined")
+            return r;
+        if (v === true || v === false) {
+            r.s = v ? "Y" : "N";
+            return r;
+        }
+        if (v instanceof Date) {
+            r.d = v.getTime();
+            r.s = String(r.d);
+            return r;
+        }
+        if (typeof v === "number") {
+            r.n = v;
+            r.s = String(v);
+            return r;
+        }
+        r.s = String(v).trim();
+        if (r.s !== "" && isFinite(r.s))
+            r.n = Number(r.s);
+        else if (/^\d{4}-\d{2}-\d{2}([ T].*)?$/.test(r.s)) {
+            var t = Date.parse(r.s.length == 10 ? r.s + "T00:00:00" : r.s.replace(" ", "T"));
+            if (!isNaN(t))
+                r.d = t;
+        }
+        return r;
+    };
+
+    /**
+     *  Has the user changed this column on the current (existing) record since it was loaded/saved?
+     *  Compares the original row snapshot GridTable.rowData (taken on the first edit)
+     *  with the current row. Always false for a new record or when nothing is pending.
+     *  @param columnName column name (any case)
+     */
+    GridTab.prototype.isColumnChanged = function (columnName) {
+        var table = this.gridTable;
+        if (!table || table.rowData == null || table.getIsInserting()
+            || table.rowChanged == null || table.rowChanged < 0) {
+            return false;
+        }
+        var key = columnName.toLowerCase();
+        var current = table.getValueAt(table.rowChanged, key);
+        var original = (key in table.rowData) ? table.rowData[key] : null;
+        return !commitValueEquals(original, current);
+    };
+
+    /** Loose value equality for change detection: null/""/undefined alike, true/"Y",
+     *  numbers by value ("10" == 10.0), dates by time. */
+    function commitValueEquals(a, b) {
+        var na = normalizeCommitValue(a), nb = normalizeCommitValue(b);
+        if (na === nb) {
+            return true;
+        }
+        if (na !== "" && nb !== "" && isFinite(na) && isFinite(nb)) {
+            return Number(na) === Number(nb);
+        }
+        return false;
+    };
+
+    function normalizeCommitValue(v) {
+        if (v === null || typeof v === "undefined") {
+            return "";
+        }
+        if (v === true) {
+            return "Y";
+        }
+        if (v === false) {
+            return "N";
+        }
+        if (v instanceof Date) {
+            return isNaN(v.getTime()) ? "" : String(v.getTime());
+        }
+        if (typeof v === "string") {
+            v = v.trim();
+            // ISO date strings compare by instant, so "2026-11-13T00:00:00" vs a Date still match
+            if (/^\d{4}-\d{2}-\d{2}T/.test(v)) {
+                var t = Date.parse(v);
+                if (!isNaN(t)) {
+                    return String(t);
+                }
+            }
+            return v;
+        }
+        return String(v);
     };
 
     /// <summary>
