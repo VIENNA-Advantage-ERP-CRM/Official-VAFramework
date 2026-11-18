@@ -1817,7 +1817,7 @@ namespace VIS.Helpers
         private PO GetPO(Ctx ctx, int AD_Table_ID, int Record_ID, string whereClause, Trx trx, int CurrWindow_ID, int CurrTable_ID, bool isMaintainVer, bool inserting, out int AD_Window_ID)
         {
             MTable table = MTable.Get(ctx, AD_Table_ID);
-
+            table.p_ctx = ctx;
             //Special Check ID zero tables
             bool _idZeroUpdate = false;
             if (!inserting // not inserting, updating a record 
