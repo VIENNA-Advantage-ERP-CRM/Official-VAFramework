@@ -275,6 +275,8 @@ namespace VIS.Models
                             //string fileName = objAttachment.GetEntryName(0);
                             List<AttachedFileInfo> lstAttchments = GetBytes(ctx, attachmentID, "");
                             sendmail.AddAttachment(lstAttchments[0].FileBytes, lstAttchments[0].FileName);
+                            // Stored with the sent mail too, so the Inbox and the history show it
+                            _mAttachment.AddEntry(lstAttchments[0].FileName, lstAttchments[0].FileBytes);
 
                         }
                         catch (Exception ex)
@@ -295,7 +297,10 @@ namespace VIS.Models
                         FileStream attachmentStream = File.OpenRead(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, rep.ReportFilePath));
                         BinaryReader binary = new BinaryReader(attachmentStream);
                         byte[] buffer = binary.ReadBytes((int)attachmentStream.Length);
-                        sendmail.AddAttachment(buffer, rep.ReportFilePath.Substring(rep.ReportFilePath.LastIndexOf('\\') + 1));
+                        string printFileName = rep.ReportFilePath.Substring(rep.ReportFilePath.LastIndexOf('\\') + 1);
+                        sendmail.AddAttachment(buffer, printFileName);
+                        // Stored with the sent mail too, so the Inbox and the history show it
+                        _mAttachment.AddEntry(printFileName, buffer);
                     }
                 }
 
