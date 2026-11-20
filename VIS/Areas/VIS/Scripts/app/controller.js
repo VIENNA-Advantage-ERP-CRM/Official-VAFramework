@@ -2197,7 +2197,7 @@
         }
         VIS.context.setWindowContext(windowNo, "CommitWarning_Matched", "Y");
         VIS.context.setWindowContext(windowNo, "CommitWarning_Columns", columns.join(","));
-        VIS.context.setWindowContext(windowNo, "CommitWarning_Conditions", conditions.join(";;"));
+        VIS.context.setWindowContext(windowNo, "CommitWarning_Conditions", conditions.join(","));
         return true;
     };
 
@@ -2709,23 +2709,21 @@
     /**
      *  Get Commit Warning - the text to show before saving the current record.
      *
-     *  AD_Tab.CommitWarning holds rules separated by ";;". Each rule is one of
-     *   - "{condition} message" : shown when the condition is true for the pending change
-     *   - "@ColumnName@ message": shorthand for "{IsChanged(@ColumnName@)} message"
-     *   - "message"             : plain text, shown on every save (old behaviour)
+     *  AD_Tab.CommitWarning holds rules separated by "," :
+     *      condition ? "message"
+     *  e.g.
+     *      @GrandTotal@>=10000 & IsChanged(@DocStatus@) ? "High value order status change",
+     *      (@DocStatus@=CO | @DocStatus@=CL) & IsChanged(@C_BPartner_ID@) ? "Partner changed on a completed document"
      *  condition (see parseCommitCondition):
      *      @Col@ op value   op: = != ! <> ^ > < >= <=   value: literal, 'text', "text" or @Var@
      *      IsChanged(@Col@) the user changed the column on an existing record
      *      & / AND, | / OR, ( ) - AND binds tighter than OR
-     *  e.g. "{@GrandTotal@>=10000 & IsChanged(@DocStatus@)} High value order status change;;
-     *        {(@DocStatus@=CO | @DocStatus@=CL) & IsChanged(@C_BPartner_ID@)} Partner changed on a completed document;;
-     *        Check the totals"
+     *  message: in double quotes, \" for a quote inside it; "," and "?" inside quotes are text.
      *  @Var@ is read from the current row when it is a column of this tab, else from the window context.
-     *  "@Name@ text" where Name is not a column of the tab stays plain text (old warnings keep working).
-     *  A rule with a condition but no message is ignored; an invalid condition never matches.
+     *  Every rule needs a condition and a non-empty message; an invalid rule is skipped (console warning).
+     *  Old style text with no 'condition ? "message"' rule in it is shown as is on every save.
      *
-     *  @param conditionRulesOnly true = only the messages of matched condition rules
-     *                            (plain text skipped); used by the auto-save paths that
+     *  @param conditionRulesOnly true = skip old style text; used by the auto-save paths that
      *                            never showed the plain warning before
      *  @return the warning text for the pending change, "" when nothing applies
      */
@@ -2768,51 +2766,56 @@
             return this._commitRules;
         }
         var rules = [];
-        var parts = raw.split(";;");
-        var shortRx = /^@([A-Za-z0-9_]+)@\s*([\s\S]*)$/;
-        for (var i = 0; i < parts.length; i++) {
-            var text = parts[i].trim();
-            if (text.length == 0)
-                continue;
-            var condition = null, message = text, m;
-            if (text.charAt(0) == "{") {
-                var close = findCommitBraceEnd(text);
-                if (close < 0) {
-                    commitLog("missing '}' => " + text);
+        var parts = splitCommitTop(raw, ",");
+        var isRuleText = false;
+        for (var i = 0; i < parts.length && !isRuleText; i++) {
+            isRuleText = commitRuleQuestion(parts[i]) >= 0;
+        }
+
+        if (!isRuleText) {
+            // old style: the whole text, shown on every save
+            if (raw.trim().length > 0)
+                rules.push({ cond: null, message: raw });
+        }
+        else {
+            var msgRx = /^"((?:[^"\\]|\\[\s\S])*)"$/;
+            for (var i = 0; i < parts.length; i++) {
+                var text = parts[i].trim();
+                if (text.length == 0)
+                    continue;
+                var q = commitRuleQuestion(text);
+                if (q < 0) {
+                    commitLog("not a 'condition ? \"message\"' rule, skipped => " + text);
                     continue;
                 }
-                condition = text.substring(1, close).trim();
-                message = text.substring(close + 1).trim();
+                var condition = text.substring(0, q).trim();
+                var m = msgRx.exec(text.substring(q + 1).trim());
+                if (!m) {
+                    commitLog("message must be one \"quoted\" text, rule skipped => " + text);
+                    continue;
+                }
+                var message = m[1].replace(/\\([\s\S])/g, "$1").trim();
+                if (condition.length == 0 || message.length == 0) {
+                    commitLog("condition and message are both required, rule skipped => " + text);
+                    continue;
+                }
+                var cond;
+                try {
+                    cond = parseCommitCondition(condition);
+                }
+                catch (e) {
+                    commitLog("invalid condition '" + condition + "' - " + e.message + ", rule skipped");
+                    continue;
+                }
+                // columns of this tab used by the condition, in their AD spelling
+                var columns = [];
+                for (var v = 0; v < cond.vars.length; v++) {
+                    var f = this.gridTable.getField(cond.vars[v]);
+                    if (f && columns.indexOf(f.getColumnName()) < 0)
+                        columns.push(f.getColumnName());
+                }
+                rules.push({ cond: cond, condition: condition, columns: columns, message: message });
             }
-            else if ((m = shortRx.exec(text)) && this.gridTable.getField(m[1])) {
-                condition = "IsChanged(@" + m[1] + "@)";
-                message = m[2].trim();
-            }
-
-            if (condition == null) {
-                rules.push({ cond: null, message: text });
-                continue;
-            }
-            if (message.length == 0) {
-                commitLog("condition without message ignored => " + text);
-                continue;
-            }
-            var cond;
-            try {
-                cond = parseCommitCondition(condition);
-            }
-            catch (e) {
-                commitLog("invalid condition '" + condition + "' - " + e.message);
-                cond = { t: "false", vars: [] };
-            }
-            // columns of this tab used by the condition, in their AD spelling
-            var columns = [];
-            for (var v = 0; v < cond.vars.length; v++) {
-                var f = this.gridTable.getField(cond.vars[v]);
-                if (f && columns.indexOf(f.getColumnName()) < 0)
-                    columns.push(f.getColumnName());
-            }
-            rules.push({ cond: cond, condition: condition, columns: columns, message: message });
         }
         this._commitRulesRaw = raw;
         this._commitRules = rules;
@@ -2856,18 +2859,44 @@
             console.warn("CommitWarning: " + msg);
     };
 
-    /** index of the "}" closing the leading "{", skipping quoted text; -1 if none */
-    function findCommitBraceEnd(text) {
-        var quote = null;
-        for (var i = 1; i < text.length; i++) {
+    /**
+     *  Positions of ch in text outside quoted parts: "..." (\" escapes a quote) and, outside
+     *  double quotes, '...' (condition text values).
+     */
+    function commitTopIndexes(text, ch, firstOnly) {
+        var found = [], quote = null;
+        for (var i = 0; i < text.length; i++) {
             var c = text.charAt(i);
             if (quote) {
-                if (c == quote) quote = null;
+                if (c == "\\" && quote == '"') i++;
+                else if (c == quote) quote = null;
             }
-            else if (c == "'" || c == '"') quote = c;
-            else if (c == "}") return i;
+            else if (c == '"' || c == "'") quote = c;
+            else if (c == ch) {
+                found.push(i);
+                if (firstOnly) break;
+            }
         }
-        return -1;
+        return found;
+    };
+
+    /** split on sep outside quotes */
+    function splitCommitTop(text, sep) {
+        var idx = commitTopIndexes(text, sep, false), parts = [], start = 0;
+        for (var i = 0; i < idx.length; i++) {
+            parts.push(text.substring(start, idx[i]));
+            start = idx[i] + 1;
+        }
+        parts.push(text.substring(start));
+        return parts;
+    };
+
+    /** index of the "?" of a 'condition ? "message"' rule, -1 when text is not such a rule */
+    function commitRuleQuestion(text) {
+        var idx = commitTopIndexes(text, "?", true);
+        if (idx.length == 0)
+            return -1;
+        return text.substring(idx[0] + 1).trim().charAt(0) == '"' ? idx[0] : -1;
     };
 
     /**
@@ -7684,6 +7713,37 @@
 
     GridField.prototype.getZoomWindow_ID = function () {
         return this.vo.ZoomWindow_ID;
+    };
+
+    /** AD_Field.ZoomLogic - when set, the zoom window is resolved on the server from the selected record */
+    GridField.prototype.getZoomLogic = function () {
+        return this.vo.ZoomLogic || '';
+    };
+
+    /**
+     * Zoom window from the field's ZoomLogic for the selected record (e.g. Prospect vs Customer window).
+     * The server returns the record's values and a window Name -> ID map; the logic is evaluated with the
+     * style-logic evaluator (VKeyText.evaluateStyleLogicFromRecord). Its result is an AD_Window.Name.
+     * Returns 0 when the field has no logic or nothing matched - the caller keeps its standard zoom.
+     */
+    GridField.prototype.getZoomWindowByLogic = function (value) {
+        var logic = this.getZoomLogic();
+        if (!logic || value == null || value === '' || isNaN(value) || parseInt(value) <= 0)
+            return 0;
+        try {
+            var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Form/GetZoomLogicData",
+                { AD_Field_ID: this.getAD_Field_ID(), Record_ID: parseInt(value) });
+            if (!data || !data.Values)
+                return 0;
+            var target = VIS.Controls.VKeyText.prototype.evaluateStyleLogicFromRecord(logic, data.Values);
+            if (target == null || target === '')
+                return 0;
+            // target is an AD_Window.Name; the map holds only active windows the role can open
+            return (data.Windows && data.Windows[target]) ? VIS.Utility.Util.getValueOfInt(data.Windows[target]) : 0;
+        }
+        catch (e) {
+            return 0;
+        }
     };
 
     GridField.prototype.getIsDefaultFocus = function () {

@@ -77,6 +77,17 @@ namespace VIS.Controllers
         }
 
         /// <summary>
+        /// Record values + window Name->ID map for a lookup field's AD_Field.ZoomLogic; the client evaluates
+        /// the logic with the style-logic evaluator. Null when there is no logic or no record access.
+        /// </summary>
+        public ActionResult GetZoomLogicData(int AD_Field_ID, int Record_ID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            FormModel model = new FormModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetZoomLogicData(AD_Field_ID, Record_ID)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// Get isSOtrx setting for zoom record
         /// </summary>
         /// <param name="parentTable"></param>

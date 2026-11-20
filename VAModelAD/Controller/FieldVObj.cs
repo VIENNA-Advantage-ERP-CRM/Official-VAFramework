@@ -240,6 +240,8 @@ namespace VAdvantage.Controller
         public bool isRightPaneLink = false;
         /** zoom window **/
         public int ZoomWindow_ID = -1;
+        /** zoom logic - picks the zoom window from the selected record, e.g. @IsProspect@='Y' ? 'Prospect', 'Customer' **/
+        public string ZoomLogic = "";
 
         public bool IsCopy = true;
         public int ColumnWidth = 0;

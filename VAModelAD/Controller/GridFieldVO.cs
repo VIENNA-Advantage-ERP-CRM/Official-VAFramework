@@ -267,6 +267,10 @@ namespace VAdvantage.Controller
                     {
                         vo.ZoomWindow_ID = Util.GetValueOfInt(dr[i]);
                     }
+                    else if (columnName.Equals("ZOOMLOGIC"))
+                    {
+                        vo.ZoomLogic = dr[i].ToString();
+                    }
 
                     else if (columnName.Equals("ISLINK"))
                     {
@@ -981,6 +985,7 @@ namespace VAdvantage.Controller
             clone.MobileListingFormat = MobileListingFormat;
             clone.mrSeqNo = mrSeqNo;
             clone.ZoomWindow_ID = ZoomWindow_ID;
+            clone.ZoomLogic = ZoomLogic;
             clone.isLink = isLink;
             clone.isRightPaneLink = isRightPaneLink;
             clone.IsCopy = IsCopy;
