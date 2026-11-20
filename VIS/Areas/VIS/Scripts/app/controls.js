@@ -1938,9 +1938,13 @@
                 zoomQuery.setRecordCount(1);	//	guess
             }
 
-            var AD_Window_ID = 0;
+            // Zoom Logic: window picked from the selected record (e.g. Prospect vs Customer); 0 when the field has none
+            var AD_Window_ID = (self.mField != null && self.mField.getZoomWindowByLogic) ? self.mField.getZoomWindowByLogic(value) : 0;
+            if (AD_Window_ID > 0) {
+                // resolved by zoom logic
+            }
             // VIS0045 : Handle Zoom Issue on Combo when control used on Form
-            if (self.mField != null && self.mField.getZoomWindow_ID() > 0) {
+            else if (self.mField != null && self.mField.getZoomWindow_ID() > 0) {
                 AD_Window_ID = self.mField.getZoomWindow_ID();
             }
             else {
@@ -3528,8 +3532,12 @@
                 zoomQuery.setRecordCount(1);	//	guess
             }
 
-            var AD_Window_ID = 0;
-            if (self.mField != null && self.mField.getZoomWindow_ID() > 0) {
+            // Zoom Logic: window picked from the selected record (e.g. Prospect vs Customer); 0 when the field has none
+            var AD_Window_ID = (self.mField != null && self.mField.getZoomWindowByLogic) ? self.mField.getZoomWindowByLogic(value) : 0;
+            if (AD_Window_ID > 0) {
+                // resolved by zoom logic
+            }
+            else if (self.mField != null && self.mField.getZoomWindow_ID() > 0) {
                 AD_Window_ID = self.mField.getZoomWindow_ID();
             }
             else if (zoomWindow_ID && zoomWindow_ID > 0) {

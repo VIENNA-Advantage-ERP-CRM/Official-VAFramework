@@ -668,6 +668,129 @@ namespace VIS.Models
             return 0;
         }
 
+        #region Zoom Logic
+        /// <summary>
+        /// Data for a lookup field's AD_Field.ZoomLogic, evaluated on the client with the style-logic
+        /// evaluator (VKeyText.evaluateStyleLogicFromRecord) against the SELECTED record, e.g.
+        ///   @IsProspect@='Y' ? 'Prospect', @IsCustomer@='Y' ? 'Customer', 'Business Partner'
+        /// The logic is read from the dictionary by AD_Field_ID - never taken from the client.
+        /// Returns
+        ///   Values  : the target record's columns named in the logic (keys lower case, as the evaluator reads them)
+        ///   Windows : AD_Window.Name -> AD_Window_ID for the quoted names in the logic the role can open
+        /// </summary>
+        /// <param name="AD_Field_ID">field whose ZoomLogic to evaluate</param>
+        /// <param name="Record_ID">selected value of the field (target record key)</param>
+        /// <returns>null when there is no logic or the record is not accessible</returns>
+        public Dictionary<string, Dictionary<string, object>> GetZoomLogicData(int AD_Field_ID, int Record_ID)
+        {
+            if (AD_Field_ID <= 0 || Record_ID <= 0)
+                return null;
+            try
+            {
+                SqlParameter[] param = new SqlParameter[] { new SqlParameter("@AD_Field_ID", AD_Field_ID) };
+                DataSet ds = DB.ExecuteDataset("SELECT f.ZoomLogic, c.ColumnName, c.AD_Reference_Value_ID FROM AD_Field f"
+                    + " INNER JOIN AD_Column c ON (f.AD_Column_ID=c.AD_Column_ID) WHERE f.AD_Field_ID=@AD_Field_ID", param, null);
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                    return null;
+                DataRow fr = ds.Tables[0].Rows[0];
+                string logic = Util.GetValueOfString(fr["ZoomLogic"]).Trim();
+                string columnName = Util.GetValueOfString(fr["ColumnName"]);
+                int AD_Reference_Value_ID = Util.GetValueOfInt(fr["AD_Reference_Value_ID"]);
+                if (logic.Length == 0)
+                    return null;
+
+                // Target table + key column of the lookup
+                string tableName = null, keyColumn = null;
+                if (AD_Reference_Value_ID > 0)
+                {
+                    param = new SqlParameter[] { new SqlParameter("@AD_Reference_ID", AD_Reference_Value_ID) };
+                    ds = DB.ExecuteDataset("SELECT t.TableName, kc.ColumnName FROM AD_Ref_Table rt"
+                        + " INNER JOIN AD_Table t ON (rt.AD_Table_ID=t.AD_Table_ID)"
+                        + " INNER JOIN AD_Column kc ON (rt.Column_Key_ID=kc.AD_Column_ID)"
+                        + " WHERE rt.AD_Reference_ID=@AD_Reference_ID", param, null);
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        tableName = Util.GetValueOfString(ds.Tables[0].Rows[0]["TableName"]);
+                        keyColumn = Util.GetValueOfString(ds.Tables[0].Rows[0]["ColumnName"]);
+                    }
+                }
+                if (string.IsNullOrEmpty(tableName) && columnName.EndsWith("_ID", StringComparison.OrdinalIgnoreCase))
+                {
+                    tableName = columnName.Substring(0, columnName.Length - 3);   // Table Direct
+                    keyColumn = columnName;
+                }
+                if (!QueryValidator.IsValidIdentifier(tableName) || !QueryValidator.IsValidIdentifier(keyColumn))
+                    return null;
+                MTable table = MTable.Get(_ctx, tableName);
+                if (table == null)
+                    return null;
+
+                // Record values: @Var@ of the logic that are real (non-virtual) columns of the target table
+                Dictionary<string, object> values = new Dictionary<string, object>();
+                List<string> recordColumns = new List<string>();
+                foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(logic, "@([^@]+)@"))
+                {
+                    string variable = m.Groups[1].Value.Trim();
+                    if (!QueryValidator.IsValidIdentifier(variable) || recordColumns.Contains(variable, StringComparer.OrdinalIgnoreCase))
+                        continue;
+                    MColumn col = table.GetColumn(variable);
+                    if (col != null && !col.IsVirtualColumn())
+                        recordColumns.Add(col.GetColumnName());
+                }
+                if (recordColumns.Count > 0)
+                {
+                    // Role data access applies: a record the user cannot see resolves to nothing
+                    string sql = MRole.GetDefault(_ctx).AddAccessSQL("SELECT " + string.Join(", ", recordColumns)
+                        + " FROM " + tableName + " WHERE " + keyColumn + "=@Record_ID",
+                        tableName, MRole.SQL_NOTQUALIFIED, MRole.SQL_RO);
+                    param = new SqlParameter[] { new SqlParameter("@Record_ID", Record_ID) };
+                    ds = DB.ExecuteDataset(sql, param, null);
+                    if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                        return null;
+                    foreach (string col in recordColumns)
+                        values[col.ToLower()] = Util.GetValueOfString(ds.Tables[0].Rows[0][col]);
+                }
+
+                // Windows: quoted literals of the logic matched on AD_Window.Name (unique), role access only
+                Dictionary<string, object> windows = new Dictionary<string, object>();
+                List<string> names = new List<string>();
+                foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(logic, "'([^']+)'|\"([^\"]+)\""))
+                {
+                    string name = (m.Groups[1].Success ? m.Groups[1].Value : m.Groups[2].Value).Trim();
+                    if (name.Length > 0 && !names.Contains(name))
+                        names.Add(name);
+                }
+                if (names.Count > 0)
+                {
+                    param = new SqlParameter[names.Count];
+                    List<string> placeholders = new List<string>();
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        param[i] = new SqlParameter("@Name" + i, names[i]);
+                        placeholders.Add("@Name" + i);
+                    }
+                    ds = DB.ExecuteDataset("SELECT AD_Window_ID, Name FROM AD_Window WHERE IsActive='Y' AND Name IN ("
+                        + string.Join(",", placeholders) + ")", param, null);
+                    MRole role = MRole.GetDefault(_ctx);
+                    if (ds != null && ds.Tables.Count > 0)
+                        foreach (DataRow r in ds.Tables[0].Rows)
+                        {
+                            int AD_Window_ID = Util.GetValueOfInt(r["AD_Window_ID"]);
+                            if (role.GetWindowAccess(AD_Window_ID) != null)
+                                windows[Util.GetValueOfString(r["Name"])] = AD_Window_ID;
+                        }
+                }
+
+                return new Dictionary<string, Dictionary<string, object>> { { "Values", values }, { "Windows", windows } };
+            }
+            catch (Exception e)
+            {
+                log.Severe("GetZoomLogicData - AD_Field_ID=" + AD_Field_ID + " : " + e.Message);
+                return null;
+            }
+        }
+        #endregion
+
         public List<JTable> GetZoomWindowID(int AD_Table_ID)
         {
             SqlParamsIn sqlP = new SqlParamsIn();
