@@ -2175,7 +2175,7 @@
      *  (sent with the save request, read on the server as ctx.GetContext("CommitWarning_...")):
      *    CommitWarning_Matched    "Y"
      *    CommitWarning_Columns    tab columns used by the matched conditions, e.g. "GrandTotal,DocStatus"
-     *    CommitWarning_Conditions matched conditions separated by ";;"
+     *    CommitWarning_Conditions matched conditions separated by ","
      *  @param matched result of getMatchedCommitRules(); null/empty clears the keys
      *  @return true when keys were set
      */
