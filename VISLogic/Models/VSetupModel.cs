@@ -432,6 +432,7 @@ namespace VIS.Models
         private bool InstallPackageModules(Ctx ctx, string tenantName, SelectedPackageInfo packageInfo, string logKey)
         {
             List<InstallModuleInfo> moduleList = GetModulesToInstall(packageInfo, tenantName);
+            VLogger.Get().SaveError("Module Versions", "Mod : Modules List Fetched");
             if (moduleList.Count == 0)
             {
                 VLogger.Get().Info("No module selected for installation");
@@ -456,7 +457,9 @@ namespace VIS.Models
                modules, short enough that a dead endpoint fails instead of hanging. Market
                keeps installing after a timeout here; the log says how it went. */
             string error;
+            VLogger.Get().SaveError("Module Versions", "Mod : Calling Market module API");
             string raw = CallMarketModuleApi(ctx, json, TimeSpan.FromMinutes(5), out error);
+            VLogger.Get().SaveError("Module Versions", "Mod : Calling Finished");
             if (raw == null)
             {
                 //  no error on a timeout - Market is still installing, the log carries on
@@ -597,6 +600,8 @@ namespace VIS.Models
                 if (moduleList.Any(m => m.Name.Equals(module.Name, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
+                VLogger.Get().SaveError("Module Versions", "Mod : " + module.Name + " - Version : " + module.LatestAvailableVersion);
+
                 moduleList.Add(new InstallModuleInfo()
                 {
                     Name = module.Name,
@@ -720,6 +725,7 @@ namespace VIS.Models
             try
             {
                 string url = GetMarketApiUrl(m_ctx);
+                VLogger.Get().SaveError("Module Versions", "Market URL : " + url + " - Calling Finished");
                 System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                 using (HttpClient client = new HttpClient())
                 {
@@ -732,7 +738,7 @@ namespace VIS.Models
                     //  Task.Run avoids the ASP.NET sync-context deadlock on .Result
                     HttpResponseMessage response = System.Threading.Tasks.Task.Run(() => client.PostAsync(url, content)).GetAwaiter().GetResult();
                     string raw = System.Threading.Tasks.Task.Run(() => response.Content.ReadAsStringAsync()).GetAwaiter().GetResult();
-
+                    VLogger.Get().SaveError("Module Versions", "Response : " + response.IsSuccessStatusCode + " , " + response.StatusCode);
                     if (!response.IsSuccessStatusCode)
                     {
                         VLogger.Get().Log(Level.SEVERE, "Market API failed: " + response.StatusCode + " - " + raw);

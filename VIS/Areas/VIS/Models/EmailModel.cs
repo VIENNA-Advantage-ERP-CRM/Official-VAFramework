@@ -296,6 +296,7 @@ namespace VIS.Models
                         BinaryReader binary = new BinaryReader(attachmentStream);
                         byte[] buffer = binary.ReadBytes((int)attachmentStream.Length);
                         sendmail.AddAttachment(buffer, rep.ReportFilePath.Substring(rep.ReportFilePath.LastIndexOf('\\') + 1));
+                        _mAttachment.AddEntry("pformatName", buffer);
                     }
                 }
 
