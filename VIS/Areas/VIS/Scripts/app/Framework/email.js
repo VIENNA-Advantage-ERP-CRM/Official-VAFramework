@@ -2445,6 +2445,8 @@
 
                 // mailInfo.Body = $textAreakeno.value();
                 mailInfo.TableID = currentTable_ID;
+                // window the mail is sent from, names the print format attachment
+                mailInfo.WindowID = (_curtab != null) ? _curtab.getAD_Window_ID() : 0;
                 mailInfo.Recordids = '';
 
                 if (rowsSingleView != null) {
@@ -3339,6 +3341,7 @@
             }
             mailInfo.Subject = sssub;  //done bcoz mail is not being sent if subject length is 0....
             mailInfo.TableID = currentTable_ID;
+            mailInfo.WindowID = (_curtab != null) ? _curtab.getAD_Window_ID() : 0;
             if (_curGC.singleRow == true && rowsSource.length == 0) {
                 mailInfo.Recordids = Record_ID;
             }
