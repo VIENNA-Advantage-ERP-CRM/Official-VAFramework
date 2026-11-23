@@ -35,6 +35,21 @@ namespace VIS.Controllers
             return PartialView();
         }
 
+        /// <summary>
+        /// Signature of the mailbox the user sends from, placeholders filled. Empty when there is none.
+        /// </summary>
+        /// <returns>JsonResult, signature HTML</returns>
+        public JsonResult GetSignature()
+        {
+            string signature = "";
+            if (Session["ctx"] != null)
+            {
+                Ctx ctx = Session["ctx"] as Ctx;
+                signature = MUserMailConfigration.GetSignature(ctx);
+            }
+            return Json(signature, JsonRequestBehavior.AllowGet);
+        }
+
 
 
         [HttpPost]
