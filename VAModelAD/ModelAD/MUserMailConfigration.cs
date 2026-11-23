@@ -96,8 +96,7 @@ namespace VAdvantage.Model
         }
 
         /// <summary>
-        /// Signature of the mailbox the context user sends from, with the placeholders filled: @Name@, @Title@ and
-        /// @Phone@ from the user, @EMail@ from this mail configuration, @Org_Name@ and @Client_Name@ from the login.
+        /// Signature of the mailbox the context user sends from, with the placeholders filled (see FillPlaceholders).
         /// Empty when the user has no mail configuration (the tenant's mailbox has no personal signature),
         /// when the signature is empty or when the column does not exist (VA101 not installed).
         /// </summary>
@@ -121,32 +120,125 @@ namespace VAdvantage.Model
                 return "";
             }
 
-            // Placeholders: values are HTML-encoded, they come from the user record and go into HTML
-            DataSet ds = DB.ExecuteDataset("SELECT u.Name, u.Title, u.Phone, u.EMail FROM AD_User u WHERE u.AD_User_ID=" + ctx.GetAD_User_ID());
-            DataRow user = ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 ? ds.Tables[0].Rows[0] : null;
-            string orgName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Org WHERE AD_Org_ID=" + ctx.GetAD_Org_ID()));
-            string clientName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Client WHERE AD_Client_ID=" + ctx.GetAD_Client_ID()));
-
-            signature = ReplacePlaceholder(signature, "Name", user == null ? "" : Util.GetValueOfString(user["Name"]));
-            signature = ReplacePlaceholder(signature, "Title", user == null ? "" : Util.GetValueOfString(user["Title"]));
-            signature = ReplacePlaceholder(signature, "Phone", user == null ? "" : Util.GetValueOfString(user["Phone"]));
-            // @EMail@ is the address of the mailbox that sends (this configuration), the user's own e-mail only when it has none
-            string mailboxEMail = Util.GetValueOfString(config.Get_Value("EMail"));
-            if (string.IsNullOrWhiteSpace(mailboxEMail) && user != null)
-            {
-                mailboxEMail = Util.GetValueOfString(user["EMail"]);
-            }
-            signature = ReplacePlaceholder(signature, "EMail", mailboxEMail);
-            signature = ReplacePlaceholder(signature, "Org_Name", orgName);
-            signature = ReplacePlaceholder(signature, "Client_Name", clientName);
-            return signature;
+            return FillPlaceholders(ctx, config, signature);
         }
 
-        /// <summary>Replaces @name@ (any case) by the HTML-encoded value.</summary>
-        private static string ReplacePlaceholder(string html, string name, string value)
+        /// <summary>Table of the mail configuration.</summary>
+        private const string CONFIG_TABLE = "AD_UserMailConfigration";
+
+        /// <summary>
+        /// Fills the placeholders of a signature, HTML-encoded:
+        /// - @Table.Column@, e.g. @AD_User.Name@: the column of that table. The record is this mail configuration
+        ///   for AD_UserMailConfigration, the sending user for AD_User, else the record this configuration or the
+        ///   user points to (its Table_ID column), else the login's (#Table_ID, e.g. AD_Org, AD_Client).
+        /// - @Column@, e.g. @Name@ or @EMail@: the column of this mail configuration.
+        /// Blank when the table, column or record is not found, and always for encrypted columns and passwords,
+        /// tokens and secrets, so a signature cannot show them.
+        /// </summary>
+        /// <param name="ctx">context of the user who sends</param>
+        /// <param name="config">mail configuration the mail is sent from</param>
+        /// <param name="html">signature HTML</param>
+        /// <returns>signature with the placeholders filled</returns>
+        private static string FillPlaceholders(Ctx ctx, MUserMailConfigration config, string html)
         {
-            return System.Text.RegularExpressions.Regex.Replace(html, "@" + name + "@", System.Net.WebUtility.HtmlEncode(value ?? ""),
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            Dictionary<string, PO> records = new Dictionary<string, PO>(StringComparer.OrdinalIgnoreCase);
+            records[CONFIG_TABLE] = config;
+            return System.Text.RegularExpressions.Regex.Replace(html, @"@([A-Za-z][A-Za-z0-9_]*)(?:\.([A-Za-z][A-Za-z0-9_]*))?@", m =>
+            {
+                string tableName = m.Groups[2].Success ? m.Groups[1].Value : CONFIG_TABLE;
+                string columnName = m.Groups[2].Success ? m.Groups[2].Value : m.Groups[1].Value;
+                return System.Net.WebUtility.HtmlEncode(GetPlaceholderValue(ctx, config, records, tableName, columnName));
+            });
+        }
+
+        /// <summary>Value of one placeholder, empty when it is not found or must not be shown.</summary>
+        private static string GetPlaceholderValue(Ctx ctx, MUserMailConfigration config, Dictionary<string, PO> records, string tableName, string columnName)
+        {
+            try
+            {
+                // Table and column must exist in the dictionary; their real names come from there
+                SqlParameter[] param = new SqlParameter[2];
+                param[0] = new SqlParameter("@param1", tableName.ToUpper());
+                param[1] = new SqlParameter("@param2", columnName.ToUpper());
+                DataSet ds = DB.ExecuteDataset("SELECT t.TableName, c.ColumnName, c.IsEncrypted FROM AD_Column c"
+                    + " INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID)"
+                    + " WHERE UPPER(t.TableName)=@param1 AND UPPER(c.ColumnName)=@param2 AND c.IsActive='Y'", param);
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
+                    return "";
+                }
+                DataRow col = ds.Tables[0].Rows[0];
+                tableName = Util.GetValueOfString(col["TableName"]);
+                columnName = Util.GetValueOfString(col["ColumnName"]);
+                string upper = columnName.ToUpper();
+                if (Util.GetValueOfString(col["IsEncrypted"]) == "Y" || upper.Contains("PASSWORD") || upper.Contains("TOKEN") || upper.Contains("SECRET"))
+                {
+                    return "";
+                }
+
+                PO po;
+                if (!records.TryGetValue(tableName, out po))
+                {
+                    po = null;
+                    int recordID = 0;
+                    if (tableName.Equals("AD_User", StringComparison.OrdinalIgnoreCase))
+                    {
+                        recordID = ctx.GetAD_User_ID();
+                    }
+                    else
+                    {
+                        // the record the mail configuration points to, else the user's, else the login's
+                        string keyColumn = tableName + "_ID";
+                        if (config.Get_ColumnIndex(keyColumn) >= 0)
+                        {
+                            recordID = Util.GetValueOfInt(config.Get_Value(keyColumn));
+                        }
+                        if (recordID <= 0)
+                        {
+                            PO user = GetRecord(ctx, records, "AD_User", ctx.GetAD_User_ID());
+                            if (user != null && user.Get_ColumnIndex(keyColumn) >= 0)
+                            {
+                                recordID = Util.GetValueOfInt(user.Get_Value(keyColumn));
+                            }
+                        }
+                        if (recordID <= 0)
+                        {
+                            recordID = ctx.GetContextAsInt("#" + keyColumn);
+                        }
+                    }
+                    po = GetRecord(ctx, records, tableName, recordID);
+                }
+                if (po == null || po.Get_ColumnIndex(columnName) < 0)
+                {
+                    return "";
+                }
+                return Util.GetValueOfString(po.Get_Value(columnName));
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        /// <summary>Loads a record once per signature; null when it does not exist.</summary>
+        private static PO GetRecord(Ctx ctx, Dictionary<string, PO> records, string tableName, int recordID)
+        {
+            PO po;
+            if (records.TryGetValue(tableName, out po))
+            {
+                return po;
+            }
+            po = null;
+            if (recordID > 0)
+            {
+                po = MTable.GetPO(ctx, tableName, recordID, null);
+                if (po != null && po.Get_ID() != recordID)
+                {
+                    po = null;
+                }
+            }
+            records[tableName] = po;
+            return po;
         }
 
         /// <summary>
