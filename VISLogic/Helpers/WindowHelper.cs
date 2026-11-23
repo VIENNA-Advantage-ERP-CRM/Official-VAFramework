@@ -66,11 +66,11 @@ namespace VIS.Helpers
         /// <param name="ctx">session context </param>
         /// <returns>Data contract to client</returns>
         /// <summary>
-        /// Context keys of the CommitWarning rules (AD_Tab.CommitWarning "{condition} message")
+        /// Context keys of the CommitWarning rules (AD_Tab.CommitWarning 'condition ? "message"', comma separated)
         /// that matched the record being saved and that the user confirmed:
         ///   CommitWarning_Matched    "Y" when any rule matched
         ///   CommitWarning_Columns    tab columns used by the matched conditions, e.g. "GrandTotal,DocStatus"
-        ///   CommitWarning_Conditions matched conditions separated by ";;"
+        ///   CommitWarning_Conditions matched conditions separated by ","
         /// The client sends them in the window context of the save request; for the duration of
         /// the save they are global keys of the session ctx, so model code reads them with
         /// GetCtx().GetContext("CommitWarning_Columns").

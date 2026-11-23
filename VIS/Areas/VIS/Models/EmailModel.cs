@@ -297,7 +297,7 @@ namespace VIS.Models
                         FileStream attachmentStream = File.OpenRead(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, rep.ReportFilePath));
                         BinaryReader binary = new BinaryReader(attachmentStream);
                         byte[] buffer = binary.ReadBytes((int)attachmentStream.Length);
-                        string printFileName = rep.ReportFilePath.Substring(rep.ReportFilePath.LastIndexOf('\\') + 1);
+                        string printFileName = GetPrintFileName(mails[j], rep.ReportFilePath.Substring(rep.ReportFilePath.LastIndexOf('\\') + 1));
                         sendmail.AddAttachment(buffer, printFileName);
                         // Stored with the sent mail too, so the Inbox and the history show it
                         _mAttachment.AddEntry(printFileName, buffer);
@@ -979,6 +979,80 @@ namespace VIS.Models
         }
 
         /// <summary>
+        /// Name of the print format attachment: ScreenName_DocumentNo (or Value)_BusinessPartner, each part only
+        /// when it exists: the window name, not translated (else the table name), the record's DocumentNo or
+        /// else its Value (search key), and the name of its C_BPartner_ID. For several records in one file only the
+        /// screen name. The generated name is kept when nothing is found.
+        /// </summary>
+        /// <param name="mail">mail with window, table and record</param>
+        /// <param name="generatedName">temporary file name of the report</param>
+        /// <returns>file name with the extension of the report</returns>
+        private string GetPrintFileName(NewMailMessage mail, string generatedName)
+        {
+            try
+            {
+                List<string> parts = new List<string>();
+                string screenName = "";
+                if (mail.WindowID > 0)
+                {
+                    screenName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Window WHERE AD_Window_ID=" + mail.WindowID));
+                }
+                if (string.IsNullOrWhiteSpace(screenName) && mail.TableID > 0)
+                {
+                    screenName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Table WHERE AD_Table_ID=" + mail.TableID));
+                }
+                if (!string.IsNullOrWhiteSpace(screenName))
+                {
+                    parts.Add(screenName.Trim());
+                }
+
+                string[] ids = (mail.Recordids ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                int recordID = ids.Length == 1 ? Util.GetValueOfInt(ids[0].Trim()) : 0;
+                if (recordID > 0 && mail.TableID > 0)
+                {
+                    PO po = MTable.GetPO(ctx, MTable.GetTableName(ctx, mail.TableID), recordID, null);
+                    if (po != null && po.Get_ID() == recordID)
+                    {
+                        string docNo = po.Get_ColumnIndex("DocumentNo") >= 0 ? Util.GetValueOfString(po.Get_Value("DocumentNo")) : "";
+                        if (string.IsNullOrWhiteSpace(docNo) && po.Get_ColumnIndex("Value") >= 0)
+                        {
+                            docNo = Util.GetValueOfString(po.Get_Value("Value"));
+                        }
+                        if (!string.IsNullOrWhiteSpace(docNo))
+                        {
+                            parts.Add(docNo.Trim());
+                        }
+                        int bpID = po.Get_ColumnIndex("C_BPartner_ID") >= 0 ? Util.GetValueOfInt(po.Get_Value("C_BPartner_ID")) : 0;
+                        if (bpID > 0)
+                        {
+                            string bpName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM C_BPartner WHERE C_BPartner_ID=" + bpID));
+                            if (!string.IsNullOrWhiteSpace(bpName))
+                            {
+                                parts.Add(bpName.Trim());
+                            }
+                        }
+                    }
+                }
+                if (parts.Count == 0)
+                {
+                    return generatedName;
+                }
+
+                // characters a file name must not have, e.g. / in a document number
+                string name = string.Join("_", parts);
+                foreach (char c in Path.GetInvalidFileNameChars())
+                {
+                    name = name.Replace(c, '-');
+                }
+                return name + Path.GetExtension(generatedName);
+            }
+            catch (Exception)
+            {
+                return generatedName;
+            }
+        }
+
+        /// <summary>
         /// Enhancement to provide facility to attacht print format directlty for selected record
         /// </summary>
         /// <param name="tableID"></param>
@@ -1286,6 +1360,9 @@ namespace VIS.Models
         public bool IsHtml { get; set; }
 
         public int TableID { get; set; }
+
+        /// <summary>Window the mail is sent from, 0 when unknown.</summary>
+        public int WindowID { get; set; }
 
         //  public AttachmentInfo[] Attachments { get; set; }
 

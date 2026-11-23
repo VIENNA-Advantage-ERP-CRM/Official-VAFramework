@@ -535,6 +535,67 @@
 
       
 
+        // Signature of the sending mailbox (Mail Configuration), placeholders already filled; empty for none
+        var mailSignature = "";
+
+        // The signature in the body: a div with this class, so it can be found again after the body is replaced
+        var SIGNATURE_CLASS = "vis-email-signature";
+
+        function signatureBlock() {
+            return "<div class='" + SIGNATURE_CLASS + "'>" + mailSignature + "</div>";
+        }
+
+        /**
+         * Whether the body still holds the signature (false once the user deleted it, then it is not added again)
+         */
+        function hasSignature() {
+            if (!mailSignature || !$textAreakeno) {
+                return false;
+            }
+            return $("<div>").html($textAreakeno.value()).find("." + SIGNATURE_CLASS).length > 0;
+        }
+
+        /**
+         * Body without the signature, for saving it as a mail format
+         * @param {string} html body
+         */
+        function withoutSignature(html) {
+            if (!mailSignature || !html) {
+                return html;
+            }
+            var $html = $("<div>").html(html);
+            var $sig = $html.find("." + SIGNATURE_CLASS);
+            if ($sig.length == 0) {
+                return html;
+            }
+            $sig.remove();
+            return $html.html();
+        }
+
+        /**
+         * Adds the signature of the sending mailbox: in a new mail below an empty line where the user types,
+         * in a reply or forward (the form opened with the quoted mail as body) above the quoted mail.
+         */
+        function loadSignature() {
+            $.ajax({
+                url: VIS.Application.contextUrl + "Email/GetSignature",
+                dataType: "json",
+                success: function (data) {
+                    if (!data || !$textAreakeno) {
+                        return;
+                    }
+                    mailSignature = data;
+                    var current = $textAreakeno.value();
+                    if (body != undefined && body != null && body != "") {
+                        $textAreakeno.value("<p><br></p>" + signatureBlock() + "<br>" + current);
+                    }
+                    else {
+                        $textAreakeno.value((current || "<p><br></p>") + signatureBlock());
+                    }
+                }
+            });
+        }
+
         function loadTextArea() {
             if (isEmail || !IsSyncEditor) {
                 try {
@@ -593,6 +654,9 @@
 
                     if (body != undefined && body != null) {
                         $textAreakeno.value(body);
+                    }
+                    if (isEmail) {
+                        loadSignature();
                     }
                 }
                 catch (ex) {
@@ -1281,8 +1345,13 @@
                         $subject.val(response.Subject);
                         let editor = $txtArea.data("kendoEditor");
                         if (editor) {
+                            var keepSignature = hasSignature();
                             editor.value(""); // Set content in the rich text editor
                             let formattedMessage = "<p>" + response.Message.split(/\n{2,}/).join("</p><p>") + "</p>";
+                            if (keepSignature) {
+                                // The generated text replaces the body: the signature goes back below it
+                                formattedMessage = formattedMessage + signatureBlock();
+                            }
                             if (body != undefined && body != null) {
                                 formattedMessage = formattedMessage + "<br/> <br/>" + body;
                             }
@@ -2376,6 +2445,8 @@
 
                 // mailInfo.Body = $textAreakeno.value();
                 mailInfo.TableID = currentTable_ID;
+                // window the mail is sent from, names the print format attachment
+                mailInfo.WindowID = (_curtab != null) ? _curtab.getAD_Window_ID() : 0;
                 mailInfo.Recordids = '';
 
                 if (rowsSingleView != null) {
@@ -2889,8 +2960,8 @@
                                 // Clear Syncfusion document
                                 rteObj.documentEditor.openBlank();
                             } else {
-                                // Clear Kendo
-                                $textAreakeno.value('');
+                                // Clear Kendo; the signature stays unless the user had deleted it
+                                $textAreakeno.value(hasSignature() ? "<p><br></p>" + signatureBlock() : '');
                             }
 
                             selectedTemplateID = 0;
@@ -2916,8 +2987,8 @@
                 // Syncfusion blank document
                 rteObj.documentEditor.openBlank();
             } else {
-                // Kendo blank document
-                $textAreakeno.value('');
+                // Kendo blank document; the signature stays unless the user had deleted it
+                $textAreakeno.value(hasSignature() ? "<p><br></p>" + signatureBlock() : '');
             }
 
             selectedTemplateID = 0;
@@ -3024,7 +3095,8 @@
                         });
                     }
                     else {
-                        $textAreakeno.value(selectedRow.MAILTEXT);
+                        // The format replaces the body; the signature goes back below it unless the user had deleted it
+                        $textAreakeno.value(selectedRow.MAILTEXT + (hasSignature() ? signatureBlock() : ""));
                     }
                 }
                 onOkOpentn = false;
@@ -3053,7 +3125,7 @@
                 });
             }
             else {
-                text = $textAreakeno.value();
+                text = withoutSignature($textAreakeno.value()); // a format does not keep the signature
             }
 
             if (text != null && text.trim() != "" && text != undefined) {
@@ -3096,7 +3168,7 @@
                 });
             }
             else {
-                text = $textAreakeno.value();  // existing kendo
+                text = withoutSignature($textAreakeno.value());  // existing kendo; a format does not keep the signature
             }
 
             if (text != null && text != "" && text != undefined) {
@@ -3269,6 +3341,7 @@
             }
             mailInfo.Subject = sssub;  //done bcoz mail is not being sent if subject length is 0....
             mailInfo.TableID = currentTable_ID;
+            mailInfo.WindowID = (_curtab != null) ? _curtab.getAD_Window_ID() : 0;
             if (_curGC.singleRow == true && rowsSource.length == 0) {
                 mailInfo.Recordids = Record_ID;
             }
