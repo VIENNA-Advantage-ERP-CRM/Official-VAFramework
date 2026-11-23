@@ -96,8 +96,8 @@ namespace VAdvantage.Model
         }
 
         /// <summary>
-        /// Signature of the mailbox the context user sends from, with the placeholders filled from the user:
-        /// @Name@, @Title@, @Phone@, @EMail@, @Org_Name@ and @Client_Name@.
+        /// Signature of the mailbox the context user sends from, with the placeholders filled: @Name@, @Title@ and
+        /// @Phone@ from the user, @EMail@ from this mail configuration, @Org_Name@ and @Client_Name@ from the login.
         /// Empty when the user has no mail configuration (the tenant's mailbox has no personal signature),
         /// when the signature is empty or when the column does not exist (VA101 not installed).
         /// </summary>
@@ -130,7 +130,13 @@ namespace VAdvantage.Model
             signature = ReplacePlaceholder(signature, "Name", user == null ? "" : Util.GetValueOfString(user["Name"]));
             signature = ReplacePlaceholder(signature, "Title", user == null ? "" : Util.GetValueOfString(user["Title"]));
             signature = ReplacePlaceholder(signature, "Phone", user == null ? "" : Util.GetValueOfString(user["Phone"]));
-            signature = ReplacePlaceholder(signature, "EMail", user == null ? "" : Util.GetValueOfString(user["EMail"]));
+            // @EMail@ is the address of the mailbox that sends (this configuration), the user's own e-mail only when it has none
+            string mailboxEMail = Util.GetValueOfString(config.Get_Value("EMail"));
+            if (string.IsNullOrWhiteSpace(mailboxEMail) && user != null)
+            {
+                mailboxEMail = Util.GetValueOfString(user["EMail"]);
+            }
+            signature = ReplacePlaceholder(signature, "EMail", mailboxEMail);
             signature = ReplacePlaceholder(signature, "Org_Name", orgName);
             signature = ReplacePlaceholder(signature, "Client_Name", clientName);
             return signature;
