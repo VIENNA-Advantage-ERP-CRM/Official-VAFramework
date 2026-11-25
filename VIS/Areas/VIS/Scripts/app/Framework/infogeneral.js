@@ -6,7 +6,8 @@
  * Date           :     10-Aug-2014
   ******************************************************/
 ; (function (VIS, $) {
-    function infoGeneral(modal, WindowNo, value, tableName, keyColumn, multiSelection, validationCode, selectedIDs) {
+    // AD_Tab_ID (optional): tab whose grid fields are shown as columns; 0 = the table's default window
+    function infoGeneral(modal, WindowNo, value, tableName, keyColumn, multiSelection, validationCode, selectedIDs, AD_Tab_ID) {
 
         this.onClose = null;
         this.selectedIDs = selectedIDs;
@@ -258,7 +259,7 @@
 
             AD_Table_ID = schema[0].AD_Table_ID;
             //Change by mohit-to handle translation in general info. Added 2 new parametere- AD_Language, IsBaseLangage. Asked by mukesh sir - 09/03/2018
-            displayCols = (VIS.dataContext.getJSONData(VIS.Application.contextUrl + "InfoGeneral/GetDispalyColumns", { "AD_Table_ID": AD_Table_ID, "AD_Language": VIS.context.getAD_Language(), "IsBaseLangage": VIS.Env.isBaseLanguage(VIS.context), "TableName": tableName })).result;
+            displayCols = (VIS.dataContext.getJSONData(VIS.Application.contextUrl + "InfoGeneral/GetDispalyColumns", { "AD_Table_ID": AD_Table_ID, "AD_Language": VIS.context.getAD_Language(), "IsBaseLangage": VIS.Env.isBaseLanguage(VIS.context), "TableName": tableName, "AD_Tab_ID": AD_Tab_ID || 0 })).result;
 
             if (displayCols == null) {
                 alert(VIS.Msg.getMsg('ERRORGettingDisplayCols'));
