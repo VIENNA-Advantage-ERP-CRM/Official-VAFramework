@@ -554,7 +554,8 @@
                     SelectedIDs: selectedIDs,
                     Requery: requery,
                     SrchCtrl: JSON.stringify(srhCtrls),
-                    ValidationCode: VIS.secureEngine.encrypt(validationCode)
+                    ValidationCode: VIS.secureEngine.encrypt(validationCode),
+                    AD_Tab_ID: AD_Tab_ID || 0
                 },
                 error: function () {
                     alert(VIS.Msg.getMsg('ErrorWhileGettingData'));

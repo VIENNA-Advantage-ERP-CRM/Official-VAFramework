@@ -46,7 +46,7 @@ namespace VIS.Controllers
         [HttpPost]
         [ValidateInput(false)]
         public JsonResult GetData(string TableName, int AD_Table_ID, int PageNo, string KeyCol, string SelectedIDs,
-            bool Requery, string SrchCtrl, string ValidationCode)
+            bool Requery, string SrchCtrl, string ValidationCode, int AD_Tab_ID = 0)
         {
             VIS.Models.InfoGeneralModel model = new Models.InfoGeneralModel();
             Ctx ctx = Session["ctx"] as Ctx;
@@ -57,7 +57,7 @@ namespace VIS.Controllers
                 List<InfoSearchCol> srchCtrls = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
                 //model.GetSchema(Ad_InfoWindow_ID);
                 return Json(JsonConvert.SerializeObject(model.GetData(TableName, AD_Table_ID, PageNo, ctx, KeyCol,
-                    SelectedIDs, Requery, srchCtrls, ValidationCode)), JsonRequestBehavior.AllowGet);
+                    SelectedIDs, Requery, srchCtrls, ValidationCode, AD_Tab_ID)), JsonRequestBehavior.AllowGet);
             }
             return Json(null);
         }
