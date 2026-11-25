@@ -98,7 +98,12 @@ namespace VIS.Models
             }
         }
 
-        public List<InfoColumn> GetDisplayCol(int AD_Table_ID, string AD_Language, bool IsBaseLangage, string _tableName)
+        /// <summary>
+        /// Columns of the general info: the fields of the first tab of the table's default window, in form order.
+        /// With AD_Tab_ID (an active tab of the same table, e.g. the screen the user picked when the table is used by
+        /// several windows), the fields that tab shows in its grid, in grid order.
+        /// </summary>
+        public List<InfoColumn> GetDisplayCol(int AD_Table_ID, string AD_Language, bool IsBaseLangage, string _tableName, int AD_Tab_ID = 0)
         {
             try
             {
@@ -125,6 +130,14 @@ namespace VIS.Models
                 if (tabId > 0)
                 {
                     hasWindowAndTab = true;
+                }
+
+                // Tab given by the caller: used only when it is an active tab of this table
+                int infoTabID = 0;
+                if (AD_Tab_ID > 0)
+                {
+                    infoTabID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Tab_ID FROM AD_Tab WHERE AD_Tab_ID=" + AD_Tab_ID
+                        + " AND AD_Table_ID=" + AD_Table_ID + " AND IsActive='Y'", null, null));
                 }
 
                 string sql = "SELECT AD_Window_ID FROM AD_Table WHERE AD_Table_Id=" + AD_Table_ID;
@@ -205,7 +218,11 @@ namespace VIS.Models
                     sql += " c.Name, ";
                 }
                 sql += "c.AD_Reference_ID, c.IsKey,";
-                if (hasWindowAndTab)
+                if (infoTabID > 0)
+                {
+                    sql += " f.MRIsDisplayed AS IsDisplayed, ";
+                }
+                else if (hasWindowAndTab)
                 {
                     sql += " f.IsDisplayed, ";
 
@@ -228,7 +245,11 @@ namespace VIS.Models
                 }
 
                 //if table is linked with any tab
-                if (hasWindowAndTab)
+                if (infoTabID > 0)
+                {
+                    sql += " INNER JOIN AD_Field f ON (f.AD_Tab_ID=" + infoTabID + " AND f.AD_Column_ID=c.AD_Column_ID AND f.IsActive='Y')";
+                }
+                else if (hasWindowAndTab)
                 {
                     sql += @" INNER JOIN AD_Tab tab
                             ON (t.AD_Window_ID=tab.AD_Window_ID)
@@ -242,7 +263,11 @@ namespace VIS.Models
                 {
                     sql += " AND trl.AD_Language = '" + AD_Language + "'";
                 }
-                if (hasWindowAndTab)
+                if (infoTabID > 0)
+                {
+                    sql += " AND (c.IsKey='Y' OR (f.IsEncrypted='N' AND f.ObscureType IS NULL))";
+                }
+                else if (hasWindowAndTab)
                 {
                     //Get first created tab if we have multiple tabs linked with same table on same window.
                     sql += @" AND tab.IsSortTab='N' 
@@ -262,7 +287,11 @@ namespace VIS.Models
 
                 }
                 sql += " AND c.IsActive = 'Y' ORDER BY c.IsKey DESC";
-                if (hasWindowAndTab)
+                if (infoTabID > 0)
+                {
+                    sql += ", f.MRSeqNo, f.SeqNo";
+                }
+                else if (hasWindowAndTab)
                 {
                     sql += ", f.SeqNo";
                 }
