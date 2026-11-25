@@ -980,7 +980,7 @@ namespace VIS.Models
 
         /// <summary>
         /// Name of the print format attachment: ScreenName_DocumentNo (or Value)_BusinessPartner, each part only
-        /// when it exists: the window name, not translated (else the table name), the record's DocumentNo or
+        /// when it exists: the window DisplayName in the login language (AD_Window_Trl when not the base language; else the table name), the record's DocumentNo or
         /// else its Value (search key), and the name of its C_BPartner_ID. For several records in one file only the
         /// screen name. The generated name is kept when nothing is found.
         /// </summary>
@@ -995,7 +995,18 @@ namespace VIS.Models
                 string screenName = "";
                 if (mail.WindowID > 0)
                 {
-                    screenName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Window WHERE AD_Window_ID=" + mail.WindowID));
+                    // DisplayName of the window; for a non-base login language its translation from AD_Window_Trl
+                    // one query: the translation (LEFT JOIN) when it exists, else the base window
+                    if (Env.IsBaseLanguage(ctx, "AD_Window"))
+                    {
+                        screenName = Util.GetValueOfString(DB.ExecuteScalar("SELECT COALESCE(w.DisplayName, w.Name) FROM AD_Window w WHERE w.AD_Window_ID=" + mail.WindowID));
+                    }
+                    else
+                    {
+                        screenName = Util.GetValueOfString(DB.ExecuteScalar("SELECT COALESCE(trl.Name, w.DisplayName) FROM AD_Window w"
+                            + " LEFT JOIN AD_Window_Trl trl ON (trl.AD_Window_ID = w.AD_Window_ID AND trl.AD_Language = '" + ctx.GetAD_Language() + "')"
+                            + " WHERE w.AD_Window_ID=" + mail.WindowID));
+                    }
                 }
                 if (string.IsNullOrWhiteSpace(screenName) && mail.TableID > 0)
                 {
