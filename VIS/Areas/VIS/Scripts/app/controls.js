@@ -2402,6 +2402,8 @@
         // Variable for setting custom info window while creating search control.- added by Mohit.
         this.custInfoWin = null;
         this.isGenInfo = false;
+        // Tab whose fields the general info shows as columns (0 = the table's default window)
+        this.infoTabID = 0;
         var _TableName = null;
         var _KeyColumnName = null;
         this.infoMultipleIds = null;
@@ -3340,7 +3342,7 @@
                 }
                 else if (self.isGenInfo) {
                     InfoWindow = new VIS.infoGeneral(true, self.lookup.windowNo, text,
-                        tableName, _keyColumnName, self.isMultiKeyTextBox, wc, selectedIDs);
+                        tableName, _keyColumnName, self.isMultiKeyTextBox, wc, selectedIDs, self.infoTabID);
                 }
                 else {
                     //try get dynamic window
@@ -3777,6 +3779,15 @@
     // Added by Bharat - To Open general info window while creating search control.
     VTextBoxButton.prototype.setIsGenInfo = function (IsGenInfo) {
         this.isGenInfo = IsGenInfo;
+    }
+
+    /**
+     * Tab whose grid fields the general info shows as columns, e.g. the screen picked by the user, when the table
+     * is used by several windows. Without it the columns come from the table's default window.
+     * @param {number} AD_Tab_ID tab of the same table; 0 = the table's default window
+     */
+    VTextBoxButton.prototype.setInfoTabID = function (AD_Tab_ID) {
+        this.infoTabID = VIS.Utility.Util.getValueOfInt(AD_Tab_ID);
     }
 
     //7. 
