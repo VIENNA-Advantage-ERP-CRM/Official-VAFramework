@@ -1385,7 +1385,7 @@
             $AttacmentOption.css('height', '100%');
             var li = "<li class='vis-filesystem' value='0'>" + VIS.Msg.getMsg("FileSystem") + "</li> ";
             if (window.VADMS) {
-                li += "<li class='vis-dms' value='1'>" + VIS.Msg.getMsg("DMS") + "</li>"
+                li += "<li class='vis-dms' value='1'>" + VIS.Msg.getMsg("VIS_DMS") + "</li>"
             }
             $AttacmentOption.append(li);
             $root.append($AttacmentOption);
@@ -2105,7 +2105,8 @@
         function attachDynamicPF(e) {
 
             if (this.checked) {
-                $cmbPfFiletype.parent().show();
+                // File Format is always hidden; the print format is always sent as PDF
+                $cmbPfFiletype.parent().hide();
                 //in ase of dynmic mail, to, bccc and cc will be enabled only for single record.
                 //otherwise disable them.
 
@@ -2591,7 +2592,7 @@
 
             var pfFiletype = 'X';// no Action
             if ($chkBSendPFasAtt.prop("checked")) {
-                pfFiletype = $cmbPfFiletype.val();
+                pfFiletype = 'P'; // always PDF (File Format field is hidden)
             }
 
 
