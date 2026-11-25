@@ -1565,7 +1565,7 @@
 
             divup.append($Attachdiv);
 
-            dLAContent = $("<div class='vis-attach-content-wrap' style='height:83px;border-bottom:2px solid rgba(var(--v-c-secondary), 1);padding-bottom:0px'>");
+            dLAContent = $("<div class='vis-attach-content-wrap' style='height:auto;min-height:0;max-height:145px;border-bottom:2px solid rgba(var(--v-c-secondary), 1);padding-bottom:0px'>");
             dLAContent.append($('<div style="height:auto;overflow:auto" ></div>'));
             $Attachdiv.append(dLAContent);
             $root.find('.vis-email-attachmentContainer').append(divReadOnly);
@@ -1710,9 +1710,10 @@
                     }
 
                     if (!hasScrollBar()) {
-                        $root.find('.vis-attach-content-wrap').height(83);
+                        // size to content (no fixed height)
+                        $root.find('.vis-attach-content-wrap').css('height', 'auto');
 
-                        $root.find('.vis-email-attachmentContainer').height(90);
+                        $root.find('.vis-email-attachmentContainer').css('height', 'auto');
                         if (callingFromOutsideofWindow) {
                             $root.find(".vis-Email-textarea-div").height($('.vis-Email-ContentArea').height() - ($('.vis-form-horizontal').height() + 30));
                         }
@@ -1723,8 +1724,8 @@
 
                     if (lstLatestFiles.length == 0) {
                         $root.find('.vis-email-attachmentContainer').hide();
-                        $root.find('.vis-email-attachmentContainer').height(90);
-                        $root.find('.vis-attach-content-wrap').height(83);
+                        $root.find('.vis-email-attachmentContainer').css('height', 'auto');
+                        $root.find('.vis-attach-content-wrap').css('height', 'auto');
                         if (callingFromOutsideofWindow) {
                             $root.find(".vis-Email-textarea-div").height($('.vis-Email-ContentArea').height() - ($('.vis-form-horizontal').height() + 30));
                         }
@@ -1767,12 +1768,7 @@
                 fileInfo.Size = file.size;
                 lstLatestFiles.push(file);
 
-                if (hasScrollBar()) {
-                    if ($root.find('.vis-email-attachmentContainer').height() == 90) {
-                        $root.find('.vis-email-attachmentContainer').height(155);
-                        $root.find('.vis-attach-content-wrap').height(145);
-                    }
-                }
+                // height follows the files (CSS max-height + scroll when there are many)
 
             }
 
