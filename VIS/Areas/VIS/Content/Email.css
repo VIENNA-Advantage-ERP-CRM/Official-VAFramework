@@ -55,7 +55,8 @@ html[dir="rtl"] .vis-email-leftDiv {
 }
 
 .vis-email-attachmentContainer {
-    height: 90px;
+    height: auto;
+    max-height: 155px;
     /*border: #CCCCCC solid 1px;*/
     margin-top: 20px;
     overflow: auto;

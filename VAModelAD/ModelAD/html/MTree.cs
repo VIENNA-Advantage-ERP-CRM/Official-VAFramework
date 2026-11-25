@@ -1131,6 +1131,8 @@ namespace VAdvantage.Model
                     dt = null;
                 }
             }
+            // Filter leaf nodes now that every node's parent is known
+            BuildLeafNodesList();
             ////  Done with loading - add remainder from buffer
             // Get From list
             log.Finest("clearing buffer - Adding to****************: " + m_root);
@@ -1223,10 +1225,28 @@ namespace VAdvantage.Model
                 barNodes.Insert(barNodes.Count, childBar);
             }
 
-            if (!child.IsSummary)
+            /*VTreeNode parentNode = null;
+            foreach (VTreeNode node in mnuNodes)
             {
-                SearchItem childLeaf = new SearchItem(child);
-                _leafNodesList.Insert(_leafNodesList.Count, childLeaf);
+                if (node.Node_ID == child.Parent_ID)
+                {
+                    parentNode = node;
+                    break;
+                }
+              
+                parentNode = FindTreeNode(node.Nodes, child.Parent_ID.ToString());
+                if (parentNode != null)
+                     break;
+                
+            }*/
+            // Remember parent of every node so the level can be resolved later
+            _nodeParentMap[Node_ID] = Parent_ID;
+
+            if (!child.IsSummary && child.Parent_ID != 0 && child.Parent_ID != -1)
+            {
+                //SearchItem childLeaf = new SearchItem(child);
+                //_leafNodesList.Insert(_leafNodesList.Count, childLeaf);
+                _leafCandidates.Add(child);
             }
 
 
@@ -1267,6 +1287,31 @@ namespace VAdvantage.Model
 
 
         private List<SearchItem> _leafNodesList = new List<SearchItem>(20);
+        // Node_ID -> Parent_ID for all loaded nodes
+        private Dictionary<int, int> _nodeParentMap = new Dictionary<int, int>();
+        // Non-summary nodes not directly under root, filtered in BuildLeafNodesList
+        private List<VTreeNode> _leafCandidates = new List<VTreeNode>();
+        /// <summary>
+        /// Build leaf (window) list:
+        /// - hide windows directly under root (Parent_ID = 0)
+        /// - hide windows inside a top-level folder (folder's Parent_ID = 0)
+        /// - show windows at deeper levels (inside sub folders)
+        /// </summary>
+        private void BuildLeafNodesList()
+        {
+            _leafNodesList.Clear();
+            foreach (VTreeNode child in _leafCandidates)
+            {
+                int grandParent_ID;
+                if (!_nodeParentMap.TryGetValue(child.Parent_ID, out grandParent_ID))
+                    continue;   // parent folder not loaded
+                if (grandParent_ID == 0 || grandParent_ID == -1)
+                    continue;   // parent is a top-level folder - show only folders here
+                _leafNodesList.Add(new SearchItem(child));
+            }
+            _leafCandidates.Clear();
+            _nodeParentMap.Clear();
+        }
 
         public List<SearchItem> GetLeafNodes()
         {
