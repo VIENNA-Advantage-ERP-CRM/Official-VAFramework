@@ -405,7 +405,7 @@ namespace VIS.Models
         }
 
         public InfoData GetData(string tableName, int AD_Table_ID, int pageNo, Ctx ctx, string keyCol, string selectedIDs,
-            bool requery, List<InfoSearchCol> srchCtrls, string validationCode)
+            bool requery, List<InfoSearchCol> srchCtrls, string validationCode, int AD_Tab_ID = 0)
         {
             InfoData _iData = new InfoData();
             // SECURITY: tableName is client-supplied and flows into the FROM/SELECT of the query below.
@@ -431,7 +431,8 @@ namespace VIS.Models
 
                 var isTrlColExist = false;
 
-                List<InfoColumn> displayCols = GetDisplayCol(AD_Table_ID, ctx.GetAD_Language(), Env.IsBaseLanguage(ctx, tableName), tableName);
+                // Same columns as the grid shows (GetDispalyColumns), including the caller's tab
+                List<InfoColumn> displayCols = GetDisplayCol(AD_Table_ID, ctx.GetAD_Language(), Env.IsBaseLanguage(ctx, tableName), tableName, AD_Tab_ID);
                 int count = displayCols.Count;
                 //get Qry from InfoColumns
                 for (int item = 0; item < count; item++)
