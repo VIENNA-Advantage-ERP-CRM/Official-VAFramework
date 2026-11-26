@@ -385,13 +385,14 @@ textarea.vis-email-addrbox {
         height: 35px;
     }
 
-/* small, subtle hint under the To box, aligned with the textbox text */
+/* small, subtle hint under the To box, aligned with the textbox text.
+   In the flow, so a hint that wraps (German) pushes Cc down instead of running into it;
+   the negative bottom margin uses part of the existing gap and leaves room for Cc's floating label. */
 .vis-email-hint {
-    position: absolute; /* sits in the existing gap under the box, so no layout shift */
-    top: 100%;
-    left: 10px;
-    right: 0;
+    display: block;
+    padding-left: 10px;
     margin-top: 1px;
+    margin-bottom: -6px;
     font-size: 10.5px;
     font-style: italic;
     line-height: 13px;
