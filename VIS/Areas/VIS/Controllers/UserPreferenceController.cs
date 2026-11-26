@@ -16,6 +16,7 @@ using VAdvantage.Model;
 using VAdvantage.ProcessEngine;
 using VAdvantage.Utility;
 using VIS.Classes;
+using VIS.Filters;
 using VIS.Models;
 
 namespace VIS.Controllers
@@ -450,6 +451,72 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(objUPModel.UpdateTwoFAMethod(ctx, method)), JsonRequestBehavior.AllowGet);
 
         }
+
+        #region My Sign (AD_UserSignature)
+
+        /// <summary>
+        /// The logged in user's saved signature and initials, for the My Sign tab.
+        /// </summary>
+        /// <returns>UserSignatureData</returns>
+        [HttpGet]
+        [AjaxAuthorize]
+        [AjaxSessionFilter]
+        public JsonResult GetUserSignatures()
+        {
+            UserSignatureData data = new UserSignatureData();
+
+            if (Session["Ctx"] != null)
+            {
+                data = new UserPreferenceModel().GetUserSignatures(Session["ctx"] as Ctx);
+            }
+
+            // the pictures travel as data URLs, which can pass the default 2 MB JSON limit
+            return new JsonResult { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet, MaxJsonLength = int.MaxValue };
+        }
+
+        /// <summary>
+        /// Save the full name, the initials and the signature and / or initials image from the My Sign tab.
+        /// </summary>
+        /// <param name="signatureFile">Signature image (optional)</param>
+        /// <param name="initialsFile">Initials image (optional)</param>
+        /// <param name="fullName">Full name shown with the signature (required)</param>
+        /// <param name="initials">Initials shown with the initials image (required)</param>
+        /// <returns>{ result: OK | NAMEREQUIRED | INITIALSREQUIRED | NAMETOOLONG | NOFILE | TOOLARGE | BADTYPE | BADSIZE | ERROR }</returns>
+        [HttpPost]
+        [AjaxAuthorize]
+        [AjaxSessionFilter]
+        public JsonResult SaveUserSignatures(HttpPostedFileBase signatureFile, HttpPostedFileBase initialsFile, string fullName, string initials)
+        {
+            string result = "ERROR";
+
+            if (Session["Ctx"] != null)
+            {
+                result = new UserPreferenceModel().SaveUserSignatures(Session["ctx"] as Ctx, signatureFile, initialsFile, fullName, initials);
+            }
+
+            return Json(new { result = result }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Remove the saved signature and initials of the logged in user, both at once.
+        /// </summary>
+        /// <returns>{ result: OK | NOTFOUND | ERROR }</returns>
+        [HttpPost]
+        [AjaxAuthorize]
+        [AjaxSessionFilter]
+        public JsonResult DeleteUserSignatures()
+        {
+            string result = "ERROR";
+
+            if (Session["Ctx"] != null)
+            {
+                result = new UserPreferenceModel().DeleteUserSignatures(Session["ctx"] as Ctx);
+            }
+
+            return Json(new { result = result }, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
 
     }
 }

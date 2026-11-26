@@ -11,6 +11,9 @@
             <li class="VIS_Pref_li VIS_Pref_link-2">
                 <label id="@("lblPreferenceMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Preference</label>
             </li>
+            <li class="VIS_Pref_li VIS_Pref_link-8">
+                <label id="@("lblMySignMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "MySign")</label>
+            </li>
             <li class="VIS_Pref_li VIS_Pref_link-3">
                 <label id="@("lblContextMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Context</label>
             </li>
@@ -720,6 +723,11 @@
         }
         <!-- End API Setting Section-->
     </div>
+
+    <div class="VIS_Pref_content-right-8" style="display: none;" id="@("content8_" + ViewBag.WindowNumber)">
+        <h3 class="VIS_Pref_change-pass">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "MySign")</h3>
+    </div>
+    <!-- end of My Sign -->
 
     <!-- end of Gmail Settings -->
     <!-- end of content -->

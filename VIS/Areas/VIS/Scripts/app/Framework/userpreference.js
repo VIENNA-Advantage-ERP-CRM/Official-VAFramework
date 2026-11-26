@@ -319,6 +319,8 @@
             lblUserSetMenu.text(VIS.Msg.getMsg("UserSetting"));
             lblPreferenceMenu.text(VIS.Msg.getMsg("Preference"));
             lblContextMenu.text(VIS.Msg.getMsg("Context"));
+            root.find("#lblMySignMenu_" + windowNo).text(VIS.Msg.getMsg("MySign"));
+            initMySign(root);
             lblErrorMenu.text(VIS.Msg.getMsg("PreferenceError"));
 
             var lblchangePwsHeader = root.find("#lblchangePwsHeader_" + windowNo);
@@ -805,6 +807,24 @@
                 $(".VIS_Pref_content-right-7").css("display", "block");
                 divBottom.css("display", "none");
             })
+
+            // My Sign tab
+            $(".VIS_Pref_link-8").click(function () {
+                $(".VIS_Pref_content-right").css("display", "none");
+                $(".VIS_Pref_content-right-2").css("display", "none");
+                $(".VIS_Pref_content-right-3").css("display", "none");
+                $(".VIS_Pref_content-right-4").css("display", "none");
+                $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-8").css("display", "block");
+                divBottom.css("display", "none");
+                mySignLoad();
+            });
+            // any other tab hides the My Sign panel
+            $(".VIS_Pref_li").not(".VIS_Pref_link-8").click(function () {
+                $(".VIS_Pref_content-right-8").css("display", "none");
+            });
 
 
             if (isGmailSettings) {
@@ -2169,6 +2189,444 @@
 
         }
 
+        /* My Sign tab - upload signature and initials (AD_UserSignature) */
+        var MYSIGN_MAX_SIZE = 200 * 1024;                           // keep in step with UserPreferenceModel.MaxSignatureFileSize
+        var MYSIGN_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'bmp'];
+        var MYSIGN_KINDS = ['signature', 'initials'];
+        var MYSIGN_NAME_MAX = 60;                                   // keep in step with UserPreferenceModel.MaxSignatureNameLength
+        var MYSIGN_INITIALS_MAX = 10;                               // keep in step with UserPreferenceModel.MaxSignatureInitialsLength
+
+        var mySign = {
+            loaded: false,                                          // saved images fetched at least once
+            pending: { signature: null, initials: null },           // { file, url } picked, not saved yet
+            saved: { signature: null, initials: null },             // { ID, Image } as stored on the server
+            baseline: { fullName: '', initials: '' },               // what the name boxes held when loaded - Cancel goes back to it
+            $pane: null
+        };
+
+        // Translated text. Falls back to the English default while the AD_Message row does not exist yet.
+        var mySignText = function (key, fallback) {
+            return VIS.I18N.hasLabel(key) ? VIS.Msg.getMsg(key) : fallback;
+        };
+
+        var mySignInitialsOf = function (name) {
+            var parts = (name || '').replace(/^\s+|\s+$/g, '').split(/\s+/);
+            var initials = '';
+            for (var i = 0; i < parts.length && i < 3; i++) {
+                initials += parts[i].charAt(0).toUpperCase();
+            }
+            return initials;
+        };
+
+        var mySignMessage = function (type, text) {
+            if (!mySign || !mySign.$pane) {
+                return;
+            }
+            mySign.$pane.find('.VIS_MySign_message')
+                .removeClass('VIS_MySign_error VIS_MySign_ok')
+                .addClass(type === 'error' ? 'VIS_MySign_error' : (type === 'ok' ? 'VIS_MySign_ok' : ''))
+                .text(text || '');
+        };
+
+        // Block the dialog with the spinner while the server is called. The dialog's busy layer was added when
+        // the dialog opened, but loading the form into the dialog afterwards removed it again - so it is put back
+        // here each time, and sized to the visible dialog area (the opening size is taller than that and would
+        // add a scrollbar).
+        var mySignBusy = function (on) {
+            if (!$busyDiv || !$busyDiv.length) {
+                return;
+            }
+            if (on && $root && $root.length) {
+                $root.append($busyDiv.css({ height: '100%', width: '100%' }));
+            }
+            $busyDiv[0].style.visibility = on ? 'visible' : 'hidden';
+        };
+
+        // Text for a result code returned by the server (or found by the check in the browser)
+        var mySignResultText = function (code) {
+            switch (code) {
+                case 'NAMEREQUIRED':
+                    return mySignText('VIS_MySignFullNameRequired', 'Full Name is required.');
+                case 'INITIALSREQUIRED':
+                    return mySignText('VIS_MySignInitialsRequired', 'Initials are required.');
+                case 'NOFILE':
+                    return mySignText('VIS_MySignNoFile', 'Upload both your signature and initials.');
+                case 'NOSIGNATURE':
+                    return mySignText('VIS_MySignNeedSignature', 'Upload your signature.');
+                case 'NOINITIALS':
+                    return mySignText('VIS_MySignNeedInitials', 'Upload your initials.');
+                case 'TOOLARGE':
+                    return mySignText('VIS_MySignTooLarge', 'The file is larger than 200KB.');
+                case 'BADTYPE':
+                    return mySignText('VIS_MySignBadType', 'Only GIF, JPG, PNG or BMP images can be uploaded.');
+                case 'BADSIZE':
+                    return mySignText('VIS_MySignBadSize', 'The image is too large. The maximum is 1500 x 1500 pixels.');
+                default:
+                    return mySignText('VIS_MySignFailed', 'Could not save. Please try again.');
+            }
+        };
+
+        var mySignTrimmed = function ($input) {
+            return $.trim($input.val() || '');
+        };
+
+        // Show or clear the "required" error under one text box. Returns true when the box is filled in.
+        var mySignCheckField = function ($input) {
+            var ok = $input.prop('readonly') || mySignTrimmed($input) !== '';
+            var required = $input.data('field') === 'initials' ? 'INITIALSREQUIRED' : 'NAMEREQUIRED';
+
+            $input.closest('.VIS_MySign_field').toggleClass('VIS_MySign_invalid', !ok)
+                .find('.VIS_MySign_fielderr').text(ok ? '' : mySignResultText(required));
+            return ok;
+        };
+
+        // Show what is picked (if anything) or what is saved, in each box
+        var mySignRender = function () {
+            if (!mySign || !mySign.$pane) {
+                return;
+            }
+            var hasPending = false;
+            var present = { signature: false, initials: false };    // a picture is there: saved, or picked and waiting for Save
+
+            for (var i = 0; i < MYSIGN_KINDS.length; i++) {
+                var kind = MYSIGN_KINDS[i];
+                var $box = mySign.$pane.find('.VIS_MySign_box[data-kind="' + kind + '"]');
+                var pending = mySign.pending[kind];
+                var saved = mySign.saved[kind];
+                var src = pending ? pending.url : (saved ? saved.Image : null);
+                var $img = $box.find('.VIS_MySign_img');
+
+                if (src) {
+                    $img.attr('src', src).show();
+                }
+                else {
+                    $img.removeAttr('src').hide();
+                }
+                $box.find('.VIS_MySign_empty').toggle(!src);
+
+                // a box without its picture is marked in red; once the picture is there it shows a green tick instead
+                $box.toggleClass('VIS_MySign_missing', !src);
+                present[kind] = !!src;
+
+                if (pending) {
+                    hasPending = true;
+                }
+            }
+
+            // Both pictures are mandatory: until both are there, Save stays off and the note under the boxes is red
+            var hasBoth = present.signature && present.initials;
+
+            mySign.$pane.find('.VIS_MySign_required').toggleClass('VIS_MySign_incomplete', !hasBoth);
+
+            // The name and the initials can be typed until their picture is saved; after that they are fixed.
+            // (They are stored with their picture, and removing the pictures frees them again.)
+            mySign.$pane.find('.VIS_MySign_fullName').prop('readonly', !!mySign.saved.signature);
+            mySign.$pane.find('.VIS_MySign_initials').prop('readonly', !!mySign.saved.initials);
+            mySign.$pane.find('.VIS_MySign_removeAll').prop('disabled', !mySign.saved.signature && !mySign.saved.initials);
+
+            // Cancel is for any change; Save also needs both pictures and both texts
+            var name = mySignTrimmed(mySign.$pane.find('.VIS_MySign_fullName'));
+            var initials = mySignTrimmed(mySign.$pane.find('.VIS_MySign_initials'));
+            var changed = hasPending || name !== mySign.baseline.fullName || initials !== mySign.baseline.initials;
+
+            mySign.$pane.find('.VIS_MySign_cancel').prop('disabled', !changed);
+            mySign.$pane.find('.VIS_MySign_save').prop('disabled', !changed || !hasBoth || name === '' || initials === '');
+        };
+
+        var mySignApply = function (data) {
+            if (!mySign || !mySign.$pane) {
+                return;
+            }
+            var name = $.trim((data && data.FullName) || '');
+            var initials = $.trim((data && data.InitialsText) || '') || mySignInitialsOf(name);
+
+            mySign.baseline = { fullName: name, initials: initials };
+            mySign.$pane.find('.VIS_MySign_fullName').val(name);
+            mySign.$pane.find('.VIS_MySign_initials').val(initials);
+            mySign.$pane.find('.VIS_MySign_field').removeClass('VIS_MySign_invalid').find('.VIS_MySign_fielderr').text('');
+            mySign.saved.signature = (data && data.Signature) || null;
+            mySign.saved.initials = (data && data.Initials) || null;
+            mySignRender();
+        };
+
+        // Fetch the saved images - on the first visit of the tab, or again when forced
+        var mySignLoad = function (force) {
+            if (!mySign || !mySign.$pane || (mySign.loaded && !force)) {
+                return;
+            }
+            mySignBusy(true);
+            $.ajax({
+                url: VIS.Application.contextUrl + 'UserPreference/GetUserSignatures',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                success: function (data) {
+                    mySignBusy(false);
+                    if (!mySign) {
+                        return;
+                    }
+                    mySign.loaded = true;
+                    mySignApply(data);
+                },
+                error: function () {
+                    mySignBusy(false);
+                    mySignMessage('error', mySignText('VIS_MySignLoadFailed', 'Could not load your saved signature.'));
+                }
+            });
+        };
+
+        // A file was chosen or dropped: check it here for a quick answer (the server checks it again)
+        var mySignPick = function (kind, file) {
+            if (!file || MYSIGN_KINDS.indexOf(kind) < 0) {
+                return;
+            }
+            var ext = (file.name || '').split('.').pop().toLowerCase();
+
+            if (MYSIGN_EXTENSIONS.indexOf(ext) < 0) {
+                mySignMessage('error', mySignResultText('BADTYPE'));
+                return;
+            }
+            if (file.size > MYSIGN_MAX_SIZE) {
+                mySignMessage('error', mySignResultText('TOOLARGE'));
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                if (!mySign) {
+                    return;
+                }
+                mySign.pending[kind] = { file: file, url: e.target.result };
+                mySignMessage('', '');
+                mySignRender();
+            };
+            reader.readAsDataURL(file);
+        };
+
+        var mySignSave = function () {
+            var $name = mySign.$pane.find('.VIS_MySign_fullName');
+            var $initials = mySign.$pane.find('.VIS_MySign_initials');
+            var nameOk = mySignCheckField($name);
+            var initialsOk = mySignCheckField($initials);
+
+            if (!nameOk || !initialsOk) {
+                return;
+            }
+            var name = mySignTrimmed($name);
+            var initials = mySignTrimmed($initials);
+            var nameChanged = name !== mySign.baseline.fullName;
+            var initialsChanged = initials !== mySign.baseline.initials;
+
+            if (!mySign.pending.signature && !mySign.pending.initials && !nameChanged && !initialsChanged) {
+                return;
+            }
+            // both pictures are mandatory - each one is either saved already or picked now (the button is off otherwise)
+            var hasSignature = !!(mySign.saved.signature || mySign.pending.signature);
+            var hasInitialsImage = !!(mySign.saved.initials || mySign.pending.initials);
+
+            if (!hasSignature || !hasInitialsImage) {
+                mySignMessage('error', mySignResultText(!hasSignature && !hasInitialsImage ? 'NOFILE' : (!hasSignature ? 'NOSIGNATURE' : 'NOINITIALS')));
+                return;
+            }
+            var fd = new FormData();
+
+            fd.append('fullName', name);
+            fd.append('initials', initials);
+
+            if (mySign.pending.signature) {
+                fd.append('signatureFile', mySign.pending.signature.file);
+            }
+            if (mySign.pending.initials) {
+                fd.append('initialsFile', mySign.pending.initials.file);
+            }
+            mySignBusy(true);
+
+            $.ajax({
+                url: VIS.Application.contextUrl + 'UserPreference/SaveUserSignatures',
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (res) {
+                    mySignBusy(false);
+                    if (!mySign) {
+                        return;
+                    }
+                    if (res && res.result === 'OK') {
+                        mySign.pending = { signature: null, initials: null };
+                        mySignMessage('ok', mySignText('VIS_MySignSaved', 'Saved.'));
+                        mySignLoad(true);
+                    }
+                    else {
+                        mySignMessage('error', mySignResultText(res && res.result));
+                    }
+                },
+                error: function () {
+                    mySignBusy(false);
+                    mySignMessage('error', mySignResultText('ERROR'));
+                }
+            });
+        };
+
+        // Remove the saved signature and the saved initials together
+        var mySignRemoveAll = function () {
+            if (!mySign.saved.signature && !mySign.saved.initials) {
+                return;
+            }
+            VIS.ADialog.confirm(null, true, mySignText('VIS_MySignConfirmRemoveAll', 'Remove your signature and initials?'), mySignText('Confirm', 'Confirm'), function (result) {
+                if (!result || !mySign) {
+                    return;
+                }
+                mySignBusy(true);
+                $.ajax({
+                    url: VIS.Application.contextUrl + 'UserPreference/DeleteUserSignatures',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (res) {
+                        mySignBusy(false);
+                        if (!mySign) {
+                            return;
+                        }
+                        // NOTFOUND: they were already gone (removed elsewhere) - the reload shows that
+                        if (res && (res.result === 'OK' || res.result === 'NOTFOUND')) {
+                            mySign.pending = { signature: null, initials: null };
+                            mySignMessage('ok', mySignText('VIS_MySignRemoved', 'Removed.'));
+                            mySignLoad(true);
+                        }
+                        else {
+                            mySignMessage('error', mySignText('VIS_MySignRemoveFailed', 'Could not remove. Please try again.'));
+                        }
+                    },
+                    error: function () {
+                        mySignBusy(false);
+                        mySignMessage('error', mySignText('VIS_MySignRemoveFailed', 'Could not remove. Please try again.'));
+                    }
+                });
+            });
+        };
+
+        // Build the My Sign tab: name and initials on top, then one upload box for each of signature and initials
+        var initMySign = function (root) {
+            var $pane = root.find('#content8_' + windowNo);
+            if (!$pane.length || $pane.find('.VIS_MySign').length) {
+                return;
+            }
+            mySign.$pane = $pane;
+
+            var uploadIcon = '<svg class="VIS_MySign_icon" viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">' +
+                '<path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" ' +
+                'd="M12 16V4m0 0L7 9m5-5l5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>';
+
+            // green tick, shown in a box once its picture is there (picked or saved)
+            var tickIcon = '<svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="11" fill="#2e7d32"/>' +
+                '<path d="M7 12.5l3.2 3.2L17 8.8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+            var boxHtml = function (kind, label, title) {
+                return '<div class="VIS_MySign_box VIS_MySign_missing" data-kind="' + kind + '">' +
+                    '<div class="VIS_MySign_boxHead">' +
+                    '<span class="VIS_MySign_boxTitle">' + title + '<sup>*</sup></span>' +
+                    '<span class="VIS_MySign_status" aria-hidden="true">' + tickIcon + '</span>' +
+                    '</div>' +
+                    '<div class="VIS_MySign_drop">' +
+                    '<span class="VIS_MySign_empty">' + uploadIcon + '</span>' +
+                    '<img class="VIS_MySign_img" alt="' + label + '" style="display:none" />' +
+                    '</div>' +
+                    '<div class="VIS_MySign_boxActions">' +
+                    '<button type="button" class="VIS_MySign_upload">' + label + '</button>' +
+                    '</div>' +
+                    '<input type="file" class="VIS_MySign_file" style="display:none" ' +
+                    'accept=".gif,.jpg,.jpeg,.png,.bmp,image/gif,image/jpeg,image/png,image/bmp" />' +
+                    '</div>';
+            };
+
+            // a framework textbox: floating label inside vis-input-wrap / vis-control-wrap, with the error under it
+            var fieldHtml = function (field, cssClass, label, maxLength) {
+                return '<div class="VIS_MySign_field">' +
+                    '<div class="input-group vis-input-wrap">' +
+                    '<div class="vis-control-wrap">' +
+                    '<input type="text" class="' + cssClass + '" data-field="' + field + '" maxlength="' + maxLength + '" placeholder=" " autocomplete="off" />' +
+                    '<label>' + label + '<sup>*</sup></label>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="VIS_MySign_fielderr" role="alert"></div>' +
+                    '</div>';
+            };
+
+            $pane.append(
+                '<div class="VIS_MySign">' +
+                '<div class="VIS_MySign_names">' +
+                fieldHtml('fullName', 'VIS_MySign_fullName', mySignText('VIS_MySignFullName', 'Full Name'), MYSIGN_NAME_MAX) +
+                fieldHtml('initials', 'VIS_MySign_initials', mySignText('VIS_MySignInitials', 'Initials'), MYSIGN_INITIALS_MAX) +
+                '</div>' +
+                '<div class="VIS_MySign_boxes">' +
+                boxHtml('signature', mySignText('VIS_MySignUploadSignature', 'Upload Signature'), mySignText('VIS_MySignSignature', 'Signature')) +
+                boxHtml('initials', mySignText('VIS_MySignUploadInitials', 'Upload Initials'), mySignText('VIS_MySignInitials', 'Initials')) +
+                '</div>' +
+                '<div class="VIS_MySign_required VIS_MySign_incomplete" role="note"><sup>*</sup> ' +
+                mySignText('VIS_MySignBothRequired', 'Both signature and initials are required. Save is enabled only after both are uploaded.') + '</div>' +
+                '<div class="VIS_MySign_formats">' +
+                mySignText('VIS_MySignFormats', 'Accepted file formats: GIF, JPG, PNG, BMP. Max file size 200KB.') + '</div>' +
+                '<div class="VIS_MySign_consent">' +
+                mySignText('VIS_MySignConsent', 'By clicking Save, I agree that the signature and initials will be the electronic representation of my signature and initials for all purposes when I (or my agent) use them on documents, including legally binding contracts - just the same as a pen-and-paper signature or initial.') +
+                '</div>' +
+                '<div class="VIS_MySign_actions">' +
+                '<button type="button" class="VIS_MySign_removeAll" disabled="disabled">' +
+                $('<span>').text(mySignText('VIS_MySignRemoveAll', 'Remove Signature & Initials')).html() + '</button>' +
+                '<div class="VIS_MySign_message" role="status"></div>' +
+                '<button type="button" class="VIS_MySign_cancel" disabled="disabled">' + mySignText('Cancel', 'Cancel') + '</button>' +
+                '<button type="button" class="VIS_MySign_save" disabled="disabled">' + mySignText('Save', 'Save') + '</button>' +
+                '</div>' +
+                '</div>');
+
+            // upload button -> the hidden file chooser of the same box
+            $pane.on('click.mySign', '.VIS_MySign_upload', function () {
+                $(this).closest('.VIS_MySign_box').find('.VIS_MySign_file').trigger('click');
+            });
+
+            $pane.on('change.mySign', '.VIS_MySign_file', function () {
+                mySignPick($(this).closest('.VIS_MySign_box').data('kind'), this.files && this.files[0]);
+                $(this).val('');                                    // lets the same file be picked again
+            });
+
+            // drag a file onto a box
+            $pane.on('dragenter.mySign dragover.mySign', '.VIS_MySign_box', function (e) {
+                e.preventDefault();
+                $(this).addClass('VIS_MySign_dragover');
+            });
+
+            $pane.on('dragleave.mySign drop.mySign', '.VIS_MySign_box', function (e) {
+                e.preventDefault();
+                $(this).removeClass('VIS_MySign_dragover');
+                if (e.type === 'drop') {
+                    var dt = e.originalEvent && e.originalEvent.dataTransfer;
+                    mySignPick($(this).data('kind'), dt && dt.files && dt.files[0]);
+                }
+            });
+
+            $pane.on('click.mySign', '.VIS_MySign_removeAll', mySignRemoveAll);
+
+            $pane.on('click.mySign', '.VIS_MySign_save', mySignSave);
+
+            // typing or leaving a text box: an empty box shows its error at once, a filled one clears it
+            $pane.on('input.mySign focusout.mySign', '.VIS_MySign_fullName, .VIS_MySign_initials', function () {
+                mySignCheckField($(this));
+                mySignMessage('', '');
+                mySignRender();
+            });
+
+            // Cancel drops what was picked and typed and shows what is saved again
+            $pane.on('click.mySign', '.VIS_MySign_cancel', function () {
+                mySign.pending = { signature: null, initials: null };
+                $pane.find('.VIS_MySign_fullName').val(mySign.baseline.fullName);
+                $pane.find('.VIS_MySign_initials').val(mySign.baseline.initials);
+                $pane.find('.VIS_MySign_field').removeClass('VIS_MySign_invalid').find('.VIS_MySign_fielderr').text('');
+                mySignMessage('', '');
+                mySignRender();
+            });
+
+            mySignRender();
+        };
+
         /* End APIKey Section*/
         this.showDialog = function () {
             var w = $(window).width() - 150;
@@ -2204,6 +2662,10 @@
 
         this.disposeComponent = function () {
             $self = null;
+            if (mySign && mySign.$pane) {
+                mySign.$pane.off('.mySign');
+            }
+            mySign = null;
             if (drpTheme) {
                 drpTheme.off('click');
             }
