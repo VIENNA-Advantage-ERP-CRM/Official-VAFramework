@@ -246,7 +246,7 @@
             if (!callingFromOutsideofWindow) {
                 loadFields(false);
                 addPrintOption();
-             //   initEmailAutoComplete();  
+                //   initEmailAutoComplete();  
             }
             //  loadTextArea();
             //createDesign();
@@ -429,7 +429,7 @@
                     $to = $root.find('#' + self.windowNo + "_emailTo");
                     $bcc = $root.find('#' + self.windowNo + "_emailBcc");
                     $cc = $root.find('#' + self.windowNo + "_eamilCc");
-                   // $cc.css("margin-top", "2px");
+                    // $cc.css("margin-top", "2px");
                     $cc.parent().css("margin-top", "4px");
                     $root.find(".vis-Email-textarea-div").height($root.height() - (115 + 30));
                     $refresh = $root.find('#' + self.windowNo + "_emailRefresh");
@@ -511,7 +511,7 @@
             let primary = language.split('-')[0];   // ar_IQ → ar
 
             // Try full locale first (ar-IQ.json)
-            $.getJSON(VIS.Application.contextUrl+`Areas/KJS/Scripts/SyncfusionLocale/${language}.json`)
+            $.getJSON(VIS.Application.contextUrl + `Areas/KJS/Scripts/SyncfusionLocale/${language}.json`)
                 .done(function (data) {
                     ej.base.L10n.load(data);
                     ej.base.setCulture(language);
@@ -519,7 +519,7 @@
                 })
                 .fail(function () {
                     // If full locale not found, try the primary one (ar.json)
-                    $.getJSON(VIS.Application.contextUrl +`Areas/KJS/Scripts/SyncfusionLocale/${primary}.json`)
+                    $.getJSON(VIS.Application.contextUrl + `Areas/KJS/Scripts/SyncfusionLocale/${primary}.json`)
                         .done(function (data) {
                             ej.base.L10n.load(data);
                             ej.base.setCulture(primary);
@@ -533,7 +533,7 @@
         }
 
 
-      
+
 
         // Signature of the sending mailbox (Mail Configuration), placeholders already filled; empty for none
         var mailSignature = "";
@@ -700,7 +700,7 @@
                     //setTimeout(function () {
                     // IMPORTANT
 
-                    rteObj.appendTo(str[0]);                 
+                    rteObj.appendTo(str[0]);
 
                     if (VIS.Application.isRTL) {
                         rteObj.documentEditor.documentEditorSettings = { rtl: true };
@@ -758,7 +758,7 @@
                 rowsSingleView = _curtab.getRecords()[_curtab.getCurrentRow()];
 
                 // if To still holds the address we auto-filled earlier, clear it so it can be recalculated
-                
+
                 autoToEmail = "";
             }
             if (_curGC.singleRow && rowsSource.length == 0) {
@@ -781,7 +781,7 @@
                             // 2) only one email -> To field, not the checklist
                             var onlyEmail = $.trim(withEmail[0]["email"]);
                             if ($to && $to.length > 0 && $.trim($to.val()) == "") {
-                               // $to.val(onlyEmail);
+                                // $to.val(onlyEmail);
                                 $to.val(onlyEmail + ";");
                                 autoToEmail = onlyEmail;
                                 resizeAddressBox($to);
@@ -810,60 +810,60 @@
             }
         };
 
-       /* function loadEmails(refersh) {
-
-            if (refersh == true) {
-                //$bccChkList.empty();
-                // this is data source for multiView Records
-                rowsSource = _curGC.getSelectedRows();
-
-                // this is data source for single View Records
-                rowsSingleView = _curtab.getRecords()[_curtab.getCurrentRow()];
-            }
-            if (_curGC.singleRow && rowsSource.length == 0)//show records for single window
-            {
-                loademailforSingleView();
-            }
-            else {
-                if (rowsSource.length > 0) {
-                    var htm = '';
-                    for (var i = 0; i < rowsSource.length; i++) {
-
-                        // else {
-                        if (isEmail) {
-                            if (rowsSource[i]["email"] != null) {
-                                isEmail = true;
-                                var ID = rowsSource[i][_curtab.getKeyColumnName().toLower()];
-
-                                htm += '<li class="vis-list-li-bcc"  data-email="' + rowsSource[i]["email"] + '"><input data-currentrec="Y" data-recID="' + ID + '" id="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSource[i]["email"] + '" checked/><label class="vis-chcklist-label"  for="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1">' + rowsSource[i]["email"] + '(' + ID + ')</label></li>';
-                            }
-
-                        }
-                    }
-                    $bccChkList.append(htm);
-                    htm = null;
-                }
-                else {
-                    loademailforSingleView();
-                }
-            }
-            if (!refersh) {
-                $rightDiv.append($bccChkList);
-            }
-        };*/
+        /* function loadEmails(refersh) {
+ 
+             if (refersh == true) {
+                 //$bccChkList.empty();
+                 // this is data source for multiView Records
+                 rowsSource = _curGC.getSelectedRows();
+ 
+                 // this is data source for single View Records
+                 rowsSingleView = _curtab.getRecords()[_curtab.getCurrentRow()];
+             }
+             if (_curGC.singleRow && rowsSource.length == 0)//show records for single window
+             {
+                 loademailforSingleView();
+             }
+             else {
+                 if (rowsSource.length > 0) {
+                     var htm = '';
+                     for (var i = 0; i < rowsSource.length; i++) {
+ 
+                         // else {
+                         if (isEmail) {
+                             if (rowsSource[i]["email"] != null) {
+                                 isEmail = true;
+                                 var ID = rowsSource[i][_curtab.getKeyColumnName().toLower()];
+ 
+                                 htm += '<li class="vis-list-li-bcc"  data-email="' + rowsSource[i]["email"] + '"><input data-currentrec="Y" data-recID="' + ID + '" id="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSource[i]["email"] + '" checked/><label class="vis-chcklist-label"  for="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1">' + rowsSource[i]["email"] + '(' + ID + ')</label></li>';
+                             }
+ 
+                         }
+                     }
+                     $bccChkList.append(htm);
+                     htm = null;
+                 }
+                 else {
+                     loademailforSingleView();
+                 }
+             }
+             if (!refersh) {
+                 $rightDiv.append($bccChkList);
+             }
+         };*/
 
         function loademailforSingleView() {
             if (isEmail) {
-              //  var singleEmail = rowsSingleView ? rowsSingleView["email"] : null;
+                //  var singleEmail = rowsSingleView ? rowsSingleView["email"] : null;
                 if (rowsSingleView["email"] != null) {
                     isEmail = true;
                     var ID = rowsSingleView[_curtab.getKeyColumnName().toLower()];
 
                     $bccChkList.append('<li class="vis-list-li-bcc" data-email="' + rowsSingleView["email"] + '"><input id="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSingleView["email"]
                         + '" checked /><label class="vis-chcklist-label" for="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1">' + rowsSingleView["email"] + '(' + ID + ')</label></li>');
-                   /* if ($to && $to.length > 0 && $.trim($to.val()) == "") {
-                        $to.val(singleEmail);
-                    }*/
+                    /* if ($to && $to.length > 0 && $.trim($to.val()) == "") {
+                         $to.val(singleEmail);
+                     }*/
                 }
             }
         };
@@ -1305,7 +1305,7 @@
                     return;
                 }
 
-                
+
 
                 var subject = $subject.val();
                 var message = $txtArea.val();
@@ -1565,7 +1565,7 @@
 
             divup.append($Attachdiv);
 
-            dLAContent = $("<div class='vis-attach-content-wrap' style='height:auto;min-height:0;max-height:145px;border-bottom:2px solid rgba(var(--v-c-secondary), 1);padding-bottom:0px'>");
+            dLAContent = $("<div class='vis-attach-content-wrap' style='height:83px;border-bottom:2px solid rgba(var(--v-c-secondary), 1);padding-bottom:0px'>");
             dLAContent.append($('<div style="height:auto;overflow:auto" ></div>'));
             $Attachdiv.append(dLAContent);
             $root.find('.vis-email-attachmentContainer').append(divReadOnly);
@@ -1709,11 +1709,8 @@
                         filesforAttachmentforNewAttachment.push(lstLatestFiles[itm].name);
                     }
 
-                    if (!hasScrollBar()) {
-                        // size to content (no fixed height)
-                        $root.find('.vis-attach-content-wrap').css('height', 'auto');
-
-                        $root.find('.vis-email-attachmentContainer').css('height', 'auto');
+                    if (!hasMultipleAttachmentRows()) {
+                        fitAttachmentStrip();
                         if (callingFromOutsideofWindow) {
                             $root.find(".vis-Email-textarea-div").height($('.vis-Email-ContentArea').height() - ($('.vis-form-horizontal').height() + 30));
                         }
@@ -1724,8 +1721,8 @@
 
                     if (lstLatestFiles.length == 0) {
                         $root.find('.vis-email-attachmentContainer').hide();
-                        $root.find('.vis-email-attachmentContainer').css('height', 'auto');
-                        $root.find('.vis-attach-content-wrap').css('height', 'auto');
+                        $root.find('.vis-email-attachmentContainer').height(90);
+                        $root.find('.vis-attach-content-wrap').height(83);
                         if (callingFromOutsideofWindow) {
                             $root.find(".vis-Email-textarea-div").height($('.vis-Email-ContentArea').height() - ($('.vis-form-horizontal').height() + 30));
                         }
@@ -1768,7 +1765,7 @@
                 fileInfo.Size = file.size;
                 lstLatestFiles.push(file);
 
-                // height follows the files (CSS max-height + scroll when there are many)
+                fitAttachmentStrip();
 
             }
 
@@ -1790,26 +1787,39 @@
             }
         };
 
-        function hasScrollBar() {
+        // Are the attachment tiles on more than one row? Judged from where the tiles actually sit.
+        function hasMultipleAttachmentRows() {
+            var $tiles = dLAContent.children(0).children('.vis-attach-file-wrapla');
 
-
-            if (dLAContent.children(0).height() < 75) {
-
+            if ($tiles.length < 2) {
                 return false;
             }
-            else {
-                return true;
+            return $tiles.last()[0].offsetTop > $tiles.first()[0].offsetTop;
+        };
+
+        // Size the attachment strip from its tiles: one row keeps the default size (90 / 83 px); two or more rows
+        // get the taller one (155 / 145 px) and scroll beyond that. This replaces a test against a fixed 75px
+        // height, which one row of tiles could pass on some screens (font size, display scaling) - the strip then
+        // jumped to the tall size and showed blank space under one or two attachments.
+        function fitAttachmentStrip() {
+            var wrapHeight = 83;
+            var containerHeight = 90;
+
+            if (hasMultipleAttachmentRows()) {
+                wrapHeight = 145;
+                containerHeight = 155;
             }
+            else {
+                // a single row that is taller than the default (large fonts) is shown whole, not scrolled
+                var rowHeight = Math.min(Math.ceil(dLAContent.children(0).outerHeight(true)), 145);
 
-
-            ////if ($root.find('.attach-content-wrap')[0].scrollHeight > $root.find('.attach-content-wrap').height()) {
-            //if ($root.find('.attach-content-wrap')[0].scrollHeight > dLAContent.children(0).height()) {
-
-            //    return true;
-            //}
-            //else {
-            //    return false;
-            //}
+                if (rowHeight > wrapHeight) {
+                    containerHeight += rowHeight - wrapHeight;
+                    wrapHeight = rowHeight;
+                }
+            }
+            $root.find('.vis-attach-content-wrap').height(wrapHeight);
+            $root.find('.vis-email-attachmentContainer').height(containerHeight);
         };
 
         var getImageUrl = function (fileName) {
@@ -2038,7 +2048,7 @@
                         }
 
                         if (currentchunk <= totalChunks) {
-                            setProgressValue(parseInt((currentchunk / totalChunks) * 100)); 
+                            setProgressValue(parseInt((currentchunk / totalChunks) * 100));
                         }
                         window.setTimeout(function () {
                             TransferFile();
@@ -2195,11 +2205,11 @@
                     processData: false,   // IMPORTANT for FormData
                     contentType: false,
                     success: function (html) {
-                        previewContent(html);   
+                        previewContent(html);
                     }
                 });
 
-                return;  
+                return;
             }
 
             var html = $textAreakeno.value();
@@ -2598,44 +2608,44 @@
             //    }
 
 
-                $bsyDiv[0].style.visibility = "visible";
-                var datainit = {
-                    mails: VIS.Utility.encodeText(mails), AD_User_ID: ctx.getAD_User_ID(), AD_Client_ID: ctx.getAD_Client_ID(),
-                    AD_Org_ID: ctx.getAD_Org_ID(), attachment_ID: attachmentID, fileNamesFornNewAttach: JSON.stringify(filesforAttachmentforNewAttachment),
-                    fileNamesForopenFormat: JSON.stringify(filesforAttachmentforOpenFormat), mailFormat: VIS.Utility.encodeText($textAreakeno.value()),
-                    notify: wantNotification, strDocAttach: VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo),
-                    /** tab panel- null check ** Dt: 05/07/2021 ** Modified By: Kumar **/
-                    AD_Process_ID: ((_curtab != null) ? _curtab.getAD_Process_ID() : 0), printformatfileType: pfFiletype
-                };
-                $.ajax({
-                    url: VIS.Application.contextUrl + "Email/SendMail",
-                    data: datainit,
-                    datatype: "json",
-                    type: "post",
-                    cache: false,
-                    async: true,
-                    success: function (data) {
-                        $bsyDiv[0].style.visibility = "hidden";
-                        var res = JSON.parse(data);
-                        if (res == "") {
-                            self.dispose();
-                            self = null;
-                            if (doc != null) {
-                                doc.dispose();
-                            }
-                            doc = null;
+            $bsyDiv[0].style.visibility = "visible";
+            var datainit = {
+                mails: VIS.Utility.encodeText(mails), AD_User_ID: ctx.getAD_User_ID(), AD_Client_ID: ctx.getAD_Client_ID(),
+                AD_Org_ID: ctx.getAD_Org_ID(), attachment_ID: attachmentID, fileNamesFornNewAttach: JSON.stringify(filesforAttachmentforNewAttachment),
+                fileNamesForopenFormat: JSON.stringify(filesforAttachmentforOpenFormat), mailFormat: VIS.Utility.encodeText($textAreakeno.value()),
+                notify: wantNotification, strDocAttach: VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo),
+                /** tab panel- null check ** Dt: 05/07/2021 ** Modified By: Kumar **/
+                AD_Process_ID: ((_curtab != null) ? _curtab.getAD_Process_ID() : 0), printformatfileType: pfFiletype
+            };
+            $.ajax({
+                url: VIS.Application.contextUrl + "Email/SendMail",
+                data: datainit,
+                datatype: "json",
+                type: "post",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    $bsyDiv[0].style.visibility = "hidden";
+                    var res = JSON.parse(data);
+                    if (res == "") {
+                        self.dispose();
+                        self = null;
+                        if (doc != null) {
+                            doc.dispose();
                         }
-                        else {
-                            window.setTimeout(function () {
-
-                                VIS.ADialog.info(res);
-                                if (res.contains("MailSent")) {
-                                    VIS.context.setContext("DocumentAttachViaEmail_" + self.windowNo, "");
-                                }
-                            }, 2);
-                        }
+                        doc = null;
                     }
-                });
+                    else {
+                        window.setTimeout(function () {
+
+                            VIS.ADialog.info(res);
+                            if (res.contains("MailSent")) {
+                                VIS.context.setContext("DocumentAttachViaEmail_" + self.windowNo, "");
+                            }
+                        }, 2);
+                    }
+                }
+            });
 
 
             //});
@@ -2682,7 +2692,7 @@
                 html = $textAreakeno.value();
             }
 
-          
+
             if (html == null || html == "" || html == undefined || html.trim().length < 1) {
                 return;
             }
@@ -2764,7 +2774,7 @@
 
                 html = $textAreakeno.value();
             }
-            if (html == null || html == "" || html ==  undefined || html.trim().length < 1) {
+            if (html == null || html == "" || html == undefined || html.trim().length < 1) {
                 return;
             }
             var finalhtmls = '';
@@ -2977,7 +2987,7 @@
                 }
             }
 
-          
+
             $subject.val("");
 
             if (IsSyncEditor) {
@@ -3116,7 +3126,7 @@
                     data: formData,
                     processData: false,   // IMPORTANT for FormData
                     contentType: false,
-                    success: function (result) {                        
+                    success: function (result) {
                         text = result;
                     }
                 });
@@ -3159,7 +3169,7 @@
                     data: formData,
                     processData: false,   // IMPORTANT for FormData
                     contentType: false,
-                    success: function (result) {                        
+                    success: function (result) {
                         text = result;    // HTML returned
                     }
                 });
@@ -3186,7 +3196,7 @@
             loadEmails(true); // Load emails
 
             loadFields(true); // Load Feilds and their bpartner's email IDS....
-          //  initEmailAutoComplete();  
+            //  initEmailAutoComplete();  
         };
 
         function cancel(e) {
@@ -3194,7 +3204,7 @@
             self = null;
         };
 
-        function saveFormat(id,text) {
+        function saveFormat(id, text) {
             var inputData = {
                 id: id,
                 AD_Client_ID: ctx.getAD_Client_ID(),
@@ -3250,10 +3260,10 @@
 
                 if (!$root.find('.vis-email-attachmentContainer').is(":visible")) {
                     $root.find(".vis-Email-textarea-div").height($root.height() - 180);
-                   
+
                 }
                 else {
-                    $root.find(".vis-Email-textarea-div").height($root.height() - 365);                    
+                    $root.find(".vis-Email-textarea-div").height($root.height() - 365);
                 }
 
 
@@ -3303,7 +3313,7 @@
                     }, 2);
                 }
                 mailInfo.Bcc.push(email);
-                 hasMail = true;
+                hasMail = true;
             }
             else if ($bccChkList != null && $bccChkList != undefined) {
                 if (Object.keys(source).indexOf("email") > -1 && selectedValues.indexOf(source['email']) > -1) {
@@ -3319,7 +3329,7 @@
                             return;
                         }, 2);
                     }
-                     mailInfo.Bcc.push(source['email']);
+                    mailInfo.Bcc.push(source['email']);
                     hasMail = true;
                 }
                 else if (!_curGC.singleRow == false && rowsSource.length == 1) {
@@ -3363,13 +3373,13 @@
             }
             return mailInfo;
         };
-       /* function addRecipient(mailInfo, email) {
-            if (mailInfo.To == null || mailInfo.To.trim().length === 0) {
-                mailInfo.To = email;
-            } else {
-                mailInfo.Bcc.push(email);
-            }
-        }*/
+        /* function addRecipient(mailInfo, email) {
+             if (mailInfo.To == null || mailInfo.To.trim().length === 0) {
+                 mailInfo.To = email;
+             } else {
+                 mailInfo.Bcc.push(email);
+             }
+         }*/
         ///For Multi Row Selection
         function listofSelectedItems1(html, i) {
             var copyhtml = html;
@@ -3413,7 +3423,7 @@
         };
 
         ///For Single View Selection
-        function listofSelectedItems2(html) {   
+        function listofSelectedItems2(html) {
             var copyhtml = html;
             var retValues = {};
             while (copyhtml.indexOf("@@") > -1) {
@@ -3663,74 +3673,74 @@
 
         };
 
-       /* function initEmailAutoComplete() {
-            if (callingFromOutsideofWindow || !isEmail) return;
+        /* function initEmailAutoComplete() {
+             if (callingFromOutsideofWindow || !isEmail) return;
+ 
+             [$to, $cc, $bcc].forEach(function ($inp) {
+                 if (!$inp || $inp.length === 0) return;
+ 
+                 // already attached -> nothing to refresh, the source is remote
+                 if ($inp.data("kendoAutoComplete")) return;
+ 
+                 try {
+                     $inp.kendoAutoComplete({
+                         filter: "contains",
+                         minLength: 2,
+                         delay: 300,
+                         separator: "; ",
+                         clearButton: false,
+                         dataSource: {
+                             serverFiltering: true,
+                             transport: {
+                                 read: function (options) {
+                                     var f = options.data.filter;
+                                     var term = (f && f.filters && f.filters.length > 0) ? f.filters[0].value : "";
+ 
+                                     // 1) reference emails from the checklist (instant)
+                                     var local = getReferenceEmails().filter(function (e) {
+                                         return e.toLowerCase().indexOf(String(term).toLowerCase()) > -1;
+                                     });
+                                     var t = getTableInfo();
+                                     // 2) all other emails from the server
+                                     $.ajax({
+                                         url: VIS.Application.contextUrl + "Email/SearchEmails",
+                                         type: "POST",
+                                         datatype: "json",
+                                         cache: false,
+                                         *//*data: { term: term },*//*
+data: { term: term, tableName: t.tableName, tableID: t.tableID },
+success: function (data) {
+var remote = [];
+try {
+remote = (typeof data === "string") ? JSON.parse(data) : data;
+} catch (ex) { remote = []; }
+if (!$.isArray(remote)) remote = [];
 
-            [$to, $cc, $bcc].forEach(function ($inp) {
-                if (!$inp || $inp.length === 0) return;
-
-                // already attached -> nothing to refresh, the source is remote
-                if ($inp.data("kendoAutoComplete")) return;
-
-                try {
-                    $inp.kendoAutoComplete({
-                        filter: "contains",
-                        minLength: 2,
-                        delay: 300,
-                        separator: "; ",
-                        clearButton: false,
-                        dataSource: {
-                            serverFiltering: true,
-                            transport: {
-                                read: function (options) {
-                                    var f = options.data.filter;
-                                    var term = (f && f.filters && f.filters.length > 0) ? f.filters[0].value : "";
-
-                                    // 1) reference emails from the checklist (instant)
-                                    var local = getReferenceEmails().filter(function (e) {
-                                        return e.toLowerCase().indexOf(String(term).toLowerCase()) > -1;
-                                    });
-                                    var t = getTableInfo();
-                                    // 2) all other emails from the server
-                                    $.ajax({
-                                        url: VIS.Application.contextUrl + "Email/SearchEmails",
-                                        type: "POST",
-                                        datatype: "json",
-                                        cache: false,
-                                        *//*data: { term: term },*//*
-                                        data: { term: term, tableName: t.tableName, tableID: t.tableID },
-                                        success: function (data) {
-                                            var remote = [];
-                                            try {
-                                                remote = (typeof data === "string") ? JSON.parse(data) : data;
-                                            } catch (ex) { remote = []; }
-                                            if (!$.isArray(remote)) remote = [];
-
-                                            // merge, reference emails first, no duplicates
-                                            var seen = {};
-                                            var merged = [];
-                                            local.concat(remote).forEach(function (e) {
-                                                var key = String(e).toLowerCase();
-                                                if (!seen[key]) {
-                                                    seen[key] = true;
-                                                    merged.push(e);
-                                                }
-                                            });
-                                            options.success(merged);
-                                        },
-                                        error: function () {
-                                            options.success(local);
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    });
-                } catch (ex) {
-                    console.log("AutoComplete not available", ex);
-                }
-            });
-        }*/
+// merge, reference emails first, no duplicates
+var seen = {};
+var merged = [];
+local.concat(remote).forEach(function (e) {
+var key = String(e).toLowerCase();
+if (!seen[key]) {
+seen[key] = true;
+merged.push(e);
+}
+});
+options.success(merged);
+},
+error: function () {
+options.success(local);
+}
+});
+}
+}
+}
+});
+} catch (ex) {
+console.log("AutoComplete not available", ex);
+}
+});
+}*/
         // suggests addresses from the table this form was opened from in the To / Cc / Bcc boxes; ';' separates several addresses
         function initAddressAutoComplete() {
             if (!isEmail || currentTable_ID <= 0 || !$.fn.autocomplete) {

@@ -1004,6 +1004,492 @@ namespace VIS.Models
             }
         }
 
+        #region My Sign - signature and initials uploaded by the user (AD_UserSignature)
+
+        /// <summary>Largest signature / initials file accepted, in bytes (200 KB).</summary>
+        public const int MaxSignatureFileSize = 200 * 1024;
+
+        /// <summary>Largest width or height accepted, in pixels. A small file can still decode into a very
+        /// large bitmap, so the dimensions are checked before the image is re-encoded.</summary>
+        private const int MaxSignatureImageSide = 1500;
+
+        /// <summary>Longest full name / initials text kept with a signature. The name column holds 60 characters.</summary>
+        private const int MaxSignatureNameLength = 60;
+        private const int MaxSignatureInitialsLength = 10;
+
+        private static readonly string[] SignatureFileExtensions = { ".gif", ".jpg", ".jpeg", ".png", ".bmp" };
+
+        /// <summary>
+        /// Load the saved signature and initials of the logged in user. The user always comes from the
+        /// session context - never from the request - so nobody can read another user's images.
+        /// </summary>
+        /// <param name="ctx">Current context</param>
+        /// <returns>UserSignatureData. FullName is the name saved with the signature (the user's own name until one
+        /// is saved), InitialsText the initials saved with the initials image (null until one is saved).
+        /// Signature / Initials are null when no image is saved.</returns>
+        public UserSignatureData GetUserSignatures(Ctx ctx)
+        {
+            UserSignatureData data = new UserSignatureData();
+
+            try
+            {
+                int userID = ctx.GetAD_User_ID();
+                data.FullName = new MUser(ctx, userID, null).GetName();
+
+                // newest first, so the first row met for each type is the current one
+                DataSet ds = DB.ExecuteDataset(@"SELECT AD_UserSignature_ID, SignatureType, SignatureImage, FullName
+                    FROM AD_UserSignature
+                    WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID() + " AND AD_User_ID=" + userID + @"
+                    AND SignatureType IN ('" + MUserSignature.SIGNATURETYPE_Signature + "','" + MUserSignature.SIGNATURETYPE_Initials + @"')
+                    ORDER BY Created DESC, AD_UserSignature_ID DESC");
+
+                if (ds == null || ds.Tables.Count == 0)
+                {
+                    return data;
+                }
+
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    string type = Util.GetValueOfString(ds.Tables[0].Rows[i]["SignatureType"]);
+                    bool isSignature = type == MUserSignature.SIGNATURETYPE_Signature;
+
+                    if ((isSignature && data.Signature != null) || (!isSignature && data.Initials != null))
+                    {
+                        continue;   // an older row of a type already found
+                    }
+
+                    // an entry whose image went missing is of no use - skip it rather than show an empty tile
+                    string image = GetSignatureImageDataUrl(ctx, Util.GetValueOfInt(ds.Tables[0].Rows[i]["SignatureImage"]));
+
+                    if (string.IsNullOrEmpty(image))
+                    {
+                        continue;
+                    }
+
+                    UserSignatureItem item = new UserSignatureItem
+                    {
+                        ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_UserSignature_ID"]),
+                        Image = image
+                    };
+
+                    // each row keeps the text its picture stands for: the full name on the signature,
+                    // the initials on the initials
+                    string text = Util.GetValueOfString(ds.Tables[0].Rows[i]["FullName"]);
+
+                    if (isSignature)
+                    {
+                        data.Signature = item;
+                        if (!string.IsNullOrEmpty(text)) data.FullName = text;
+                    }
+                    else
+                    {
+                        data.Initials = item;
+                        if (!string.IsNullOrEmpty(text)) data.InitialsText = text;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                VAdvantage.Logging.VLogger.Get().Severe("ErrorToGetUserSignatures=>" + ex.Message);
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// Save the full name and initials of the logged in user, together with the uploaded signature and / or
+        /// initials image. Both pictures are mandatory: a file may be left out only when that picture is already
+        /// saved, and only what is sent is replaced. A user has one signature and one set of initials: uploading
+        /// again replaces the image and removes the old one.
+        /// The text travels with its picture: the full name is kept on the signature row and the initials on the
+        /// initials row, so text for a picture the user does not have yet cannot be stored and is ignored.
+        /// Every file is checked here again (size, type, dimensions) and re-encoded as PNG, whatever the
+        /// browser let through, so only real images of the accepted formats are ever stored.
+        /// </summary>
+        /// <param name="ctx">Current context</param>
+        /// <param name="signatureFile">Signature image (optional)</param>
+        /// <param name="initialsFile">Initials image (optional)</param>
+        /// <param name="fullName">Full name shown with the signature (required)</param>
+        /// <param name="initials">Initials shown with the initials image (required)</param>
+        /// <returns>"OK", or NAMEREQUIRED / INITIALSREQUIRED / NAMETOOLONG / NOFILE (neither picture) / NOSIGNATURE / NOINITIALS / TOOLARGE / BADTYPE / BADSIZE / ERROR</returns>
+        public string SaveUserSignatures(Ctx ctx, HttpPostedFileBase signatureFile, HttpPostedFileBase initialsFile, string fullName, string initials)
+        {
+            fullName = (fullName ?? string.Empty).Trim();
+            initials = (initials ?? string.Empty).Trim();
+
+            if (fullName.Length == 0)
+            {
+                return "NAMEREQUIRED";
+            }
+
+            if (initials.Length == 0)
+            {
+                return "INITIALSREQUIRED";
+            }
+
+            if (fullName.Length > MaxSignatureNameLength || initials.Length > MaxSignatureInitialsLength)
+            {
+                return "NAMETOOLONG";
+            }
+
+            bool hasSignature = signatureFile != null && signatureFile.ContentLength > 0;
+            bool hasInitials = initialsFile != null && initialsFile.ContentLength > 0;
+
+            byte[] signaturePng = null;
+            byte[] initialsPng = null;
+            string error;
+
+            if (hasSignature && (error = ConvertToPng(signatureFile, out signaturePng)) != null)
+            {
+                return error;
+            }
+
+            if (hasInitials && (error = ConvertToPng(initialsFile, out initialsPng)) != null)
+            {
+                return error;
+            }
+
+            Trx trx = Trx.GetTrx(Trx.CreateTrxName("VIS_SaveUserSignature"));
+
+            try
+            {
+                int userID = ctx.GetAD_User_ID();
+                MUser user = new MUser(ctx, userID, null);
+
+                // Email is mandatory in the table (as in DMS). The owner is AD_User_ID, the address is
+                // only a label, so a user without an e-mail must not be blocked from saving a signature.
+                string email = user.GetEMail();
+                if (string.IsNullOrEmpty(email)) email = user.GetValue();
+                if (string.IsNullOrEmpty(email)) email = user.GetName();
+                if (string.IsNullOrEmpty(email)) email = fullName;
+
+                MUserSignature signatureRow = GetUserSignatureRow(ctx, trx, userID, MUserSignature.SIGNATURETYPE_Signature);
+                MUserSignature initialsRow = GetUserSignatureRow(ctx, trx, userID, MUserSignature.SIGNATURETYPE_Initials);
+
+                // Both pictures are mandatory: each one is sent now or saved already. This is checked here as well
+                // as in the browser, so a request that skips the page cannot leave a user with only one of them.
+                bool signatureOnFile = signatureRow != null && signatureRow.GetSignatureImage() > 0;
+                bool initialsOnFile = initialsRow != null && initialsRow.GetSignatureImage() > 0;
+
+                if (!hasSignature && !signatureOnFile && !hasInitials && !initialsOnFile)
+                {
+                    trx.Rollback();
+                    return "NOFILE";
+                }
+
+                if (!hasSignature && !signatureOnFile)
+                {
+                    trx.Rollback();
+                    return "NOSIGNATURE";
+                }
+
+                if (!hasInitials && !initialsOnFile)
+                {
+                    trx.Rollback();
+                    return "NOINITIALS";
+                }
+
+                // one group ties the signature to its initials
+                string group = signatureRow != null ? signatureRow.GetSignatureGroup() : null;
+                if (string.IsNullOrEmpty(group) && initialsRow != null) group = initialsRow.GetSignatureGroup();
+                if (string.IsNullOrEmpty(group)) group = Guid.NewGuid().ToString("N").Substring(0, 20);
+
+                List<int> replacedImages = new List<int>();
+
+                // a new picture is stored with its text; a saved picture that is kept only gets its text updated
+                bool signatureOK = hasSignature
+                    ? StoreUserSignature(ctx, trx, signatureRow ?? new MUserSignature(ctx, 0, trx), signaturePng,
+                        MUserSignature.SIGNATURETYPE_Signature, userID, fullName, email, group, replacedImages)
+                    : (signatureRow == null || SetUserSignatureText(trx, signatureRow, fullName));
+
+                bool initialsOK = signatureOK && (hasInitials
+                    ? StoreUserSignature(ctx, trx, initialsRow ?? new MUserSignature(ctx, 0, trx), initialsPng,
+                        MUserSignature.SIGNATURETYPE_Initials, userID, initials, email, group, replacedImages)
+                    : (initialsRow == null || SetUserSignatureText(trx, initialsRow, initials)));
+
+                if (!signatureOK || !initialsOK)
+                {
+                    trx.Rollback();
+                    return "ERROR";
+                }
+
+                // the replaced pictures belonged to these rows alone - remove them with the commit
+                foreach (int imageID in replacedImages)
+                {
+                    DeleteSignatureImage(ctx, trx, imageID);
+                }
+
+                trx.Commit();
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                VAdvantage.Logging.VLogger.Get().Severe("ErrorToSaveUserSignature=>" + ex.Message);
+                trx.Rollback();
+                return "ERROR";
+            }
+            finally
+            {
+                trx.Close();
+            }
+        }
+
+        /// <summary>
+        /// Remove the logged in user's signature and initials together: both rows and both images, in one
+        /// transaction, so either everything goes or nothing does. Only the rows of the logged in user are touched.
+        /// </summary>
+        /// <param name="ctx">Current context</param>
+        /// <returns>"OK", "NOTFOUND" (nothing was saved) or "ERROR"</returns>
+        public string DeleteUserSignatures(Ctx ctx)
+        {
+            Trx trx = Trx.GetTrx(Trx.CreateTrxName("VIS_DeleteUserSignature"));
+
+            try
+            {
+                DataSet ds = DB.ExecuteDataset(@"SELECT AD_UserSignature_ID, SignatureImage FROM AD_UserSignature
+                    WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID() + " AND AD_User_ID=" + ctx.GetAD_User_ID() + @"
+                    AND SignatureType IN ('" + MUserSignature.SIGNATURETYPE_Signature + "','" + MUserSignature.SIGNATURETYPE_Initials + "')", (SqlParameter[])null, trx);
+
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
+                    trx.Rollback();
+                    return "NOTFOUND";
+                }
+
+                List<int> imageIDs = new List<int>();
+
+                // the rows first - they point at the images
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    imageIDs.Add(Util.GetValueOfInt(ds.Tables[0].Rows[i]["SignatureImage"]));
+
+                    MUserSignature row = new MUserSignature(ctx, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_UserSignature_ID"]), trx);
+
+                    if (!row.Delete(true, trx))
+                    {
+                        trx.Rollback();
+                        return "ERROR";
+                    }
+                }
+
+                for (int i = 0; i < imageIDs.Count; i++)
+                {
+                    DeleteSignatureImage(ctx, trx, imageIDs[i]);
+                }
+
+                trx.Commit();
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                VAdvantage.Logging.VLogger.Get().Severe("ErrorToDeleteUserSignatures=>" + ex.Message);
+                trx.Rollback();
+                return "ERROR";
+            }
+            finally
+            {
+                trx.Close();
+            }
+        }
+
+        /// <summary>The user's current row of one type (newest first), or null when there is none.</summary>
+        private MUserSignature GetUserSignatureRow(Ctx ctx, Trx trx, int userID, string signatureType)
+        {
+            DataSet ds = DB.ExecuteDataset(@"SELECT AD_UserSignature_ID FROM AD_UserSignature
+                WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID() + " AND AD_User_ID=" + userID + @"
+                AND SignatureType='" + signatureType + @"'
+                ORDER BY Created DESC, AD_UserSignature_ID DESC", (SqlParameter[])null, trx);
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                return new MUserSignature(ctx, Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_UserSignature_ID"]), trx);
+            }
+
+            return null;
+        }
+
+        /// <summary>Change the text kept on a saved row (the full name of a signature, the initials of initials). Nothing is written when it is unchanged.</summary>
+        private bool SetUserSignatureText(Trx trx, MUserSignature row, string text)
+        {
+            if (string.Equals(row.GetFullName(), text, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            row.SetFullName(text);
+            return row.Save(trx);
+        }
+
+        /// <summary>Store a new picture, and the text that goes with it, on a signature row (new or existing). The picture it replaces is queued for removal.</summary>
+        private bool StoreUserSignature(Ctx ctx, Trx trx, MUserSignature row, byte[] png, string signatureType, int userID,
+            string text, string email, string group, List<int> replacedImages)
+        {
+            int oldImageID = row.Get_ID() > 0 ? row.GetSignatureImage() : 0;
+
+            int imageID = SaveSignatureImage(ctx, trx, png, signatureType + "_" + userID + "_" + DateTime.UtcNow.Ticks);
+
+            if (imageID <= 0)
+            {
+                return false;
+            }
+
+            row.SetAD_User_ID(userID);
+            row.SetEmail(email);
+            row.SetFullName(text);
+            row.SetSignatureType(signatureType);
+            row.SetSignatureImage(imageID);
+            row.SetSignatureGroup(group);
+            row.SetIsDefault(true);
+            if (!row.Save(trx))
+            {
+                return false;
+            }
+
+            if (oldImageID > 0)
+            {
+                replacedImages.Add(oldImageID);
+            }
+
+            return true;
+        }
+
+        /// <summary>Save PNG bytes as a new AD_Image, the same way DMS saves its signature images.</summary>
+        private int SaveSignatureImage(Ctx ctx, Trx trx, byte[] png, string imageName)
+        {
+            MImage img = new MImage(ctx, 0, trx);
+            img.ByteArray = png;
+            img.ImageFormat = ".png";
+            img.SetBinaryData(png);
+            img.SetName(imageName);
+            img.SetImageURL(string.Empty);
+
+            if (!img.Save(trx))
+            {
+                return 0;
+            }
+
+            return img.GetAD_Image_ID();
+        }
+
+        /// <summary>Remove a picture that belonged to a signature row. A leftover picture is not worth failing the save over.</summary>
+        private void DeleteSignatureImage(Ctx ctx, Trx trx, int imageID)
+        {
+            if (imageID <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                new MImage(ctx, imageID, trx).Delete(true, trx);
+            }
+            catch (Exception ex)
+            {
+                VAdvantage.Logging.VLogger.Get().Warning("UserSignature image " + imageID + " could not be removed=>" + ex.Message);
+            }
+        }
+
+        /// <summary>The stored picture as a data URL (all pictures are saved as PNG), or empty when it has no data.</summary>
+        private string GetSignatureImageDataUrl(Ctx ctx, int imageID)
+        {
+            if (imageID <= 0)
+            {
+                return string.Empty;
+            }
+
+            byte[] bytes = new MImage(ctx, imageID, null).GetBinaryData();
+
+            return bytes == null || bytes.Length == 0 ? string.Empty : "data:image/png;base64," + Convert.ToBase64String(bytes);
+        }
+
+        /// <summary>
+        /// Check an uploaded file and turn it into PNG bytes. The file is decoded, so a file that only carries
+        /// an image extension is refused. GIF and BMP are accepted here and stored as PNG, because MImage
+        /// itself only takes png / jpg / ico / webp / svg.
+        /// </summary>
+        /// <returns>null when the file is fine, otherwise TOOLARGE / BADTYPE / BADSIZE</returns>
+        private string ConvertToPng(HttpPostedFileBase file, out byte[] png)
+        {
+            png = null;
+
+            if (file.ContentLength > MaxSignatureFileSize)
+            {
+                return "TOOLARGE";
+            }
+
+            if (Array.IndexOf(SignatureFileExtensions, Path.GetExtension(file.FileName ?? string.Empty).ToLowerInvariant()) < 0)
+            {
+                return "BADTYPE";
+            }
+
+            try
+            {
+                using (MemoryStream input = new MemoryStream())
+                {
+                    file.InputStream.CopyTo(input);
+
+                    if (input.Length > MaxSignatureFileSize)
+                    {
+                        return "TOOLARGE";
+                    }
+
+                    input.Position = 0;
+
+                    using (System.Drawing.Image image = System.Drawing.Image.FromStream(input, false, true))
+                    {
+                        Guid format = image.RawFormat.Guid;
+
+                        if (format != System.Drawing.Imaging.ImageFormat.Png.Guid && format != System.Drawing.Imaging.ImageFormat.Jpeg.Guid
+                            && format != System.Drawing.Imaging.ImageFormat.Gif.Guid && format != System.Drawing.Imaging.ImageFormat.Bmp.Guid)
+                        {
+                            return "BADTYPE";
+                        }
+
+                        if (image.Width > MaxSignatureImageSide || image.Height > MaxSignatureImageSide)
+                        {
+                            return "BADSIZE";
+                        }
+
+                        // a copy of the first frame, so an animated GIF becomes a still picture
+                        using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(image))
+                        using (MemoryStream output = new MemoryStream())
+                        {
+                            bitmap.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+                            png = output.ToArray();
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                // not an image GDI+ can read
+                return "BADTYPE";
+            }
+        }
+
+        #endregion
+
+    }
+
+    /// <summary>One saved picture of the My Sign tab</summary>
+    public class UserSignatureItem
+    {
+        public int ID { get; set; }
+        /// <summary>The picture as a data URL</summary>
+        public string Image { get; set; }
+    }
+
+    /// <summary>What the My Sign tab shows: the name and initials with the saved signature / initials</summary>
+    public class UserSignatureData
+    {
+        /// <summary>Name saved with the signature, or the user's own name until one is saved</summary>
+        public string FullName { get; set; }
+        /// <summary>Initials saved with the initials image; null until one is saved</summary>
+        public string InitialsText { get; set; }
+        public UserSignatureItem Signature { get; set; }
+        public UserSignatureItem Initials { get; set; }
     }
 
     public class SecretKeyModel

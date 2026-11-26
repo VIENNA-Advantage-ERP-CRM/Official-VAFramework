@@ -149,7 +149,8 @@ div.VIS_Pref_slide-show.pp {
 .VIS_Pref_content-right-4,
 .VIS_Pref_content-right-5,
 .VIS_Pref_content-right-6,
-.VIS_Pref_content-right-7 {
+.VIS_Pref_content-right-7,
+.VIS_Pref_content-right-8 {
     float: left;
     width: 80%;
     padding-left: 20px;
@@ -1355,3 +1356,330 @@ html[dir="rtl"] .input-group-addon {
 
     
 }
+/* ===== My Sign tab - upload signature and initials ===== */
+/* While the tab is shown its pane fills the dialog, so the image boxes take whatever height is left
+   and the tab fits without a scrollbar. :not() keeps the tab switcher's display none/block toggle working.
+   A scrollbar only appears when the dialog is too small for the minimum sizes below. */
+.VIS_Pref_content-right-8:not([style*="display: none"]) {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+    .VIS_Pref_content-right-8 > .VIS_Pref_change-pass {
+        flex: 0 0 auto;
+    }
+
+.VIS_MySign {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    padding: 8px 12px 0;
+}
+
+/* the name row and the box row share one column layout, so each field is exactly as wide as the box under it */
+.VIS_MySign_names,
+.VIS_MySign_boxes {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 16px;
+}
+
+.VIS_MySign_names {
+    flex: 0 0 auto;
+    margin-bottom: 22px;            /* room for the error line under a box */
+}
+
+/* Full Name / Initials use the framework textbox (vis-input-wrap, floating label). The rules here only
+   set what the framework leaves to its parent forms: the border, the label start position and the error. */
+.VIS_MySign_field {
+    position: relative;
+    min-width: 0;
+}
+
+    .VIS_MySign_field .vis-input-wrap {
+        margin-bottom: 0;
+    }
+
+    .VIS_MySign_field .vis-input-wrap input {
+        padding: 5px 10px;
+        border: 1px solid rgba(var(--v-c-on-secondary), .2);
+        border-radius: .25rem;
+        background-color: transparent;
+        color: rgba(var(--v-c-on-secondary), 1);
+        box-sizing: border-box;
+    }
+
+        .VIS_MySign_field .vis-input-wrap input:focus {
+            border-color: rgba(var(--v-c-primary), 1);
+        }
+
+        .VIS_MySign_field .vis-input-wrap input:not(:focus):placeholder-shown ~ label {
+            left: 10px;
+        }
+
+        /* fixed once the signature / initials are saved */
+        .VIS_MySign_field .vis-input-wrap input[readonly] {
+            background-color: rgba(var(--v-c-on-secondary), .05);
+            cursor: default;
+        }
+
+            .VIS_MySign_field .vis-input-wrap input[readonly]:focus {
+                border-color: rgba(var(--v-c-on-secondary), .2);
+            }
+
+    .VIS_MySign_field .vis-input-wrap label sup {
+        margin-left: 2px;
+        color: #e53935;
+    }
+
+.VIS_MySign_fielderr {
+    position: absolute;
+    top: 100%;
+    left: 2px;
+    right: 0;
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #e53935;
+}
+
+    .VIS_MySign_invalid .vis-input-wrap input,
+    .VIS_MySign_invalid .vis-input-wrap input:focus {
+        border-color: #e53935;
+    }
+
+    .VIS_MySign_invalid .vis-input-wrap label,
+    .VIS_MySign_invalid .vis-input-wrap input:focus ~ label {
+        color: #e53935;
+    }
+
+.VIS_MySign_boxes {
+    flex: 1 1 auto;
+    grid-template-rows: minmax(0, 1fr);
+    min-height: 190px;
+}
+
+.VIS_MySign_box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 12px 16px;
+    border: 1px dashed rgba(var(--v-c-on-secondary), .3);
+    border-radius: .25rem;
+    background: rgba(var(--v-c-on-secondary), .04);
+    box-sizing: border-box;
+}
+
+    .VIS_MySign_box.VIS_MySign_dragover {
+        border-color: rgba(var(--v-c-primary), 1);
+        background: rgba(var(--v-c-primary), .08);
+    }
+
+    /* a picture that is still missing is marked by a red dashed border, one that is there has the normal dashed border */
+    .VIS_MySign_box.VIS_MySign_missing {
+        border-color: rgba(229, 57, 53, .6);
+    }
+
+/* title (with the red star) on the left, the green tick on the right */
+.VIS_MySign_boxHead {
+    display: flex;
+    min-height: 22px;               /* same height with or without the tick, so nothing moves when it appears */
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.VIS_MySign_boxTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(var(--v-c-on-secondary), 1);
+}
+
+    .VIS_MySign_boxTitle sup {
+        margin-left: 2px;
+        color: #e53935;
+    }
+
+/* the green tick: only there once the picture is */
+.VIS_MySign_status {
+    display: none;
+    line-height: 0;
+}
+
+.VIS_MySign_box:not(.VIS_MySign_missing) .VIS_MySign_status {
+    display: inline-block;
+}
+
+/* the rule that both pictures are mandatory - quiet once both are there, red while one is missing */
+.VIS_MySign_required {
+    flex: 0 0 auto;
+    margin-top: 8px;
+    font-size: 12px;
+    color: rgba(var(--v-c-on-secondary), .7);
+}
+
+    .VIS_MySign_required sup {
+        margin-right: 2px;
+        color: #e53935;
+    }
+
+    .VIS_MySign_required.VIS_MySign_incomplete {
+        font-weight: 600;
+        color: #e53935;
+    }
+
+/* the picture area takes the height the buttons leave over; the picture is centred in it and scaled down to fit */
+.VIS_MySign_drop {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 60px;
+}
+
+.VIS_MySign_empty {
+    color: rgba(var(--v-c-on-secondary), .45);
+}
+
+/* white behind the picture so dark ink stays readable on a dark theme */
+.VIS_MySign_img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    padding: 4px;
+    box-sizing: border-box;
+    object-fit: contain;
+    background: #fff;
+    border-radius: .25rem;
+}
+
+.VIS_MySign_boxActions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.VIS_MySign_upload,
+.VIS_MySign_cancel {
+    padding: 8px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    cursor: pointer;
+    border: 1px solid rgba(var(--v-c-on-secondary), .3);
+    border-radius: .25rem;
+    background: transparent;
+    color: rgba(var(--v-c-on-secondary), 1);
+}
+
+    .VIS_MySign_upload:hover,
+    .VIS_MySign_cancel:hover:not(:disabled) {
+        border-color: rgba(var(--v-c-primary), 1);
+        color: rgba(var(--v-c-primary), 1);
+    }
+
+.VIS_MySign_formats {
+    flex: 0 0 auto;
+    margin-top: 8px;
+    font-size: 12px;
+    color: rgba(var(--v-c-on-secondary), .7);
+}
+
+.VIS_MySign_consent {
+    flex: 0 0 auto;
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(var(--v-c-on-secondary), .8);
+}
+
+/* bottom row: Remove at the far left, status text in the middle, Cancel then Save changes at the right edge */
+.VIS_MySign_actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: stretch;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.VIS_MySign_message {
+    flex: 1 1 auto;
+    align-self: center;
+    min-width: 0;
+    margin: 0 6px;
+    font-size: 13px;
+}
+
+    .VIS_MySign_message.VIS_MySign_error {
+        color: #c0392b;
+    }
+
+    .VIS_MySign_message.VIS_MySign_ok {
+        color: #2e7d32;
+    }
+
+.VIS_MySign_save {
+    padding: 8px 24px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 0;
+    border-radius: .25rem;
+    background: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
+}
+
+.VIS_MySign_removeAll {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid rgba(229, 57, 53, .5);
+    border-radius: .25rem;
+    background: transparent;
+    color: #e53935;
+}
+
+    .VIS_MySign_removeAll:hover:not(:disabled) {
+        border-color: #e53935;
+        background: rgba(229, 57, 53, .08);
+    }
+
+    .VIS_MySign_removeAll:disabled {
+        opacity: .5;
+        cursor: default;
+    }
+
+.VIS_MySign_save,
+.VIS_MySign_cancel {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+    .VIS_MySign_save:disabled,
+    .VIS_MySign_cancel:disabled {
+        opacity: .5;
+        cursor: default;
+    }
