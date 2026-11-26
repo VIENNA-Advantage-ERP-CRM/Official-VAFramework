@@ -3741,9 +3741,10 @@ console.log("AutoComplete not available", ex);
 }
 });
 }*/
-        // suggests addresses from the table this form was opened from in the To / Cc / Bcc boxes; ';' separates several addresses
+        // suggests the addresses of the client's users (by e-mail, first, last or full name) in the To / Cc / Bcc boxes;
+        // ';' separates several addresses. Also without a record (new mail from the Inbox): the search does not need the table.
         function initAddressAutoComplete() {
-            if (!isEmail || currentTable_ID <= 0 || !$.fn.autocomplete) {
+            if (!isEmail || !$.fn.autocomplete) {
                 return;
             }
 
@@ -3775,7 +3776,7 @@ console.log("AutoComplete not available", ex);
                     searchEmails(term, t.tableName, t.tableID, [], {
                         success: function (list) {
                             response($.grep(list, function (e) {
-                                return entered.indexOf(String(e).toLowerCase()) == -1;
+                                return entered.indexOf(suggestionAddress(e).toLowerCase()) == -1;
                             }));
                         }
                     });
@@ -3890,7 +3891,7 @@ console.log("AutoComplete not available", ex);
                     var merged = [];
 
                     local.concat(remote).forEach(function (e) {
-                        var key = String(e).toLowerCase();
+                        var key = suggestionAddress(e).toLowerCase();
                         if (!seen[key]) {
                             seen[key] = true;
                             merged.push(e);
@@ -3903,6 +3904,10 @@ console.log("AutoComplete not available", ex);
                     options.success(local);
                 }
             });
+        }
+        // the address of a suggestion: { label: "Full Name <address>", value: address } from the server, or a plain address
+        function suggestionAddress(e) {
+            return String(e && e.value != null ? e.value : e);
         }
         // returns window id / name of the window the mail form was opened from
         function getTableInfo() {
