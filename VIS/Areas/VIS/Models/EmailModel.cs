@@ -1316,20 +1316,27 @@ namespace VIS.Models
             return Util.GetValueOfString(res);
         }
 
-        public List<string> SearchEmails(string term, string tableName, int tableID, Ctx ctx)
+        /// <summary>
+        /// Addresses for the To / Cc / Bcc boxes: users of the client whose e-mail, first name (Name), last name or full name
+        /// contains the typed text. Each suggestion shows "Full Name &lt;address&gt;" and inserts the address.
+        /// </summary>
+        public List<EmailSuggestion> SearchEmails(string term, string tableName, int tableID, Ctx ctx)
         {
-            var list = new List<string>();
+            var list = new List<EmailSuggestion>();
             // an empty term (To box right after "; ") returns the first addresses
             if (term == null)
                 term = "";
 
-            string sql = @"SELECT DISTINCT Email FROM AD_User
-                           WHERE Email IS NOT NULL AND UPPER(Email) LIKE UPPER(@term)
-                             AND IsActive = 'Y' AND AD_Client_ID = @clientId
-                           ORDER BY Email";
+            string sql = @"SELECT u.Email, TRIM(COALESCE(u.Name, N'') || ' ' || COALESCE(u.LastName, N'')) AS FullName
+                           FROM AD_User u
+                           WHERE u.Email IS NOT NULL AND u.IsActive = 'Y' AND u.AD_Client_ID = @clientId
+                             AND (UPPER(u.Email) LIKE @term OR UPPER(u.Name) LIKE @term OR UPPER(u.LastName) LIKE @term
+                                  OR UPPER(TRIM(COALESCE(u.Name, N'') || ' ' || COALESCE(u.LastName, N''))) LIKE @term)";
+            sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "u", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO)
+                + " ORDER BY u.Email, u.Name";
             var param = new SqlParameter[]
             {
-                new SqlParameter("@term", "%" + term.Trim() + "%"),
+                new SqlParameter("@term", "%" + term.Trim().ToUpper() + "%"),
                 new SqlParameter("@clientId", ctx.GetAD_Client_ID())
             };
 
@@ -1337,17 +1344,32 @@ namespace VIS.Models
             if (ds == null || ds.Tables.Count == 0)
                 return list;
 
+            // one suggestion per address (an address can belong to a login user and a contact);
             // cap the suggestions so a large client does not send thousands of rows per keystroke
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
                 string email = Util.GetValueOfString(dr["Email"]).Trim();
-                if (email.Length > 0)
-                    list.Add(email);
+                if (email.Length == 0 || !seen.Add(email))
+                    continue;
+                string fullName = Util.GetValueOfString(dr["FullName"]).Trim();
+                list.Add(new EmailSuggestion
+                {
+                    label = fullName.Length > 0 ? fullName + " <" + email + ">" : email,
+                    value = email
+                });
                 if (list.Count >= 100)
                     break;
             }
             return list;
         }
+    }
+
+    /// <summary>A To / Cc / Bcc suggestion: label shown in the list, value inserted in the box.</summary>
+    public class EmailSuggestion
+    {
+        public string label { get; set; }
+        public string value { get; set; }
     }
 
     public class NewMailMessage
