@@ -27,7 +27,7 @@ namespace VAModelAD.ProcessAD
     /// <summary>
     /// Email send to user for reset password.
     /// </summary>
-    public class EmailSendLink: SvrProcess
+    public class EmailSendLink : SvrProcess
     {
         private Ctx _ctx = null;
         string url = null;
@@ -39,7 +39,7 @@ namespace VAModelAD.ProcessAD
         protected override void Prepare()
         {
             _ctx = GetCtx();
-            
+
         }
 
         /// <summary>
@@ -92,93 +92,91 @@ namespace VAModelAD.ProcessAD
                 }
                 if (count > 0)
                 {
-                    StringBuilder str = new StringBuilder();
-                    DataSet ds = null;
-                    str.Clear();
-                    str.Append("SELECT Email FROM AD_User WHERE ISACTIVE ='Y' AND AD_USER_ID=" + GetRecord_ID());
-                    ds = DB.ExecuteDataset(str.ToString(), null, Get_Trx());
-                    if (ds != null && ds.Tables[0].Rows.Count > 0)
+                    MUser usr = new MUser(GetCtx(), GetRecord_ID(), Get_TrxName());
+                    string Email = usr.GetEMail();
+                    if (!string.IsNullOrEmpty(Email))
                     {
-                        string Email = ds.Tables[0].Rows[0]["Email"].ToString();
-                        if (!string.IsNullOrEmpty(Email))
+                        string emailCount = "SELECT COUNT(AD_User_ID) FROM AD_User WHERE LOWER(Email) = LOWER('" + Email + "') AND IsActive = 'Y' AND IsLoginUser = 'Y' AND AD_Client_ID = " + GetAD_Client_ID() + " AND AD_User_ID != " + usr.GetAD_User_ID();
+                        int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                        if (mailExist > 0)
                         {
-                            try
+                            return Msg.GetMsg(GetCtx(), "EmailShouldBeUnique");
+                        }
+                        try
+                        {
+                            url = _ctx.GetApplicationUrl();
+                            url = url.Substring(0, url.LastIndexOf("/"));
+                            url = url + "/Areas/VIS/WebPages/CreatePassword.aspx";
+                            mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE ISACTIVE ='Y' AND MailTemplateKey='OUC' AND AD_CLIENT_ID=" + _ctx.GetAD_Client_ID()));
+                            if (mailTemplate_ID == 0)
                             {
-                                url = _ctx.GetApplicationUrl();
-                                url = url.Substring(0, url.LastIndexOf("/"));
-                                url = url + "/Areas/VIS/WebPages/CreatePassword.aspx";
-                                mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE ISACTIVE ='Y' AND MailTemplateKey='OUC' AND AD_CLIENT_ID=" + _ctx.GetAD_Client_ID()));
+                                mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE ISACTIVE ='Y' AND MailTemplateKey='OUC' AND AD_CLIENT_ID=0"));
                                 if (mailTemplate_ID == 0)
                                 {
-                                    mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE ISACTIVE ='Y' AND MailTemplateKey='OUC' AND AD_CLIENT_ID=0"));
-                                    if (mailTemplate_ID == 0)
-                                    {
-                                        return Msg.GetMsg(GetCtx(), "VIS_TemplateNotFound");
-                                    }
+                                    return Msg.GetMsg(GetCtx(), "VIS_TemplateNotFound");
                                 }
-                                GetPO();
-                                MMailText mtext = new MMailText(_ctx, mailTemplate_ID, Get_TrxName());
-                                mtext.SetPO(_po, true);
-                                EMail objMail = new EMail(GetCtx(), "", "", "", "", "", "", true, false);
-                                string queryString = "?ID=" + SecureEngine.Encrypt(GetRecord_ID().ToString()) + "&lang=" + _ctx.GetAD_Language() + "&path=" + _ctx.GetApplicationUrl();
-                                objMail.SetMessageHTML(mtext.GetMailText()
-                                                      .Replace("@ClickHereLink@", "<a href='" + url + queryString + "'>Click Here</a>"));
-                                objMail.SetSubject(mtext.GetMailHeader());
-                                objMail.AddTo(Email, "");
-                                string res1 = objMail.Send();
-                                StringBuilder res = new StringBuilder();
-                                if (res1 != "OK")           // if mail not sent....
+                            }
+                            GetPO();
+                            MMailText mtext = new MMailText(_ctx, mailTemplate_ID, Get_TrxName());
+                            mtext.SetPO(_po, true);
+                            EMail objMail = new EMail(GetCtx(), "", "", "", "", "", "", true, false);
+                            string queryString = "?ID=" + SecureEngine.Encrypt(GetRecord_ID().ToString()) + "&lang=" + _ctx.GetAD_Language() + "&path=" + _ctx.GetApplicationUrl();
+                            objMail.SetMessageHTML(mtext.GetMailText()
+                                                  .Replace("@ClickHereLink@", "<a href='" + url + queryString + "'>Click Here</a>"));
+                            objMail.SetSubject(mtext.GetMailHeader());
+                            objMail.AddTo(Email, "");
+                            string res1 = objMail.Send();
+                            StringBuilder res = new StringBuilder();
+                            if (res1 != "OK")           // if mail not sent....
+                            {
+                                if (res1 == "AuthenticationFailed.")
                                 {
-                                    if (res1 == "AuthenticationFailed.")
-                                    {
-                                        res.Append(Msg.GetMsg(GetCtx(), "AuthenticationFailed"));
-                                        log.Fine(res.ToString());
-                                    }
-                                    else if (res1 == "ConfigurationIncompleteOrNotFound")
-                                    {
-                                        res.Append(Msg.GetMsg(GetCtx(), "ConfigurationIncompleteOrNotFound"));
-                                        log.Fine(res.ToString());
-                                    }
-                                    else
-                                    {
-                                        res.Append(res1);
-                                        log.Fine(res.ToString());
-                                    }
-                                    return res.ToString();
+                                    res.Append(Msg.GetMsg(GetCtx(), "AuthenticationFailed"));
+                                    log.Fine(res.ToString());
+                                }
+                                else if (res1 == "ConfigurationIncompleteOrNotFound")
+                                {
+                                    res.Append(Msg.GetMsg(GetCtx(), "ConfigurationIncompleteOrNotFound"));
+                                    log.Fine(res.ToString());
                                 }
                                 else
                                 {
-                                    if (!res.ToString().Contains("MailSent"))
+                                    res.Append(res1);
+                                    log.Fine(res.ToString());
+                                }
+                                return res.ToString();
+                            }
+                            else
+                            {
+                                if (!res.ToString().Contains("MailSent"))
+                                {
+                                    String Sql = "UPDATE AD_User SET IsLoginUser='Y'  WHERE AD_User_ID=" + GetRecord_ID();
+                                    DB.ExecuteQuery(Sql);
+                                    res.Append("MailSent");
+                                    if (totalRole - count > 0)
                                     {
-                                        String Sql = "UPDATE AD_User SET IsLoginUser='Y'  WHERE AD_User_ID=" + GetRecord_ID();
-                                        DB.ExecuteQuery(Sql);
-                                        res.Append("MailSent");
-                                        if (totalRole - count > 0)
-                                        {
-                                            return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + " " + Msg.GetMsg(GetCtx(), "VIS_But") + " " + Util.GetValueOfString(totalRole - count) + " " + Msg.GetMsg(GetCtx(), "Role") + ": \"" + message + "\" " + Msg.GetMsg(GetCtx(), "VIS_OutOfAssign") + " " + Util.GetValueOfString(totalRole) + " " +
-                                               Msg.GetMsg(GetCtx(), "VIS_NotHaveOrgAccess");
-                                        }
-                                        else
-                                        {
-                                            return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ".";
-                                        }
+                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + " " + Msg.GetMsg(GetCtx(), "VIS_But") + " " + Util.GetValueOfString(totalRole - count) + " " + Msg.GetMsg(GetCtx(), "Role") + ": \"" + message + "\" " + Msg.GetMsg(GetCtx(), "VIS_OutOfAssign") + " " + Util.GetValueOfString(totalRole) + " " +
+                                           Msg.GetMsg(GetCtx(), "VIS_NotHaveOrgAccess");
+                                    }
+                                    else
+                                    {
+                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ".";
                                     }
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                VLogger.Get().SaveError("EmailSendLinkProcess ", ex.Message);
-                                return ex.Message;
-
-                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            log.Fine(Msg.GetMsg(GetCtx(), "NoEmailAddressFound"));
-                            return Msg.GetMsg(GetCtx(), "NoEmailAddressFound");
+                            VLogger.Get().SaveError("EmailSendLinkProcess ", ex.Message);
+                            return ex.Message;
+
                         }
                     }
-
+                    else
+                    {
+                        log.Fine(Msg.GetMsg(GetCtx(), "NoEmailAddressFound"));
+                        return Msg.GetMsg(GetCtx(), "NoEmailAddressFound");
+                    }
                 }
                 else
                 {
