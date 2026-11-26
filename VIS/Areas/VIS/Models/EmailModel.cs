@@ -1330,14 +1330,19 @@ namespace VIS.Models
             string sql = @"SELECT u.Email, TRIM(COALESCE(u.Name, N'') || ' ' || COALESCE(u.LastName, N'')) AS FullName
                            FROM AD_User u
                            WHERE u.Email IS NOT NULL AND u.IsActive = 'Y' AND u.AD_Client_ID = @clientId
-                             AND (UPPER(u.Email) LIKE @term OR UPPER(u.Name) LIKE @term OR UPPER(u.LastName) LIKE @term
-                                  OR UPPER(TRIM(COALESCE(u.Name, N'') || ' ' || COALESCE(u.LastName, N''))) LIKE @term)";
+                             AND (UPPER(u.Email) LIKE @term1 OR UPPER(u.Name) LIKE @term2 OR UPPER(u.LastName) LIKE @term3
+                                  OR UPPER(TRIM(COALESCE(u.Name, N'') || ' ' || COALESCE(u.LastName, N''))) LIKE @term4)";
             sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "u", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO)
                 + " ORDER BY u.Email, u.Name";
+            // Oracle binds by position: one name per placeholder, in the order they appear in the SQL
+            string like = "%" + term.Trim().ToUpper() + "%";
             var param = new SqlParameter[]
             {
-                new SqlParameter("@term", "%" + term.Trim().ToUpper() + "%"),
-                new SqlParameter("@clientId", ctx.GetAD_Client_ID())
+                new SqlParameter("@clientId", ctx.GetAD_Client_ID()),
+                new SqlParameter("@term1", like),
+                new SqlParameter("@term2", like),
+                new SqlParameter("@term3", like),
+                new SqlParameter("@term4", like)
             };
 
             DataSet ds = DB.ExecuteDataset(sql, param);
