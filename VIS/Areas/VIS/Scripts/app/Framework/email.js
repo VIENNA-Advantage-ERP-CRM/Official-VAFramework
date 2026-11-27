@@ -1531,7 +1531,8 @@
                             else {
                                 $root.find(".vis-Email-textarea-div").height($root.find('.vis-Email-ContentArea').height() - ($root.find('.vis-form-horizontal').height() + 50));
                             }
-
+                            keepFooterInView();
+                            window.setTimeout(keepFooterInView, 150);   // once more after the icons have loaded and the layout has settled
 
                             if (lstLatestFiles && lstLatestFiles.length > 0) {
 
@@ -1593,6 +1594,7 @@
             else {
                 divReadOnly.hide();
                 divProgress.hide();
+                keepFooterInView();
             }
         };
 
@@ -1730,6 +1732,7 @@
                             $root.find(".vis-Email-textarea-div").height($('.vis-Email-ContentArea').height() - ($('.vis-form-horizontal').height() + 50));
                         }
                     }
+                    keepFooterInView();
                     currentFile--;
                 });
 
@@ -1820,6 +1823,22 @@
             }
             $root.find('.vis-attach-content-wrap').height(wrapHeight);
             $root.find('.vis-email-attachmentContainer').height(containerHeight);
+        };
+
+        // The editor's height comes from fixed offsets. When the attachment strip grows to its two-row size those can leave
+        // the editor a few pixels too tall, which pushes the "Dynamic Content / Send Print Format" footer below the form
+        // (the form then scrolls). When the footer is not fully inside the content area, give the height back to the editor.
+        function keepFooterInView() {
+            var $footer = $root.find('.vis-Email-leftFooter');
+            var contentArea = $root.find('.vis-Email-ContentArea')[0];
+            if (!contentArea || $footer.length == 0 || !$footer.is(':visible')) {
+                return;
+            }
+            var spare = contentArea.getBoundingClientRect().bottom - $footer[0].getBoundingClientRect().bottom;
+            if (spare < 4) {
+                var $editorDiv = $root.find('.vis-Email-textarea-div');
+                $editorDiv.height(Math.max($editorDiv.height() - Math.ceil(12 - spare), 100));
+            }
         };
 
         var getImageUrl = function (fileName) {
